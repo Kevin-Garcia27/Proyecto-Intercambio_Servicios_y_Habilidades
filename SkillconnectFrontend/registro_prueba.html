@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkillConnect - Registro de Usuario</title>
+    <style>
+        /* CSS para estilizar el formulario */
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f0f4f8;
+            /* Fondo de la página */
+            background-image: linear-gradient(135deg, #6a85b6 0%, #bac8e0 100%);
+            overflow: hidden; /* Evita barras de desplazamiento */
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            width: 350px;
+            text-align: center;
+            z-index: 10;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 25px;
+        }
+        .logo-text {
+            font-size: 3em;
+            font-weight: bold;
+            color: #4a5a7b;
+            margin-bottom: 40px;
+            letter-spacing: 2px;
+            /* Efecto llamativo de sombra de texto (neón/brillo) */
+            text-shadow: 0 0 5px #bac8e0, 0 0 10px #bac8e0, 0 0 15px #6a85b6;
+        }
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #555;
+        }
+        input[type="email"],
+        input[type="password"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+        input[type="email"]:focus,
+        input[type="password"]:focus {
+            border-color: #6a85b6;
+            outline: none;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #6a85b6;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.1s;
+        }
+        button:hover {
+            background-color: #4a5a7b;
+            transform: translateY(-2px);
+        }
+        #mensaje {
+            margin-top: 20px;
+            font-weight: bold;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .success {
+            color: #155724;
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+        }
+        .error {
+            color: #721c24;
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo-text">SkillConnect</div>
+        <h1>Crear Cuenta</h1>
+        <form id="registroForm">
+            <div class="form-group">
+                <label for="correo">Correo Electrónico:</label>
+                <input type="email" id="correo" name="correo" required>
+            </div>
+            <div class="form-group">
+                <label for="contrasena">Contraseña:</label>
+                <input type="password" id="contrasena" name="contrasena" required>
+            </div>
+            <button type="submit">Registrarse</button>
+        </form>
+        <div id="mensaje"></div>
+    </div>
+
+    <script>
+        document.getElementById('registroForm').addEventListener('submit', async function(event) {
+            event.preventDefault(); // Evita el envío tradicional del formulario
+            
+            const correo = document.getElementById('correo').value;
+            const contrasena = document.getElementById('contrasena').value;
+            const mensajeDiv = document.getElementById('mensaje');
+
+            // Limpiar mensajes anteriores
+            mensajeDiv.textContent = '';
+            mensajeDiv.className = '';
+
+            try {
+                // ** IMPORTANTE: Aquí está la URL de tu backend en localhost:3001 **
+                const url = 'http://localhost:3001/api/registro'; 
+                
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ correo, contrasena })
+                });
+
+                const data = await response.json();
+
+                if (response.status === 201) {
+                    // Éxito: Registro exitoso
+                    mensajeDiv.textContent = '✅ Registro Exitoso: ' + data.mensaje;
+                    mensajeDiv.classList.add('success');
+                    // Opcional: Limpiar el formulario después del éxito
+                    document.getElementById('registroForm').reset();
+                    
+                } else if (response.status === 409) {
+                    // Error: El usuario ya existe (Conflicto)
+                    mensajeDiv.textContent = '❌ Error: Este correo ya está registrado.';
+                    mensajeDiv.classList.add('error');
+
+                } else {
+                    // Otros errores del servidor (ej. 500)
+                    mensajeDiv.textContent = '❌ Error del servidor: ' + data.mensaje || 'Intente de nuevo.';
+                    mensajeDiv.classList.add('error');
+                }
+
+            } catch (error) {
+                // Error de red o CORS (si no configuraste el middleware cors en server.js)
+                console.error('Error al conectar con el backend:', error);
+                mensajeDiv.textContent = '⚠️ Error de conexión. Asegúrate que el Backend y el túnel SSH estén activos (y revisa la consola para errores CORS).';
+                mensajeDiv.classList.add('error');
+            }
+        });
+    </script>
+</body>
+</html>
