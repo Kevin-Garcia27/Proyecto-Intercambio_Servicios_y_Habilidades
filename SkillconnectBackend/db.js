@@ -22,11 +22,11 @@ const pool = mysql.createPool({
 pool.getConnection((err, connection) => {
     if (err) {
         // *** ESTA LÍNEA MOSTRARÁ EL ERROR REAL ***
-        console.error('❌ ERROR CRÍTICO DE CONEXIÓN A DB. Detalles del fallo:');
+        console.error('ERROR CRÍTICO DE CONEXIÓN A DB. Detalles del fallo:');
         console.error(err); 
         return;
     }
-    console.log('✅ Conexión exitosa a la base de datos SkillConnect2025 (vía túnel SSH).');
+    console.log('Conexión exitosa a la base de datos SkillConnect2025 (vía túnel SSH).');
     connection.release(); // Libera la conexión de vuelta al pool
 });
 

@@ -34,5 +34,5 @@ app.get('/', (req, res) => {
 app.listen(port, () => {
     // Asegúrate de que el db.js se importe y ejecute su conexión de prueba
     require('./db');
-    console.log(`🚀 Servidor escuchando en http://localhost:${port}`);
+    console.log(`Servidor escuchando en http://localhost:${port}`);
 });
