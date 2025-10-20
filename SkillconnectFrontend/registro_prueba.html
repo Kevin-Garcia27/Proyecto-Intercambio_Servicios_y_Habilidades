@@ -13,33 +13,48 @@
             align-items: center;
             min-height: 100vh;
             margin: 0;
-            background-color: #f0f4f8;
-            /* Fondo de la página */
-            background-image: linear-gradient(135deg, #6a85b6 0%, #bac8e0 100%);
+            
+            /* ****************************************************** */
+            /* AJUSTE CLAVE: IMAGEN DE FONDO */
+            background-image: url('trabajo.jpg'); 
+            background-size: cover; /* Cubre toda la pantalla */
+            background-position: center; /* Centra la imagen */
+            background-repeat: no-repeat;
+            background-attachment: fixed; /* Mantiene la imagen fija al desplazarse (opcional, pero se ve bien) */
+            /* ****************************************************** */
+            
             overflow: hidden; /* Evita barras de desplazamiento */
         }
         .container {
-            background-color: #ffffff;
+            background-color: rgba(255, 255, 255, 0.95); /* Blanco con 95% de opacidad para ver un poco el fondo */
             padding: 40px;
             border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4); /* Sombra más fuerte para contraste */
             width: 350px;
             text-align: center;
             z-index: 10;
         }
+        
+        /* Estilo para la imagen del Logo */
+        .logo-img {
+            /* Usamos tx.jpeg según tu última verificación de archivos */
+            width: 100%; 
+            max-width: 200px; /* Reducido un poco para que no domine tanto */
+            height: auto;
+            margin-bottom: 20px;
+        }
+        
+        /* Estilo del contenedor del logo/texto */
+        .logo-text {
+            margin-bottom: 0px; 
+        }
+        
         h1 {
             color: #333;
             margin-bottom: 25px;
+            font-size: 1.8em; 
         }
-        .logo-text {
-            font-size: 3em;
-            font-weight: bold;
-            color: #4a5a7b;
-            margin-bottom: 40px;
-            letter-spacing: 2px;
-            /* Efecto llamativo de sombra de texto (neón/brillo) */
-            text-shadow: 0 0 5px #bac8e0, 0 0 10px #bac8e0, 0 0 15px #6a85b6;
-        }
+        /* ... El resto de los estilos se mantienen sin cambios ... */
         .form-group {
             margin-bottom: 20px;
             text-align: left;
@@ -99,7 +114,14 @@
 </head>
 <body>
     <div class="container">
-        <div class="logo-text">SkillConnect</div>
+        <div class="logo-text">
+            <img 
+                src="tx.jpeg" 
+                alt="SkillConnect Logo" 
+                class="logo-img"
+            >
+        </div>
+        
         <h1>Crear Cuenta</h1>
         <form id="registroForm">
             <div class="form-group">
@@ -117,18 +139,16 @@
 
     <script>
         document.getElementById('registroForm').addEventListener('submit', async function(event) {
-            event.preventDefault(); // Evita el envío tradicional del formulario
+            event.preventDefault(); 
             
             const correo = document.getElementById('correo').value;
             const contrasena = document.getElementById('contrasena').value;
             const mensajeDiv = document.getElementById('mensaje');
 
-            // Limpiar mensajes anteriores
             mensajeDiv.textContent = '';
             mensajeDiv.className = '';
 
             try {
-                // ** IMPORTANTE: Aquí está la URL de tu backend en localhost:3001 **
                 const url = 'http://localhost:3001/api/registro'; 
                 
                 const response = await fetch(url, {
@@ -142,27 +162,22 @@
                 const data = await response.json();
 
                 if (response.status === 201) {
-                    // Éxito: Registro exitoso
                     mensajeDiv.textContent = '✅ Registro Exitoso: ' + data.mensaje;
                     mensajeDiv.classList.add('success');
-                    // Opcional: Limpiar el formulario después del éxito
                     document.getElementById('registroForm').reset();
                     
                 } else if (response.status === 409) {
-                    // Error: El usuario ya existe (Conflicto)
                     mensajeDiv.textContent = '❌ Error: Este correo ya está registrado.';
                     mensajeDiv.classList.add('error');
 
                 } else {
-                    // Otros errores del servidor (ej. 500)
                     mensajeDiv.textContent = '❌ Error del servidor: ' + data.mensaje || 'Intente de nuevo.';
                     mensajeDiv.classList.add('error');
                 }
 
             } catch (error) {
-                // Error de red o CORS (si no configuraste el middleware cors en server.js)
                 console.error('Error al conectar con el backend:', error);
-                mensajeDiv.textContent = '⚠️ Error de conexión. Asegúrate que el Backend y el túnel SSH estén activos (y revisa la consola para errores CORS).';
+                mensajeDiv.textContent = '⚠️ Error de conexión. Asegúrate que el Backend y el túnel SSH estén activos.';
                 mensajeDiv.classList.add('error');
             }
         });
