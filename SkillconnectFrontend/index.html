@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skill Connect - El Vínculo que Conecta Habilidades</title>
+    <style>
+        /* Estilos generales para el fondo y centrado */
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            /* Fondo de degradado (Azul/Gris) */
+            background-image: linear-gradient(135deg, #6a85b6 0%, #bac8e0 100%);
+            overflow: hidden;
+        }
+
+        /* Contenedor central de la Portada */
+        .portada-container {
+            text-align: center;
+            background-color: #ffffff; /* Fondo blanco para contraste */
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            max-width: 800px; /* Ancho máximo */
+            overflow: hidden; /* Asegura que la imagen no se salga del borde */
+            
+            /* ****************************************************** */
+            /* SOLUCIÓN AL BORDE: Un borde sólido azul marino sutil */
+            border: 5px solid #1a2a4b; /* Azul Marino Oscuro */
+            /* ****************************************************** */
+        }
+
+        /* Estilos para la imagen de portada */
+        .portada-img {
+            width: 100%; /* La imagen llenará el contenedor, pero el contenedor tiene un MAX-WIDTH */
+            height: auto;
+            display: block; /* Elimina espacio extra debajo de la imagen */
+            margin-bottom: 20px; /* Espacio antes del botón */
+        }
+
+        /* Contenedor del botón */
+        .boton-wrapper {
+            padding: 0 30px 30px 30px; /* Espacio lateral e inferior para el botón */
+        }
+
+        /* Estilos para el botón */
+        .registro-btn {
+            padding: 15px 30px;
+            background-color: #6a85b6; 
+            color: white;
+            text-decoration: none; 
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.1s;
+            display: inline-block;
+            width: 100%; /* Para que el botón ocupe todo el espacio del padding */
+            box-sizing: border-box; /* Incluye el padding en el ancho total */
+        }
+
+        .registro-btn:hover {
+            background-color: #4a5a7b; 
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="portada-container">
+        <img 
+            src="portada.jpeg" 
+            alt="Skill Connect - El Vínculo que Conecta Habilidades" 
+            class="portada-img"
+        >
+        
+        <div class="boton-wrapper">
+            <a href="registro_prueba.html" class="registro-btn">
+                HAZ CLICK SI QUIERES REGISTRARTE
+            </a>
+        </div>
+    </div>
+</body>
+</html>
