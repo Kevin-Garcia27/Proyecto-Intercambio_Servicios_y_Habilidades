@@ -6,8 +6,15 @@ require('dotenv').config();
 // 1. Importaciones de Librerías
 const express = require('express');
 const cors = require('cors'); 
-// Asegúrate de que esta línea exista si usas las rutas de autenticación
-const authRoutes = require('./routes/auth'); 
+
+// Importar rutas
+const authRoutes = require('./routes/auth');
+const uploadRoutes = require('./routes/upload');
+const personasRoutes = require('./routes/Personas');
+const habilidadesRoutes = require('./routes/HabilidadesYServicios_Persona');
+const direccionesRoutes = require('./routes/Direcciones');
+const categoriasRoutes = require('./routes/CategoriasGeneralesHabilidades');
+const geolocalizacionRoutes = require('./routes/Geolocalizacion');
 
 const app = express();
 // Obtiene el puerto del .env o usa 3001 por defecto
@@ -22,8 +29,14 @@ app.use(cors({
 // 3. Middleware para procesar JSON (SOLO UNA VEZ)
 app.use(express.json()); 
 
-// 4. Configurar la URL base para las rutas de autenticación
+// 4. Configurar las rutas
 app.use('/api', authRoutes);
+app.use('/api', uploadRoutes);
+app.use('/api/personas', personasRoutes);
+app.use('/api/habilidades', habilidadesRoutes);
+app.use('/api/direcciones', direccionesRoutes);
+app.use('/api/categorias', categoriasRoutes);
+app.use('/api/geolocalizacion', geolocalizacionRoutes);
 
 // Prueba básica de que el servidor Express funciona
 app.get('/', (req, res) => {
