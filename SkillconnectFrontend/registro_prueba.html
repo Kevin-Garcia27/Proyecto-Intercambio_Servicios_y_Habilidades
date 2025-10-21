@@ -162,22 +162,22 @@
                 const data = await response.json();
 
                 if (response.status === 201) {
-                    mensajeDiv.textContent = '✅ Registro Exitoso: ' + data.mensaje;
+                    mensajeDiv.textContent = 'Registro Exitoso: ' + data.mensaje;
                     mensajeDiv.classList.add('success');
                     document.getElementById('registroForm').reset();
                     
                 } else if (response.status === 409) {
-                    mensajeDiv.textContent = '❌ Error: Este correo ya está registrado.';
+                    mensajeDiv.textContent = 'Error: Este correo ya está registrado.';
                     mensajeDiv.classList.add('error');
 
                 } else {
-                    mensajeDiv.textContent = '❌ Error del servidor: ' + data.mensaje || 'Intente de nuevo.';
+                    mensajeDiv.textContent = 'Error del servidor: ' + data.mensaje || 'Intente de nuevo.';
                     mensajeDiv.classList.add('error');
                 }
 
             } catch (error) {
                 console.error('Error al conectar con el backend:', error);
-                mensajeDiv.textContent = '⚠️ Error de conexión. Asegúrate que el Backend y el túnel SSH estén activos.';
+                mensajeDiv.textContent = 'Error de conexión. Asegúrate que el Backend y el túnel SSH estén activos.';
                 mensajeDiv.classList.add('error');
             }
         });
