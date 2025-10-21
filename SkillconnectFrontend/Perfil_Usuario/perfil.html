@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil de Usuario - SkillConnect</title>
+    
+    <!-- React y ReactDOM desde CDN -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    
+    <!-- Babel Standalone para transpilar JSX en el navegador -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Leaflet para mapas -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/App.css">
+    <link rel="stylesheet" href="css/index.css">
+    <link rel="stylesheet" href="css/inline-edit.css">
+    <link rel="stylesheet" href="css/galeria-uniforme.css">
+</head>
+<body>
+    <div id="root">
+        <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; background: linear-gradient(145deg, #10151f 0%, #303747 100%); color: white; font-family: Arial, sans-serif;">
+            <div style="border: 4px solid rgba(139, 92, 246, 0.3); border-top: 4px solid #8B5CF6; border-radius: 50%; width: 60px; height: 60px; animation: spin 1s linear infinite;"></div>
+            <h2 style="margin-top: 24px; font-size: 24px;">Cargando SkillConnect...</h2>
+            <p style="color: rgba(255,255,255,0.6); margin-top: 8px;">Compilando componentes React</p>
+            <div id="loading-progress" style="margin-top: 16px; color: rgba(255,255,255,0.5); font-size: 14px;">
+                Inicializando...
+            </div>
+        </div>
+    </div>
+    
+    <style>
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+
+    <!-- userData y constantes globales -->
+    <script>
+        const API_BASE_URL = 'http://localhost:3001/api';
+
+        // userData
+        const usuarioInicial = {
+            nombre_Usuario: '',
+            apellido_Usuario: '',
+            descripcion_Usuario: '',
+            imagenUrl_Usuario: '',
+            imagen1Url_Usuario: '',
+            imagen2Url_Usuario: '',
+            imagen3Url_Usuario: '',
+            pais: '',
+            departamento: '',
+            ciudad: '',
+            codigoPostal: '',
+            estadoCivil_Usuario: 'Soltero',
+            genero_Usuario: 'Otro',
+            tipoIdentificacion_Usuario: 'DNI',
+            identificacion_usuario: '',
+            fechaNacimiento: ''
+        };
+
+        const mapGenero = {
+            'M': 'Masculino',
+            'F': 'Femenino',
+            'O': 'Otro'
+        };
+
+        const mapEstadoCivil = {
+            'S': 'Soltero',
+            'C': 'Casado',
+            'D': 'Divorciado',
+            'V': 'Viudo',
+            'U': 'Unión Libre'
+        };
+
+        // Services - Funciones globales
+        // personasService
+        async function obtenerPersonaPorId(id) {
+            const response = await fetch(`${API_BASE_URL}/personas/${id}`);
+            return response.json();
+        }
+
+        async function actualizarPersona(id, datos) {
+            const response = await fetch(`${API_BASE_URL}/personas/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(datos)
+            });
+            return response.json();
+        }
+
+        // direccionesService
+        async function obtenerDireccionPorPersona(idPersona) {
+            const response = await fetch(`${API_BASE_URL}/direcciones/persona/${idPersona}`);
+            return response.json();
+        }
+
+        async function crearDireccion(datos) {
+            const response = await fetch(`${API_BASE_URL}/direcciones`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(datos)
+            });
+            return response.json();
+        }
+
+        async function actualizarDireccion(id, datos) {
+            const response = await fetch(`${API_BASE_URL}/direcciones/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(datos)
+            });
+            return response.json();
+        }
+
+        // habilidadesService
+        async function obtenerHabilidadesPorPersona(idPersona) {
+            const response = await fetch(`${API_BASE_URL}/habilidades/persona/${idPersona}`);
+            return response.json();
+        }
+
+        async function crearHabilidad(datos) {
+            const response = await fetch(`${API_BASE_URL}/habilidades`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(datos)
+            });
+            return response.json();
+        }
+
+        async function actualizarHabilidad(id, datos) {
+            const response = await fetch(`${API_BASE_URL}/habilidades/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(datos)
+            });
+            return response.json();
+        }
+
+        async function eliminarHabilidad(id) {
+            const response = await fetch(`${API_BASE_URL}/habilidades/${id}`, {
+                method: 'DELETE'
+            });
+            return response.json();
+        }
+
+        // categoriasService
+        async function obtenerTodasCategorias() {
+            const response = await fetch(`${API_BASE_URL}/categorias`);
+            return response.json();
+        }
+
+        // geolocalizacionService
+        async function obtenerGeolocalizacionPorDireccion(idDireccion) {
+            const response = await fetch(`${API_BASE_URL}/geolocalizacion/direccion/${idDireccion}`);
+            return response.json();
+        }
+
+        async function crearGeolocalizacion(datos) {
+            const response = await fetch(`${API_BASE_URL}/geolocalizacion`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(datos)
+            });
+            return response.json();
+        }
+
+        async function actualizarGeolocalizacion(id, datos) {
+            const response = await fetch(`${API_BASE_URL}/geolocalizacion/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(datos)
+            });
+            return response.json();
+        }
+    </script>
+
+    <!-- Componentes React en orden: pequeños primero, grandes al final -->
+    <!-- 1. Componentes más pequeños primero -->
+    <script type="text/babel" src="js/PixelBarChart.js" data-type="module" onload="console.log('PixelBarChart cargado'); updateProgress('PixelBarChart cargado...')"></script>
+    
+    <!-- 2. Componentes medianos -->
+    <script type="text/babel" src="js/BlurFade.jsx" data-type="module" onload="console.log('BlurFade cargado'); updateProgress('BlurFade cargado...')"></script>
+    <script type="text/babel" src="js/InlineEditable.jsx" data-type="module" onload="console.log('InlineEditable cargado'); updateProgress('InlineEditable cargado...')"></script>
+    <script type="text/babel" src="js/SelectEditable.jsx" data-type="module" onload="console.log('SelectEditable cargado'); updateProgress('SelectEditable cargado...')"></script>
+    
+    <!-- 3. Componentes que dependen de otros -->
+    <script type="text/babel" src="js/GaleriaUniforme.jsx" data-type="module" onload="console.log('GaleriaUniforme cargado'); updateProgress('GaleriaUniforme cargado...')"></script>
+    
+    <!-- 4. Componente principal (el más grande) al final -->
+    <script type="text/babel" src="js/Perfil_Usuario.js" data-type="module" onload="console.log('Perfil_Usuario cargado'); updateProgress('Perfil_Usuario cargado, renderizando...')"></script>
+
+    <!-- Helper para actualizar el progreso -->
+    <script>
+        function updateProgress(message) {
+            const progressEl = document.getElementById('loading-progress');
+            if (progressEl) {
+                progressEl.textContent = message;
+            }
+        }
+    </script>
+
+    <!-- 5. Renderizar la aplicación después de que todo esté cargado -->
+    <script type="text/babel">
+        // Esperar a que todos los componentes estén disponibles
+        window.addEventListener('load', function() {
+            console.log('Iniciando aplicación...');
+            console.log('Verificando componentes:');
+            console.log('  - React:', typeof React);
+            console.log('  - ReactDOM:', typeof ReactDOM);
+            console.log('  - PixelBarChart:', typeof window.PixelBarChart);
+            console.log('  - BlurFade:', typeof window.BlurFade);
+            console.log('  - InlineEditable:', typeof window.InlineEditable);
+            console.log('  - SelectEditable:', typeof window.SelectEditable);
+            console.log('  - GaleriaUniforme:', typeof window.GaleriaUniforme);
+            console.log('  - Perfil_Usuario:', typeof window.Perfil_Usuario);
+            
+            if (typeof window.Perfil_Usuario === 'undefined') {
+                console.error('ERROR: Perfil_Usuario no está definido');
+                document.getElementById('root').innerHTML = '<div style="color: white; padding: 40px; text-align: center; background: linear-gradient(145deg, #10151f 0%, #303747 100%); min-height: 100vh;"><h1 style="color: #ef4444;">Error: Componente no cargado</h1><p>El componente Perfil_Usuario no se compiló correctamente.</p><p style="margin-top: 20px; color: rgba(255,255,255,0.6);">Revisa la consola (F12) para más detalles</p></div>';
+                return;
+            }
+            
+            try {
+                updateProgress('Renderizando aplicación...');
+                const root = ReactDOM.createRoot(document.getElementById('root'));
+                root.render(React.createElement(window.Perfil_Usuario));
+                console.log('Aplicación renderizada correctamente');
+            } catch (error) {
+                console.error('ERROR al renderizar:', error);
+                document.getElementById('root').innerHTML = '<div style="color: white; padding: 40px; text-align: center; background: linear-gradient(145deg, #10151f 0%, #303747 100%); min-height: 100vh;"><h1 style="color: #ef4444;">Error al renderizar</h1><p>' + error.message + '</p><pre style="background: rgba(0,0,0,0.3); padding: 20px; border-radius: 8px; margin-top: 20px; text-align: left; overflow: auto;">' + error.stack + '</pre></div>';
+            }
+        });
+    </script>
+</body>
+</html>
