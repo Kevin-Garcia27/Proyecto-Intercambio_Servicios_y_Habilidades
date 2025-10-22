@@ -21,8 +21,8 @@ function PixelBarChart({ data, title = 'Estadísticas' }) {
     <div className="pixel-chart-wrapper">
       <svg viewBox={`0 0 ${width} ${height}`} className="pixel-chart" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Gráfica de barras">
         {/* Fondo y marco */}
-        <rect x="0" y="0" width={width} height={height} fill="#161b22" />
-        <rect x={chartX} y={chartY} width={chartW} height={chartH} fill="#0f141b" stroke="#2d3748" strokeWidth="2" shapeRendering="crispEdges" />
+        <rect x="0" y="0" width={width} height={height} fill="#7C9AE6" />
+        <rect x={chartX} y={chartY} width={chartW} height={chartH} fill="#7C9AE6" stroke="#1f2937" strokeWidth="2" shapeRendering="crispEdges" />
 
         {/* Grid horizontal */}
         <g stroke="#1f2937" strokeWidth="1" shapeRendering="crispEdges">
@@ -32,8 +32,8 @@ function PixelBarChart({ data, title = 'Estadísticas' }) {
         </g>
 
         {/* Ejes */}
-        <line x1="16" y1="156" x2="304" y2="156" stroke="#94a3b8" strokeWidth="2" shapeRendering="crispEdges" />
-        <line x1="16" y1="20" x2="16" y2="156" stroke="#94a3b8" strokeWidth="2" shapeRendering="crispEdges" />
+        <line x1="16" y1="156" x2="304" y2="156" stroke="#1f2937" strokeWidth="2" shapeRendering="crispEdges" />
+        <line x1="16" y1="20" x2="16" y2="156" stroke="#1f2937" strokeWidth="2" shapeRendering="crispEdges" />
 
         {/* Barras */}
         {data.slice(0, 3).map((d, i) => {
@@ -41,7 +41,7 @@ function PixelBarChart({ data, title = 'Estadísticas' }) {
           const y = baseY - h;
           const x = groupOffsets[i] ?? 48 + i * 80;
           const capY = y - capH;
-          const capFill = d.highlight || lighten(d.fill, 0.35);
+          const capFill = d.highlight || darken(d.fill, 0.3);
           return (
             <g key={d.label} transform={`translate(${x},0)`}>
               <rect x="0" y={y} width={barW} height={h} fill={d.fill} stroke="#2e261f" strokeWidth="1" shapeRendering="crispEdges" />
@@ -58,17 +58,17 @@ function PixelBarChart({ data, title = 'Estadísticas' }) {
   );
 }
 
-// Utilidad para aclarar color hex (simple)
-function lighten(hex, amount = 0.3) {
+// Utilidad para oscurecer color hex
+function darken(hex, amount = 0.3) {
   try {
     const c = hex.replace('#', '');
     const num = parseInt(c, 16);
     let r = (num >> 16) & 0xff;
     let g = (num >> 8) & 0xff;
     let b = num & 0xff;
-    r = Math.min(255, Math.round(r + (255 - r) * amount));
-    g = Math.min(255, Math.round(g + (255 - g) * amount));
-    b = Math.min(255, Math.round(b + (255 - b) * amount));
+    r = Math.max(0, Math.round(r * (1 - amount)));
+    g = Math.max(0, Math.round(g * (1 - amount)));
+    b = Math.max(0, Math.round(b * (1 - amount)));
     return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
   } catch {
     return hex;
