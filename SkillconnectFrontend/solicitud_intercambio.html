@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enviar Solicitud de Intercambio</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background-color: #f4f7f6; }
+        .container { max-width: 500px; margin: auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        h1 { color: #6a85b6; text-align: center; margin-bottom: 25px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; color: #555; }
+        .form-group input, .form-group textarea { width: 100%; padding: 10px; margin-bottom: 20px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; background-color: #6a85b6; color: white; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; transition: background-color 0.3s; }
+        button:hover { background-color: #4a5a7b; }
+        #mensaje { margin-top: 20px; padding: 10px; border-radius: 5px; font-weight: bold; text-align: center; }
+        .success { color: #155724; background-color: #d4edda; }
+        .error { color: #721c24; background-color: #f8d7da; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Solicitud de Intercambio</h1>
+        
+        <form id="solicitudForm">
+            <input type="hidden" id="solicitante_id" value="1"> 
+            <input type="hidden" id="receptor_id" value="2">
+            <div class="form-group">
+                <label for="habilidad_ofrecida">Habilidad que Ofreces:</label>
+                <input type="text" id="habilidad_ofrecida" required placeholder="Ej: Clases de Diseño Gráfico">
+            </div>
+
+            <div class="form-group">
+                <label for="habilidad_solicitada">Habilidad que Solicitas (de él/ella):</label>
+                <input type="text" id="habilidad_solicitada" required placeholder="Ej: Asesoría Contable">
+            </div>
+            
+            <div class="form-group">
+                <label for="fecha_sugerida">Fecha Sugerida:</label>
+                <input type="date" id="fecha_sugerida" required>
+            </div>
+
+            <div class="form-group">
+                <label for="tiempo_estimado">Tiempo Estimado (Duración):</label>
+                <input type="text" id="tiempo_estimado" required placeholder="Ej: 2 horas, 1 sesión, 3 días">
+            </div>
+
+            <button type="submit">Enviar Solicitud</button>
+        </form>
+
+        <div id="mensaje"></div>
+    </div>
+
+    <script>
+        document.getElementById('solicitudForm').addEventListener('submit', async function(event) {
+            event.preventDefault(); 
+            
+            const solicitante_id = document.getElementById('solicitante_id').value;
+            const receptor_id = document.getElementById('receptor_id').value;
+            const habilidad_ofrecida = document.getElementById('habilidad_ofrecida').value;
+            const habilidad_solicitada = document.getElementById('habilidad_solicitada').value;
+            const fecha_sugerida = document.getElementById('fecha_sugerida').value;
+            const tiempo_estimado = document.getElementById('tiempo_estimado').value;
+            const mensajeDiv = document.getElementById('mensaje');
+
+            mensajeDiv.textContent = '';
+            mensajeDiv.className = '';
+
+            try {
+                // Asegúrate que tu Backend (Node.js) esté corriendo con el túnel SSH activo!
+                const url = 'http://localhost:3001/api/solicitudes'; 
+                
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ 
+                        solicitante_id, 
+                        receptor_id, 
+                        habilidad_ofrecida, 
+                        habilidad_solicitada, 
+                        fecha_sugerida, 
+                        tiempo_estimado
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.status === 201) {
+                    mensajeDiv.textContent = '¡Solicitud enviada con éxito! El usuario ha sido notificado.';
+                    mensajeDiv.classList.add('success');
+                    document.getElementById('solicitudForm').reset();
+                } else {
+                    // Muestra el mensaje de error del backend (ej: Faltan campos)
+                    mensajeDiv.textContent = 'Error al enviar solicitud: ' + data.mensaje || 'Intente de nuevo.';
+                    mensajeDiv.classList.add('error');
+                }
+
+            } catch (error) {
+                console.error('Error al conectar con el backend:', error);
+                mensajeDiv.textContent = 'Error de conexión. Asegúrate que el Backend y el túnel SSH estén activos.';
+                mensajeDiv.classList.add('error');
+            }
+        });
+    </script>
+</body>
+</html>
