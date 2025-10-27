@@ -1,88 +1,148 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Skill Connect - El Vínculo que Conecta Habilidades</title>
-    <style>
-        /* Estilos generales para el fondo y centrado */
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            /* Fondo de degradado (Azul/Gris) */
-            background-image: linear-gradient(135deg, #6a85b6 0%, #bac8e0 100%);
-            overflow: hidden;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SkillConnect - Encuentra tu talento</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to right, #dfe9f3, #ffffff);
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      height: 100vh;
+    }
 
-        /* Contenedor central de la Portada */
-        .portada-container {
-            text-align: center;
-            background-color: #ffffff; /* Fondo blanco para contraste */
-            border-radius: 15px;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-            max-width: 800px; /* Ancho máximo */
-            overflow: hidden; /* Asegura que la imagen no se salga del borde */
-            
-            /* ****************************************************** */
-            /* SOLUCIÓN AL BORDE: Un borde sólido azul marino sutil */
-            border: 5px solid #1a2a4b; /* Azul Marino Oscuro */
-            /* ****************************************************** */
-        }
+    .container {
+      display: flex;
+      background-color: #fff;
+      width: 90%;
+      max-width: 1100px;
+      margin-top: 60px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
 
-        /* Estilos para la imagen de portada */
-        .portada-img {
-            width: 100%; /* La imagen llenará el contenedor, pero el contenedor tiene un MAX-WIDTH */
-            height: auto;
-            display: block; /* Elimina espacio extra debajo de la imagen */
-            margin-bottom: 20px; /* Espacio antes del botón */
-        }
+    /* Sección izquierda */
+    .search-section {
+      flex: 1;
+      padding: 40px;
+      background-color: #fff;
+      text-align: center;
+    }
 
-        /* Contenedor del botón */
-        .boton-wrapper {
-            padding: 0 30px 30px 30px; /* Espacio lateral e inferior para el botón */
-        }
+    .search-section img {
+      width: 160px;
+      margin-bottom: 10px;
+    }
 
-        /* Estilos para el botón */
-        .registro-btn {
-            padding: 15px 30px;
-            background-color: #6a85b6; 
-            color: white;
-            text-decoration: none; 
-            border: none;
-            border-radius: 8px;
-            font-size: 18px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background-color 0.3s, transform 0.1s;
-            display: inline-block;
-            width: 100%; /* Para que el botón ocupe todo el espacio del padding */
-            box-sizing: border-box; /* Incluye el padding en el ancho total */
-        }
+    .search-section h2 {
+      margin-bottom: 20px;
+      color: #1b1b1b;
+    }
 
-        .registro-btn:hover {
-            background-color: #4a5a7b; 
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-        }
-    </style>
+    .form-group {
+      margin-bottom: 15px;
+      text-align: left;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 15px;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #007bff;
+    }
+
+    button {
+      width: 100%;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      padding: 12px;
+      font-size: 16px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    /* Sección derecha */
+    .results-section {
+      flex: 1;
+      background-color: #f5f7fa;
+      padding: 40px;
+      border-left: 1px solid #ddd;
+    }
+
+    .results-section h3 {
+      color: #1b1b1b;
+      margin-bottom: 20px;
+    }
+
+    .no-results {
+      color: #666;
+      font-size: 15px;
+      background: #fff;
+      border-radius: 8px;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        flex-direction: column;
+      }
+      .results-section {
+        border-left: none;
+        border-top: 1px solid #ddd;
+      }
+    }
+  </style>
 </head>
 <body>
-    <div class="portada-container">
-        <img 
-            src="portada.jpeg" 
-            alt="Skill Connect - El Vínculo que Conecta Habilidades" 
-            class="portada-img"
-        >
-        
-        <div class="boton-wrapper">
-            <a href="registro_prueba.html" class="registro-btn">
-                HAZ CLICK SI QUIERES REGISTRARTE
-            </a>
-        </div>
+
+  <div class="container">
+    <!-- Sección de búsqueda -->
+     <!-- Para guardar -->
+    <div class="search-section">
+      <img src="tx.jpeg" alt="Logo SkillConnect"> 
+      <h2>Encuentra tu talento</h2>
+      <div class="form-group">
+        <input type="text" placeholder="Habilidad Principal">
+      </div>
+      <div class="form-group">
+        <input type="text" placeholder="Ej: Carpintería, Diseño Web...">
+      </div>
+      <div class="form-group">
+        <input type="text" placeholder="Ciudad">
+      </div>
+      <div class="form-group">
+        <input type="text" placeholder="País">
+      </div>
+      <button>Buscar Talentos</button>
     </div>
+
+    <!-- Sección de resultados -->
+    <div class="results-section">
+      <h3>Resultados Recientes</h3>
+      <div class="no-results">
+        Aún no hay resultados recientes. Realiza una búsqueda para comenzar.
+      </div>
+    </div>
+  </div>
+
 </body>
 </html>
