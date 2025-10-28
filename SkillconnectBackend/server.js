@@ -9,6 +9,7 @@ const cors = require('cors');
 
 // Importar rutas
 const authRoutes = require('./routes/auth');
+const loginRoutes = require('./routes/Login');
 const uploadRoutes = require('./routes/upload');
 const personasRoutes = require('./routes/Personas');
 const habilidadesRoutes = require('./routes/HabilidadesYServicios_Persona');
@@ -24,8 +25,8 @@ const port = process.env.PORT || 3001;
 app.use(cors({
     // El frontend ahora corre en el puerto 5500 gracias a Live Server
     // origin: 'http://127.0.0.1:5500'
-    // origin: 'http://localhost:3000'  
-    origin: 'http://127.0.0.1:5500' 
+    origin: 'http://localhost:3000' // deben habilitar este  
+    // origin: 'http://127.0.0.1:5500' 
 }));
 
 // 3. Middleware para procesar JSON (SOLO UNA VEZ)
@@ -33,6 +34,7 @@ app.use(express.json());
 
 // 4. Configurar las rutas
 app.use('/api', authRoutes);
+app.use('/api',loginRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/personas', personasRoutes);
 app.use('/api/habilidades', habilidadesRoutes);

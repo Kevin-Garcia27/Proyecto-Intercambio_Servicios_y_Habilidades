@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Demo - SkillConnect</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        /* Oculta la barra de desplazamiento en la caja de mensajes sin cortar funcionalidad */
+        #message-container {
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE and Edge */
+        }
+        #message-container::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, Opera */
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex antialiased">
+
+    <div class="flex flex-col md:flex-row w-full max-w-7xl mx-auto shadow-xl bg-white rounded-xl overflow-hidden my-6">
+
+        <div class="md:w-1/3 border-r border-gray-200 bg-gray-50 flex flex-col h-full max-h-[85vh]">
+            <header class="p-4 border-b bg-white">
+                <h2 class="text-xl font-bold text-gray-800">Mensajes (Demo)</h2>
+            </header>
+            
+           <div class="p-3 flex items-center space-x-3 bg-indigo-100 border-l-4 border-indigo-600 cursor-pointer">
+    <div class="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center text-white font-semibold">
+        JD
+    </div>
+    <div class="flex-grow"> <!-- Añado flex-grow aquí para que ocupe el espacio y se trunque --><p class="text-sm font-semibold text-gray-900 truncate">Juan Delgado</p>
+        <p class="text-xs text-indigo-700 truncate">Escribiendo un mensaje...</p>
+    </div>
+</div>
+
+            <div class="p-3 flex items-center space-x-3 hover:bg-gray-100 cursor-pointer">
+                <div class="w-10 h-10 bg-yellow-500 rounded-full flex items-center justify-center text-white font-semibold">
+                    MP
+                </div>
+                <div>
+                    <p class="text-sm font-semibold text-gray-900">María Pérez</p>
+                    <p class="text-xs text-gray-500 truncate">Claro, lo reviso mañana.</p>
+                </div>
+            </div>
+            
+            <div class="p-3 flex items-center space-x-3 hover:bg-gray-100 cursor-pointer">
+                <div class="w-10 h-10 bg-red-500 rounded-full flex items-center justify-center text-white font-semibold">
+                    CG
+                </div>
+                <div>
+                    <p class="text-sm font-semibold text-gray-900">Carlos Gómez</p>
+                    <p class="text-xs text-gray-500 truncate">¿Aceptas el intercambio?</p>
+                </div>
+            </div>
+            <div class="flex-grow overflow-y-auto"></div>
+        </div>
+
+        <div class="md:w-2/3 flex flex-col h-full max-h-[85vh]">
+            
+            <header class="p-4 border-b bg-white flex justify-between items-center">
+                <h2 class="text-lg font-semibold text-gray-800">Conversando con Juan Delgado</h2>
+                <button class="text-sm text-indigo-600 hover:text-indigo-800">Ver Perfil</button>
+            </header>
+
+            <div id="message-container" class="flex-grow p-4 overflow-y-auto space-y-4 bg-gray-50">
+                
+                <div class="flex justify-start">
+                    <div class="bg-gray-200 p-3 rounded-xl rounded-tl-none max-w-xs text-sm shadow">
+                        Hola, ¿te parece bien que hagamos el intercambio de Python por Diseño la próxima semana?
+                        <span class="block text-right text-xs text-gray-500 mt-1">10:05 AM</span>
+                    </div>
+                </div>
+
+                <div class="flex justify-end">
+                    <div class="bg-indigo-600 text-white p-3 rounded-xl rounded-tr-none max-w-xs text-sm shadow">
+                        Sí, perfecto. ¿Martes a las 4 PM te funciona?
+                        <span class="block text-right text-xs text-indigo-300 mt-1">10:07 AM</span>
+                    </div>
+                </div>
+                
+                <div class="flex justify-start">
+                    <div class="bg-gray-200 p-3 rounded-xl rounded-tl-none max-w-xs text-sm shadow">
+                        Sí, martes a las 4 PM me va genial. ¡Nos vemos!
+                        <span class="block text-right text-xs text-gray-500 mt-1">10:10 AM</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="p-4 border-t bg-white">
+                <form id="chat-form" class="flex space-x-3">
+                    <input 
+                        type="text" 
+                        id="message-input"
+                        placeholder="Escribe un mensaje..."
+                        required
+                        class="flex-grow px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    >
+                    <button 
+                        type="submit" 
+                        class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-full transition duration-150 ease-in-out shadow-lg"
+                    >
+                        Enviar
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('chat-form');
+            const input = document.getElementById('message-input');
+            const container = document.getElementById('message-container');
+
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const messageText = input.value.trim();
+
+                if (messageText) {
+                    addMessageToChat(messageText, 'sent');
+                    input.value = ''; // Limpia el input
+                    scrollToBottom();
+
+                    // Opcional: Simula una respuesta del receptor después de 1.5 segundos
+                    setTimeout(() => {
+                        addMessageToChat("Mensaje recibido y leído. ✅", 'received');
+                        scrollToBottom();
+                    }, 1500);
+                }
+            });
+
+            function addMessageToChat(text, type) {
+                const now = new Date();
+                const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+                const messageDiv = document.createElement('div');
+                const bubbleDiv = document.createElement('div');
+                const timeSpan = document.createElement('span');
+                
+                timeSpan.className = 'block text-right text-xs mt-1';
+                timeSpan.textContent = timeString;
+
+                if (type === 'sent') {
+                    // Mensaje Mío (Emisor)
+                    messageDiv.className = 'flex justify-end';
+                    bubbleDiv.className = 'bg-indigo-600 text-white p-3 rounded-xl rounded-tr-none max-w-xs text-sm shadow';
+                    timeSpan.classList.add('text-indigo-300'); // Color de hora para mensajes enviados
+                } else {
+                    // Mensaje de Juan (Receptor)
+                    messageDiv.className = 'flex justify-start';
+                    bubbleDiv.className = 'bg-gray-200 p-3 rounded-xl rounded-tl-none max-w-xs text-sm shadow';
+                    timeSpan.classList.add('text-gray-500'); // Color de hora para mensajes recibidos
+                }
+                
+                bubbleDiv.textContent = text;
+                bubbleDiv.appendChild(timeSpan);
+                messageDiv.appendChild(bubbleDiv);
+                container.appendChild(messageDiv);
+            }
+
+            function scrollToBottom() {
+                container.scrollTop = container.scrollHeight;
+            }
+            
+            // Asegura que al cargar la página se vea el último mensaje
+            scrollToBottom();
+        });
+    </script>
+</body>
+</html>

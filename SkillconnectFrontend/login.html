@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión - SkillConnect</title>
+    <!-- Carga de Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Fuente Inter para una apariencia moderna */
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
+
+    <div class="w-full max-w-md bg-white p-8 rounded-xl shadow-2xl">
+        <h1 class="text-3xl font-extrabold text-gray-900 mb-6 text-center">
+            SkillConnect
+        </h1>
+        <p class="text-center text-sm text-gray-600 mb-8">
+            Inicia sesión para acceder a tu dashboard y conectar con el backend.
+        </p>
+
+        <!-- CRÍTICO: Este div se usa para mostrar mensajes de estado/error -->
+        <div id="message-box" class="p-3 text-sm font-medium rounded-lg mb-6 text-center" style="display:none;">
+            <!-- Los mensajes se mostrarán aquí (Ej: "Validando credenciales...") -->
+        </div>
+
+        <!-- CRÍTICO: Este formulario debe tener el ID 'login-form' -->
+        <form id="login-form" class="space-y-6">
+            <div>
+                <label for="email" class="block text-sm font-medium text-gray-700">
+                    Correo Electrónico
+                </label>
+                <!-- CRÍTICO: Este input debe tener el ID 'email' -->
+                <input 
+                    type="email" 
+                    id="email" 
+                    name="email" 
+                    required 
+                    autocomplete="email"
+                    class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition duration-150 ease-in-out"
+                    placeholder="tucorreo@ejemplo.com"
+                >
+            </div>
+            
+            <div>
+                <label for="password" class="block text-sm font-medium text-gray-700">
+                    Contraseña
+                </label>
+                <!-- CRÍTICO: Este input debe tener el ID 'password' -->
+                <input 
+                    type="password" 
+                    id="password" 
+                    name="password" 
+                    required 
+                    autocomplete="current-password"
+                    class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition duration-150 ease-in-out"
+                    placeholder="••••••••"
+                >
+            </div>
+
+            <!-- CRÍTICO: Este botón debe tener el ID 'login-button' -->
+            <button 
+                type="submit" 
+                id="login-button" 
+                class="w-full flex justify-center py-2 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out"
+            >
+                Iniciar Sesión
+            </button>
+        </form>
+        
+        <div class="mt-6 text-center">
+            <a href="register.html" class="text-sm font-medium text-indigo-600 hover:text-indigo-500">
+                ¿No tienes cuenta? Regístrate aquí
+            </a>
+        </div>
+
+    </div>
+
+    <!-- CRÍTICO: Carga el script como un módulo -->
+    <!-- <script type="module" src="js/login.js"></script> -->
+ <script>
+        // Función para mostrar mensajes (Usando clases de Tailwind para colores)
+        function showMessage(text, classes) {
+            const messageBox = document.getElementById("message-box");
+            if (messageBox) {
+                messageBox.style.display = "block";
+                messageBox.className = `p-3 text-sm font-medium rounded-lg mb-6 text-center ${classes}`;
+                messageBox.textContent = text;
+            }
+        }
+        
+        // Espera que el DOM esté listo
+        document.addEventListener("DOMContentLoaded", () => {
+            const form = document.getElementById("login-form");
+            const LOGIN_URL = "http://localhost:3001/api/login"; // URL del backend
+
+            if (!form) return; // Salir si el formulario no existe
+
+            form.addEventListener("submit", async (e) => {
+                e.preventDefault();
+
+                const correo = document.getElementById("email").value;
+                const contrasena = document.getElementById("password").value;
+
+                showMessage("Validando credenciales...", "bg-blue-100 text-blue-700");
+
+                try {
+                    // Llamar al backend
+                    const res = await fetch(LOGIN_URL, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ correo, contrasena })
+                    });
+
+                    const data = await res.json();
+
+                    if (res.ok) {
+                        // INICIO DE SESIÓN EXITOSO
+                        showMessage(" " + data.mensaje + ". Redirigiendo al dashboard...", "bg-green-100 text-green-700");
+
+                        // REDIRECCIÓN CRÍTICA DESPUÉS DE UN SEGUNDO
+                        setTimeout(() => {
+                            window.location.href = "dashboard.html"; 
+                        }, 1000); 
+
+                    } else {
+                        // El servidor respondió con error (ej: 401, credenciales inválidas)
+                        showMessage(" " + (data.error || "Error de inicio de sesión"), "bg-red-100 text-red-700");
+                    }
+
+                } catch (error) {
+                    // Fallo de conexión o error de red (Ej: Servidor apagado)
+                    console.error("Error al conectar con el backend:", error);
+                    showMessage("⚠️ Error de conexión con el servidor. Verifica que el backend esté activo.", "bg-yellow-100 text-yellow-700");
+                }
+            });
+        });
+    </script>
+
+    
+</body>
+</html>

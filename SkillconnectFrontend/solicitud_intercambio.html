@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enviar Solicitud de Intercambio | SkillConnect</title>
+    <!-- Carga de Tailwind CSS para un diseño limpio y responsivo -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Define la fuente Inter (Mejor legibilidad) */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f9fb; /* Fondo muy claro */
+        }
+        /* Clases personalizadas para los mensajes de respuesta */
+        .success-bg { background-color: #d4edda; } /* Verde claro */
+        .error-bg { background-color: #f8d7da; } /* Rojo claro */
+        .success-text { color: #155724; } /* Verde oscuro */
+        .error-text { color: #721c24; } /* Rojo oscuro */
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+
+    <!-- Contenedor Principal con Diseño de Tarjeta -->
+    <div class="w-full max-w-lg bg-white p-8 md:p-10 rounded-xl shadow-2xl">
+        
+        <h1 class="text-3xl font-bold text-center mb-6 text-indigo-700">
+            🤝 Solicitar Intercambio
+        </h1>
+        <p class="text-center text-gray-500 mb-8">
+            Define la habilidad que ofreces y la que te gustaría recibir.
+        </p>
+        
+        <form id="solicitudForm">
+            <!-- IDs Fijos para la Prueba (NOTA: En el proyecto real, se obtienen de la sesión/URL) -->
+            <!-- Usamos 1 y 2 como IDs de prueba para validar la inserción en la DB -->
+            <input type="hidden" id="solicitante_id" value="1"> 
+            <input type="hidden" id="receptor_id" value="2">
+            
+            <!-- Campo Habilidad Ofrecida -->
+            <div class="mb-5">
+                <label for="habilidad_ofrecida" class="block text-sm font-semibold text-gray-700 mb-2">Habilidad que Ofreces</label>
+                <input type="text" id="habilidad_ofrecida" required placeholder="Ej: Clases de Desarrollo Web"
+                       class="w-full p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 shadow-sm transition duration-150 ease-in-out">
+            </div>
+
+            <!-- Campo Habilidad Solicitada -->
+            <div class="mb-5">
+                <label for="habilidad_solicitada" class="block text-sm font-semibold text-gray-700 mb-2">Habilidad que Solicitas (del Receptor)</label>
+                <input type="text" id="habilidad_solicitada" required placeholder="Ej: Asesoría de Marketing Digital"
+                       class="w-full p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 shadow-sm transition duration-150 ease-in-out">
+            </div>
+            
+            <!-- Campo Fecha Sugerida -->
+            <div class="mb-5">
+                <label for="fecha_sugerida" class="block text-sm font-semibold text-gray-700 mb-2">Fecha Sugerida</label>
+                <input type="date" id="fecha_sugerida" required
+                       class="w-full p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 shadow-sm transition duration-150 ease-in-out">
+            </div>
+
+            <!-- Campo Tiempo Estimado -->
+            <div class="mb-6">
+                <label for="tiempo_estimado" class="block text-sm font-semibold text-gray-700 mb-2">Tiempo Estimado (Duración)</label>
+                <input type="text" id="tiempo_estimado" required placeholder="Ej: 2 horas, 1 sesión semanal, 3 meses"
+                       class="w-full p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 shadow-sm transition duration-150 ease-in-out">
+            </div>
+
+            <!-- Botón de Envío -->
+            <button type="submit" id="submitButton"
+                    class="w-full py-3 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-4 focus:ring-indigo-500 focus:ring-opacity-50 transition duration-300 ease-in-out shadow-lg">
+                Enviar Solicitud
+            </button>
+        </form>
+
+        <!-- Contenedor de Mensajes (Oculto inicialmente) -->
+        <div id="mensaje" class="mt-6 p-4 rounded-lg font-medium hidden"></div>
+    </div>
+
+    <script>
+        const form = document.getElementById('solicitudForm');
+        const mensajeDiv = document.getElementById('mensaje');
+        const submitButton = document.getElementById('submitButton');
+
+        // Función para mostrar mensajes de forma dinámica y elegante
+        function mostrarMensaje(texto, tipo) {
+            mensajeDiv.textContent = texto;
+            // Aplicar las clases Tailwind para el estilo y la visibilidad
+            mensajeDiv.className = `mt-6 p-4 rounded-lg font-medium text-center block ${tipo}-bg ${tipo}-text`;
+        }
+
+        form.addEventListener('submit', async function(event) {
+            event.preventDefault(); 
+            
+            // 1. Bloquear UI y mostrar estado de carga
+            submitButton.disabled = true;
+            submitButton.textContent = 'Enviando...';
+            mensajeDiv.classList.add('hidden'); // Ocultar mensaje anterior
+
+            // 2. Recolección de datos del formulario
+            const solicitante_id = document.getElementById('solicitante_id').value;
+            const receptor_id = document.getElementById('receptor_id').value;
+            const habilidad_ofrecida = document.getElementById('habilidad_ofrecida').value;
+            const habilidad_solicitada = document.getElementById('habilidad_solicitada').value;
+            const fecha_sugerida = document.getElementById('fecha_sugerida').value;
+            const tiempo_estimado = document.getElementById('tiempo_estimado').value;
+
+            try {
+                // 3. Llamada al API (Asegúrate de que tu backend esté en localhost:3001)
+                const url = 'http://localhost:3001/api/solicitudes'; 
+                
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ 
+                        solicitante_id, 
+                        receptor_id, 
+                        habilidad_ofrecida, 
+                        habilidad_solicitada, 
+                        fecha_sugerida, 
+                        tiempo_estimado
+                    })
+                });
+
+                const data = await response.json();
+
+                // 4. Procesamiento de la respuesta
+                if (response.status === 201) {
+                    mostrarMensaje('¡Solicitud enviada con éxito! (ID: ' + data.solicitudId + ')', 'success');
+                    form.reset(); // Limpiar formulario
+                } else {
+                    // Muestra el mensaje de error del backend
+                    mostrarMensaje('Error al enviar solicitud: ' + (data.mensaje || 'Intente de nuevo.'), 'error');
+                }
+
+            } catch (error) {
+                console.error('Error al conectar con el backend:', error);
+                mostrarMensaje('Error de conexión. Asegúrate que el Backend esté activo y en el puerto 3001.', 'error');
+            } finally {
+                // 5. Restaurar estado del botón
+                submitButton.disabled = false;
+                submitButton.textContent = 'Enviar Solicitud';
+            }
+        });
+    </script>
+</body>
+</html>
