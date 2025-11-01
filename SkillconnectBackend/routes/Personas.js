@@ -334,5 +334,43 @@ router.delete('/:id', async (req, res) => {
     }
 });
 
+// ----------------------------------------------------
+// ENDPOINT: Obtener personas por categoría de habilidad (GET /personas/categoria/:idCategoria)
+// ----------------------------------------------------
+router.get('/categoria/:idCategoria', async (req, res) => {
+    const idCategoria = parseInt(req.params.idCategoria);
+
+    if (isNaN(idCategoria)) {
+        return res.status(400).json({
+            success: false,
+            message: 'ID de categoría no válido'
+        });
+    }
+
+    try {
+        // Llamar al procedimiento almacenado para obtener personas por categoría
+        const query = 'CALL sp_Personas_ObtenerPorCategoria(?)';
+        
+        const [results] = await db.execute(query, [idCategoria]);
+        
+        // Los procedimientos almacenados devuelven un array de arrays
+        const personas = results[0] || [];
+        
+        res.json({
+            success: true,
+            count: personas.length,
+            data: personas
+        });
+        
+    } catch (error) {
+        console.error(`Error al obtener personas por categoría ${idCategoria}:`, error.message);
+        res.status(500).json({ 
+            success: false,
+            error: 'Error del servidor al filtrar personas por categoría',
+            details: error.message
+        });
+    }
+});
+
 // Exportar el router para usarlo en el archivo principal (e.g., app.js)
 module.exports = router;

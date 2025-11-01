@@ -287,11 +287,31 @@
     .editable:hover {
       background: #f3f4f6;
     }
+    
+    .editable:hover::after {
+      content: '✏️ Editar';
+      position: absolute;
+      right: -60px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 11px;
+      color: #6b7280;
+      background: #f9fafb;
+      padding: 2px 8px;
+      border-radius: 4px;
+      white-space: nowrap;
+      pointer-events: none;
+      opacity: 0.8;
+    }
 
     .editable.editing {
       background: white;
       border: 2px solid #2563eb;
-      min-width: 200px; /* Asegurar ancho mínimo consistente */
+      min-width: 200px;
+    }
+    
+    .editable.editing::after {
+      display: none;
     }
 
     .editable input,
@@ -307,9 +327,16 @@
       padding: 0;
       margin: 0;
     }
+    
+    .editable input::placeholder,
+    .editable textarea::placeholder {
+      color: #9ca3af;
+      font-style: italic;
+      opacity: 0.8;
+    }
 
     .editable input[type="date"] {
-      min-width: 200px; /* Asegurar que el input de fecha tenga ancho consistente */
+      min-width: 200px;
     }
 
     .editable textarea {
@@ -1588,7 +1615,15 @@
 
       // Nombre
       const nombreCompleto = document.getElementById('nombreCompleto');
-      nombreCompleto.textContent = `${usuario.nombre_Usuario} ${usuario.apellido_Usuario}`;
+      const nombreTexto = `${usuario.nombre_Usuario || ''} ${usuario.apellido_Usuario || ''}`.trim();
+      nombreCompleto.textContent = nombreTexto || 'Haz clic para agregar tu nombre';
+      if (!nombreTexto) {
+        nombreCompleto.style.color = '#9ca3af'; // Color gris para placeholder
+        nombreCompleto.style.fontStyle = 'italic';
+      } else {
+        nombreCompleto.style.color = '';
+        nombreCompleto.style.fontStyle = '';
+      }
       makeEditable(nombreCompleto, 'nombre_Usuario', (value) => {
         const parts = value.split(' ');
         updateUsuario('nombre_Usuario', parts[0] || '');
@@ -1597,11 +1632,23 @@
 
       // Username
       const username = document.getElementById('username');
-      username.textContent = `@${usuario.nombre_Usuario}${usuario.apellido_Usuario ? usuario.apellido_Usuario[0] : ''}`;
+      if (usuario.nombre_Usuario || usuario.apellido_Usuario) {
+        username.textContent = `@${usuario.nombre_Usuario || ''}${usuario.apellido_Usuario ? usuario.apellido_Usuario[0] : ''}`;
+      } else {
+        username.textContent = '@usuario';
+        username.style.color = '#9ca3af';
+      }
 
       // Descripción
       const descripcion = document.getElementById('descripcion');
-      descripcion.textContent = usuario.descripcion_Usuario || 'Añade una descripción personal';
+      descripcion.textContent = usuario.descripcion_Usuario || 'Haz clic aquí para añadir una descripción personal';
+      if (!usuario.descripcion_Usuario) {
+        descripcion.style.color = '#9ca3af';
+        descripcion.style.fontStyle = 'italic';
+      } else {
+        descripcion.style.color = '';
+        descripcion.style.fontStyle = '';
+      }
       makeEditable(descripcion, 'descripcion_Usuario', (value) => updateUsuario('descripcion_Usuario', value), true);
 
       // Datos personales
@@ -1685,10 +1732,12 @@
 
       campos.forEach(campo => {
         const li = document.createElement('li');
-        const displayValue = campo.displayValue || campo.value || 'No especificado';
+        const displayValue = campo.displayValue || campo.value || 'Haz clic para agregar';
+        const needsPlaceholderStyle = !campo.value || campo.value === '';
+        
         li.innerHTML = `
           <span class="label">${campo.label}:</span>
-          <span class="editable" data-field="${campo.field}">${displayValue}</span>
+          <span class="editable" data-field="${campo.field}" ${needsPlaceholderStyle ? 'style="color: #9ca3af; font-style: italic;"' : ''}>${displayValue}</span>
         `;
         datosPersonales.appendChild(li);
 
@@ -1713,6 +1762,17 @@
         const currentDisplayValue = element.textContent;
         let currentValue = currentDisplayValue;
         
+        // Detectar si es un placeholder (texto gris en itálica)
+        const isPlaceholder = element.style.color === 'rgb(156, 163, 175)' || 
+                             element.style.fontStyle === 'italic' ||
+                             currentDisplayValue.includes('Haz clic') ||
+                             currentDisplayValue.includes('añadir') ||
+                             currentDisplayValue === 'No especificado';
+        
+        if (isPlaceholder) {
+          currentValue = ''; // Limpiar el placeholder al editar
+        }
+        
         // Si es un campo de fecha, convertir el texto formateado a formato ISO para el input
         if (inputType === 'date') {
           currentValue = formatearFechaParaInput(usuario[field]);
@@ -1721,9 +1781,18 @@
         element.classList.add('editing');
 
         if (multiline) {
-          element.innerHTML = `<textarea rows="3">${currentValue}</textarea>`;
+          const placeholderText = field === 'descripcion_Usuario' 
+            ? 'Escribe algo sobre ti...' 
+            : 'Escribe aquí...';
+          element.innerHTML = `<textarea rows="3" placeholder="${placeholderText}">${currentValue}</textarea>`;
         } else {
-          element.innerHTML = `<input type="${inputType}" value="${currentValue}">`;
+          let placeholderText = 'Escribe aquí...';
+          if (field === 'nombre_Usuario') placeholderText = 'Nombre completo';
+          else if (field === 'email_Usuario') placeholderText = 'correo@ejemplo.com';
+          else if (field === 'celular_Usuario') placeholderText = 'Número de celular';
+          else if (field === 'identificacion_usuario') placeholderText = 'Número de identificación';
+          
+          element.innerHTML = `<input type="${inputType}" value="${currentValue}" placeholder="${placeholderText}">`;
         }
 
         const input = element.querySelector(multiline ? 'textarea' : 'input');
@@ -1733,13 +1802,35 @@
         }
 
         const save = () => {
-          const newValue = input.value;
+          const newValue = input.value.trim();
           
           // Si es fecha, mostrar formateado pero guardar en formato ISO
           if (inputType === 'date') {
             element.textContent = formatearFecha(newValue);
+            if (!newValue) {
+              element.style.color = '#9ca3af';
+              element.style.fontStyle = 'italic';
+            } else {
+              element.style.color = '';
+              element.style.fontStyle = '';
+            }
           } else {
-            element.textContent = newValue;
+            // Si el valor está vacío, mostrar un placeholder visual
+            if (!newValue) {
+              if (field === 'nombre_Usuario') {
+                element.textContent = 'Haz clic para agregar tu nombre';
+              } else if (field === 'descripcion_Usuario') {
+                element.textContent = 'Haz clic aquí para añadir una descripción personal';
+              } else {
+                element.textContent = 'No especificado';
+              }
+              element.style.color = '#9ca3af';
+              element.style.fontStyle = 'italic';
+            } else {
+              element.textContent = newValue;
+              element.style.color = '';
+              element.style.fontStyle = '';
+            }
           }
           
           element.classList.remove('editing');
@@ -1877,8 +1968,8 @@
     // ======================
     function getIniciales() {
       const nombre = usuario.nombre_Usuario || '';
-      const apellido = usuario.apellido_Usuario || '';
-      return (nombre.charAt(0) + apellido.charAt(0)).toUpperCase() || 'U';
+      // Solo retornar la primera letra del nombre en mayúscula
+      return nombre.charAt(0).toUpperCase() || 'U';
     }
 
     function getDefaultAvatar() {
@@ -1895,6 +1986,22 @@
         return getDefaultAvatar();
       }
       return url;
+    }
+
+    // Función para sincronizar imagen con el Dashboard
+    function sincronizarImagenConDashboard(nuevaImagenUrl) {
+      try {
+        // Guardar en localStorage para que el Dashboard la lea
+        localStorage.setItem('perfilImagenActualizada', nuevaImagenUrl || getDefaultAvatar());
+        localStorage.setItem('perfilImagenTimestamp', Date.now().toString());
+        
+        // Disparar evento personalizado para notificar cambios
+        window.dispatchEvent(new CustomEvent('perfilActualizado', {
+          detail: { imagenUrl: nuevaImagenUrl || getDefaultAvatar() }
+        }));
+      } catch (error) {
+        console.error('Error al sincronizar imagen:', error);
+      }
     }
 
     async function handleProfileImageUpload(event) {
@@ -1918,6 +2025,8 @@
           if (result.success) {
             await updateUsuario('imagenUrl_Usuario', result.url);
             document.getElementById('profilePic').src = result.url;
+            // Sincronizar con Dashboard
+            sincronizarImagenConDashboard(result.url);
           } else {
             alert('Error al subir la imagen. Inténtalo de nuevo.');
           }
@@ -1944,6 +2053,8 @@
         }
         await updateUsuario('imagenUrl_Usuario', '');
         document.getElementById('profilePic').src = getDefaultAvatar();
+        // Sincronizar con Dashboard
+        sincronizarImagenConDashboard(null);
         setGuardando(false);
       } catch (error) {
         console.error('Error al eliminar foto de perfil:', error);

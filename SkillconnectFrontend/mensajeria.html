@@ -3,109 +3,388 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat Demo - SkillConnect</title>
+    <title>Mensajes - SkillConnect</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Iconify para iconos -->
+    <script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; }
-        /* Oculta la barra de desplazamiento en la caja de mensajes sin cortar funcionalidad */
-        #message-container {
-            scrollbar-width: none; /* Firefox */
-            -ms-overflow-style: none; /* IE and Edge */
+        body { 
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
         }
-        #message-container::-webkit-scrollbar {
-            display: none; /* Chrome, Safari, Opera */
+
+        /* Scrollbar personalizado */
+        #message-container::-webkit-scrollbar,
+        .contact-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        #message-container::-webkit-scrollbar-track,
+        .contact-list::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        #message-container::-webkit-scrollbar-thumb,
+        .contact-list::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+
+        #message-container::-webkit-scrollbar-thumb:hover,
+        .contact-list::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* Animaciones */
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .message-sent {
+            animation: slideInRight 0.3s ease-out;
+        }
+
+        .message-received {
+            animation: slideInLeft 0.3s ease-out;
+        }
+
+        /* Indicador de escritura */
+        .typing-indicator span {
+            animation: blink 1.4s infinite both;
+        }
+
+        .typing-indicator span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-indicator span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes blink {
+            0%, 60%, 100% { opacity: 0.3; }
+            30% { opacity: 1; }
+        }
+
+        /* Badge de notificaciones */
+        .notification-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            background: #ef4444;
+            color: white;
+            font-size: 10px;
+            font-weight: 600;
+            padding: 2px 6px;
+            border-radius: 10px;
+            border: 2px solid white;
+        }
+
+        /* Hover en contactos */
+        .contact-item {
+            transition: all 0.2s ease;
+        }
+
+        .contact-item:hover {
+            background: #f8fafc;
+            transform: translateX(4px);
+        }
+
+        .contact-item.active {
+            background: linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%);
+            border-left: 4px solid #7c3aed;
+        }
+
+        /* Mensaje hover effect */
+        .message-bubble {
+            transition: transform 0.2s ease;
+        }
+
+        .message-bubble:hover {
+            transform: scale(1.02);
+        }
+
+        /* Estado online */
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            border: 2px solid white;
+            position: absolute;
+            bottom: 0;
+            right: 0;
+        }
+
+        .status-online {
+            background: #10b981;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+        }
+
+        .status-offline {
+            background: #9ca3af;
         }
     </style>
 </head>
-<body class="bg-gray-100 min-h-screen flex antialiased">
+<body class="min-h-screen antialiased">
 
-    <div class="flex flex-col md:flex-row w-full max-w-7xl mx-auto shadow-xl bg-white rounded-xl overflow-hidden my-6">
-
-        <div class="md:w-1/3 border-r border-gray-200 bg-gray-50 flex flex-col h-full max-h-[85vh]">
-            <header class="p-4 border-b bg-white">
-                <h2 class="text-xl font-bold text-gray-800">Mensajes (Demo)</h2>
-            </header>
-            
-           <div class="p-3 flex items-center space-x-3 bg-indigo-100 border-l-4 border-indigo-600 cursor-pointer">
-    <div class="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center text-white font-semibold">
-        JD
-    </div>
-    <div class="flex-grow"> <!-- Añado flex-grow aquí para que ocupe el espacio y se trunque --><p class="text-sm font-semibold text-gray-900 truncate">Juan Delgado</p>
-        <p class="text-xs text-indigo-700 truncate">Escribiendo un mensaje...</p>
-    </div>
-</div>
-
-            <div class="p-3 flex items-center space-x-3 hover:bg-gray-100 cursor-pointer">
-                <div class="w-10 h-10 bg-yellow-500 rounded-full flex items-center justify-center text-white font-semibold">
-                    MP
-                </div>
-                <div>
-                    <p class="text-sm font-semibold text-gray-900">María Pérez</p>
-                    <p class="text-xs text-gray-500 truncate">Claro, lo reviso mañana.</p>
-                </div>
-            </div>
-            
-            <div class="p-3 flex items-center space-x-3 hover:bg-gray-100 cursor-pointer">
-                <div class="w-10 h-10 bg-red-500 rounded-full flex items-center justify-center text-white font-semibold">
-                    CG
-                </div>
-                <div>
-                    <p class="text-sm font-semibold text-gray-900">Carlos Gómez</p>
-                    <p class="text-xs text-gray-500 truncate">¿Aceptas el intercambio?</p>
-                </div>
-            </div>
-            <div class="flex-grow overflow-y-auto"></div>
-        </div>
-
-        <div class="md:w-2/3 flex flex-col h-full max-h-[85vh]">
-            
-            <header class="p-4 border-b bg-white flex justify-between items-center">
-                <h2 class="text-lg font-semibold text-gray-800">Conversando con Juan Delgado</h2>
-                <button class="text-sm text-indigo-600 hover:text-indigo-800">Ver Perfil</button>
-            </header>
-
-            <div id="message-container" class="flex-grow p-4 overflow-y-auto space-y-4 bg-gray-50">
-                
-                <div class="flex justify-start">
-                    <div class="bg-gray-200 p-3 rounded-xl rounded-tl-none max-w-xs text-sm shadow">
-                        Hola, ¿te parece bien que hagamos el intercambio de Python por Diseño la próxima semana?
-                        <span class="block text-right text-xs text-gray-500 mt-1">10:05 AM</span>
+    <!-- Contenedor Principal con Diseño SkillConnect -->
+    <div class="flex flex-col h-screen max-w-7xl mx-auto">
+        
+        <!-- Header Superior -->
+        <header class="bg-white shadow-sm border-b border-gray-200 px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <a href="Dashboard.html" class="text-blue-600 hover:text-blue-700 transition">
+                        <span class="iconify" data-icon="mdi:arrow-left" data-width="24"></span>
+                    </a>
+                    <div class="flex items-center space-x-2">
+                        <span class="iconify text-blue-600" data-icon="mdi:message-text" data-width="28"></span>
+                        <h1 class="text-2xl font-bold text-gray-800">Mensajes</h1>
                     </div>
                 </div>
-
-                <div class="flex justify-end">
-                    <div class="bg-indigo-600 text-white p-3 rounded-xl rounded-tr-none max-w-xs text-sm shadow">
-                        Sí, perfecto. ¿Martes a las 4 PM te funciona?
-                        <span class="block text-right text-xs text-indigo-300 mt-1">10:07 AM</span>
-                    </div>
-                </div>
-                
-                <div class="flex justify-start">
-                    <div class="bg-gray-200 p-3 rounded-xl rounded-tl-none max-w-xs text-sm shadow">
-                        Sí, martes a las 4 PM me va genial. ¡Nos vemos!
-                        <span class="block text-right text-xs text-gray-500 mt-1">10:10 AM</span>
-                    </div>
-                </div>
-
-            </div>
-
-            <div class="p-4 border-t bg-white">
-                <form id="chat-form" class="flex space-x-3">
-                    <input 
-                        type="text" 
-                        id="message-input"
-                        placeholder="Escribe un mensaje..."
-                        required
-                        class="flex-grow px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    >
-                    <button 
-                        type="submit" 
-                        class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-full transition duration-150 ease-in-out shadow-lg"
-                    >
-                        Enviar
+                <div class="flex items-center space-x-3">
+                    <button class="relative p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-full transition">
+                        <span class="iconify" data-icon="mdi:bell" data-width="24"></span>
+                        <span class="notification-badge">3</span>
                     </button>
-                </form>
+                    <button class="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-full transition">
+                        <span class="iconify" data-icon="mdi:magnify" data-width="24"></span>
+                    </button>
+                </div>
             </div>
+        </header>
+
+        <!-- Contenedor de Chat -->
+        <div class="flex flex-1 overflow-hidden bg-white shadow-xl rounded-lg m-4">
+            
+            <!-- Panel Izquierdo: Lista de Contactos -->
+            <!-- Panel Izquierdo: Lista de Contactos -->
+            <aside class="w-full md:w-1/3 border-r border-gray-200 bg-gradient-to-b from-gray-50 to-white flex flex-col">
+                
+                <!-- Buscar Conversaciones -->
+                <div class="p-4 border-b border-gray-200">
+                    <div class="relative">
+                        <span class="iconify absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" data-icon="mdi:magnify" data-width="20"></span>
+                        <input 
+                            type="text" 
+                            placeholder="Buscar conversaciones..."
+                            class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        >
+                    </div>
+                </div>
+
+                <!-- Lista de Contactos -->
+                <div class="contact-list flex-1 overflow-y-auto">
+                    
+                    <!-- Contacto Activo -->
+                    <div class="contact-item active p-4 flex items-center space-x-3 cursor-pointer border-b border-gray-100">
+                        <div class="relative flex-shrink-0">
+                            <div class="w-12 h-12 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center text-white font-bold shadow-md">
+                                JD
+                            </div>
+                            <span class="status-dot status-online"></span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center justify-between">
+                                <p class="text-sm font-semibold text-gray-900 truncate">Juan Delgado</p>
+                                <span class="text-xs text-gray-500">10:10</span>
+                            </div>
+                            <div class="flex items-center space-x-1 mt-1">
+                                <div class="typing-indicator flex space-x-1">
+                                    <span class="w-2 h-2 bg-blue-600 rounded-full"></span>
+                                    <span class="w-2 h-2 bg-blue-600 rounded-full"></span>
+                                    <span class="w-2 h-2 bg-blue-600 rounded-full"></span>
+                                </div>
+                                <p class="text-xs text-blue-600 font-medium ml-2">Escribiendo...</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Contacto con Notificación -->
+                    <div class="contact-item p-4 flex items-center space-x-3 cursor-pointer border-b border-gray-100">
+                        <div class="relative flex-shrink-0">
+                            <div class="w-12 h-12 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center text-white font-bold shadow-md">
+                                MP
+                            </div>
+                            <span class="status-dot status-offline"></span>
+                            <span class="notification-badge">2</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center justify-between">
+                                <p class="text-sm font-semibold text-gray-900 truncate">María Pérez</p>
+                                <span class="text-xs text-gray-500">Ayer</span>
+                            </div>
+                            <p class="text-xs text-gray-600 truncate mt-1">Claro, lo reviso mañana.</p>
+                        </div>
+                    </div>
+
+                    <!-- Contacto Normal -->
+                    <div class="contact-item p-4 flex items-center space-x-3 cursor-pointer border-b border-gray-100">
+                        <div class="relative flex-shrink-0">
+                            <div class="w-12 h-12 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center text-white font-bold shadow-md">
+                                CG
+                            </div>
+                            <span class="status-dot status-online"></span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center justify-between">
+                                <p class="text-sm font-semibold text-gray-900 truncate">Carlos Gómez</p>
+                                <span class="text-xs text-gray-500">Lun</span>
+                            </div>
+                            <p class="text-xs text-gray-600 truncate mt-1">¿Aceptas el intercambio?</p>
+                        </div>
+                    </div>
+
+                    <!-- Más contactos ejemplo -->
+                    <div class="contact-item p-4 flex items-center space-x-3 cursor-pointer border-b border-gray-100">
+                        <div class="relative flex-shrink-0">
+                            <div class="w-12 h-12 bg-gradient-to-br from-purple-400 to-purple-600 rounded-full flex items-center justify-center text-white font-bold shadow-md">
+                                AS
+                            </div>
+                            <span class="status-dot status-online"></span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center justify-between">
+                                <p class="text-sm font-semibold text-gray-900 truncate">Ana Silva</p>
+                                <span class="text-xs text-gray-500">Dom</span>
+                            </div>
+                            <p class="text-xs text-gray-600 truncate mt-1">Perfecto, nos vemos entonces</p>
+                        </div>
+                    </div>
+
+                </div>
+            </aside>
+
+            <!-- Panel Derecho: Conversación -->
+            <main class="flex-1 flex flex-col bg-white">
+                
+                <!-- Header de Conversación -->
+                <header class="p-4 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-purple-50">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-3">
+                            <div class="relative">
+                                <div class="w-10 h-10 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center text-white font-bold shadow">
+                                    JD
+                                </div>
+                                <span class="status-dot status-online"></span>
+                            </div>
+                            <div>
+                                <h2 class="text-base font-bold text-gray-800">Juan Delgado</h2>
+                                <p class="text-xs text-green-600 flex items-center">
+                                    <span class="w-2 h-2 bg-green-500 rounded-full mr-1"></span>
+                                    En línea
+                                </p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <button class="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-full transition">
+                                <span class="iconify" data-icon="mdi:phone" data-width="20"></span>
+                            </button>
+                            <button class="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-full transition">
+                                <span class="iconify" data-icon="mdi:video" data-width="20"></span>
+                            </button>
+                            <button onclick="window.location.href='perfil.html'" class="px-4 py-2 text-sm font-semibold text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition flex items-center space-x-1">
+                                <span class="iconify" data-icon="mdi:account" data-width="18"></span>
+                                <span>Ver Perfil</span>
+                            </button>
+                        </div>
+                    </div>
+                </header>
+
+                <!-- Área de Mensajes -->
+                <div id="message-container" class="flex-1 p-6 overflow-y-auto space-y-4 bg-gradient-to-b from-gray-50 to-white">
+                    
+                    <!-- Mensaje Recibido -->
+                    <div class="flex justify-start message-received">
+                        <div class="flex items-end space-x-2 max-w-md">
+                            <div class="w-8 h-8 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+                                JD
+                            </div>
+                            <div>
+                                <div class="message-bubble bg-white p-4 rounded-2xl rounded-bl-none shadow-md border border-gray-100">
+                                    <p class="text-sm text-gray-800">Hola, ¿te parece bien que hagamos el intercambio de Python por Diseño la próxima semana?</p>
+                                </div>
+                                <span class="block text-xs text-gray-500 mt-1 ml-2">10:05 AM</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mensaje Enviado -->
+                    <div class="flex justify-end message-sent">
+                        <div class="flex items-end space-x-2 max-w-md">
+                            <div>
+                                <div class="message-bubble bg-gradient-to-br from-blue-600 to-purple-600 text-white p-4 rounded-2xl rounded-br-none shadow-lg">
+                                    <p class="text-sm">Sí, perfecto. ¿Martes a las 4 PM te funciona?</p>
+                                </div>
+                                <span class="block text-xs text-gray-500 mt-1 mr-2 text-right">10:07 AM</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Mensaje Recibido -->
+                    <div class="flex justify-start message-received">
+                        <div class="flex items-end space-x-2 max-w-md">
+                            <div class="w-8 h-8 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+                                JD
+                            </div>
+                            <div>
+                                <div class="message-bubble bg-white p-4 rounded-2xl rounded-bl-none shadow-md border border-gray-100">
+                                    <p class="text-sm text-gray-800">Sí, martes a las 4 PM me va genial. ¡Nos vemos!</p>
+                                </div>
+                                <span class="block text-xs text-gray-500 mt-1 ml-2">10:10 AM</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Input de Mensaje -->
+                <footer class="p-4 border-t border-gray-200 bg-white">
+                    <form id="chat-form" class="flex items-center space-x-3">
+                        <button type="button" class="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-full transition">
+                            <span class="iconify" data-icon="mdi:emoticon-happy-outline" data-width="24"></span>
+                        </button>
+                        <button type="button" class="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-full transition">
+                            <span class="iconify" data-icon="mdi:attachment" data-width="24"></span>
+                        </button>
+                        <input 
+                            type="text" 
+                            id="message-input"
+                            placeholder="Escribe un mensaje..."
+                            required
+                            class="flex-1 px-4 py-3 bg-gray-50 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white transition"
+                        >
+                        <button 
+                            type="submit" 
+                            class="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-3 px-6 rounded-full transition duration-200 ease-in-out shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center space-x-2"
+                        >
+                            <span class="iconify" data-icon="mdi:send" data-width="20"></span>
+                            <span>Enviar</span>
+                        </button>
+                    </form>
+                </footer>
+            </main>
+
         </div>
     </div>
 
@@ -121,12 +400,12 @@
 
                 if (messageText) {
                     addMessageToChat(messageText, 'sent');
-                    input.value = ''; // Limpia el input
+                    input.value = '';
                     scrollToBottom();
 
-                    // Opcional: Simula una respuesta del receptor después de 1.5 segundos
+                    // Simular respuesta automática
                     setTimeout(() => {
-                        addMessageToChat("Mensaje recibido y leído. ✅", 'received');
+                        addMessageToChat("Mensaje recibido. Gracias por escribir ✅", 'received');
                         scrollToBottom();
                     }, 1500);
                 }
@@ -137,27 +416,35 @@
                 const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
                 const messageDiv = document.createElement('div');
-                const bubbleDiv = document.createElement('div');
-                const timeSpan = document.createElement('span');
-                
-                timeSpan.className = 'block text-right text-xs mt-1';
-                timeSpan.textContent = timeString;
+                messageDiv.className = 'flex ' + (type === 'sent' ? 'justify-end message-sent' : 'justify-start message-received');
 
                 if (type === 'sent') {
-                    // Mensaje Mío (Emisor)
-                    messageDiv.className = 'flex justify-end';
-                    bubbleDiv.className = 'bg-indigo-600 text-white p-3 rounded-xl rounded-tr-none max-w-xs text-sm shadow';
-                    timeSpan.classList.add('text-indigo-300'); // Color de hora para mensajes enviados
+                    messageDiv.innerHTML = `
+                        <div class="flex items-end space-x-2 max-w-md">
+                            <div>
+                                <div class="message-bubble bg-gradient-to-br from-blue-600 to-purple-600 text-white p-4 rounded-2xl rounded-br-none shadow-lg">
+                                    <p class="text-sm">${text}</p>
+                                </div>
+                                <span class="block text-xs text-gray-500 mt-1 mr-2 text-right">${timeString}</span>
+                            </div>
+                        </div>
+                    `;
                 } else {
-                    // Mensaje de Juan (Receptor)
-                    messageDiv.className = 'flex justify-start';
-                    bubbleDiv.className = 'bg-gray-200 p-3 rounded-xl rounded-tl-none max-w-xs text-sm shadow';
-                    timeSpan.classList.add('text-gray-500'); // Color de hora para mensajes recibidos
+                    messageDiv.innerHTML = `
+                        <div class="flex items-end space-x-2 max-w-md">
+                            <div class="w-8 h-8 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+                                JD
+                            </div>
+                            <div>
+                                <div class="message-bubble bg-white p-4 rounded-2xl rounded-bl-none shadow-md border border-gray-100">
+                                    <p class="text-sm text-gray-800">${text}</p>
+                                </div>
+                                <span class="block text-xs text-gray-500 mt-1 ml-2">${timeString}</span>
+                            </div>
+                        </div>
+                    `;
                 }
                 
-                bubbleDiv.textContent = text;
-                bubbleDiv.appendChild(timeSpan);
-                messageDiv.appendChild(bubbleDiv);
                 container.appendChild(messageDiv);
             }
 
@@ -165,7 +452,6 @@
                 container.scrollTop = container.scrollHeight;
             }
             
-            // Asegura que al cargar la página se vea el último mensaje
             scrollToBottom();
         });
     </script>
