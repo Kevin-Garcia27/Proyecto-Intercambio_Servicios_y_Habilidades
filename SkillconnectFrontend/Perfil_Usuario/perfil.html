@@ -1,242 +1,3143 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Perfil de Usuario - SkillConnect</title>
-    
-    <!-- React y ReactDOM desde CDN -->
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-    
-    <!-- Babel Standalone para transpilar JSX en el navegador -->
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    
-    <!-- Leaflet para mapas -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    
-    <!-- CSS -->
-    <link rel="stylesheet" href="css/App.css">
-    <link rel="stylesheet" href="css/index.css">
-    <link rel="stylesheet" href="css/inline-edit.css">
-    <link rel="stylesheet" href="css/galeria-uniforme.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Perfil de Usuario - TruequeHub</title>
+  
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background-color: #f4f7f9;
+      color: #1f2937;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .app-container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .max-w-5xl {
+      max-width: 80rem;
+      margin: 0 auto;
+    }
+
+    /* Glass Card Effect */
+    .glass-card {
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      margin-bottom: 24px;
+    }
+
+    /* Profile Header */
+    .profile-header {
+      position: relative;
+      padding: 32px 24px;
+    }
+
+    .action-buttons {
+      position: absolute;
+      top: 24px;
+      right: 24px;
+      display: flex;
+      gap: 12px;
+      z-index: 10;
+    }
+
+    .action-buttons-mobile {
+      display: none;
+    }
+
+    .logout-button {
+      padding: 12px 24px;
+      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+      color: white;
+      border: none;
+      border-radius: 24px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .logout-button:hover {
+      background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(239, 68, 68, 0.4);
+    }
+
+    /* Modal Personalizado */
+    .custom-modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .custom-modal {
+      background: white;
+      border-radius: 16px;
+      padding: 32px;
+      max-width: 400px;
+      width: 90%;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      animation: slideUp 0.3s ease;
+    }
+
+    @keyframes slideUp {
+      from { 
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to { 
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .modal-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #d97706;
+      font-size: 24px;
+    }
+
+    .modal-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: #1f2937;
+    }
+
+    .modal-message {
+      color: #6b7280;
+      line-height: 1.6;
+      margin-bottom: 24px;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+    }
+
+    .modal-btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 14px;
+    }
+
+    .modal-btn-cancel {
+      background: #f3f4f6;
+      color: #4b5563;
+    }
+
+    .modal-btn-cancel:hover {
+      background: #e5e7eb;
+    }
+
+    .modal-btn-confirm {
+      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+      color: white;
+      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+    }
+
+    .modal-btn-confirm:hover {
+      background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(239, 68, 68, 0.4);
+    }
+
+    .profile-content {
+      display: flex;
+      align-items: flex-start;
+      gap: 32px;
+    }
+
+    .profile-pic-container {
+      position: relative;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .profile-pic {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 4px solid #e5e7eb;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    }
+
+    .camera-icon {
+      position: absolute;
+      bottom: 8px;
+      right: 8px;
+      width: 36px;
+      height: 36px;
+      background: #2563eb;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 8px rgba(37, 99, 235, 0.3);
+    }
+
+    .camera-icon svg {
+      width: 20px;
+      height: 20px;
+      color: white;
+    }
+
+    .profile-info {
+      flex: 1;
+    }
+
+    .profile-name {
+      font-size: 32px;
+      font-weight: 700;
+      color: #1f2937;
+      margin-bottom: 4px;
+    }
+
+    .profile-username {
+      font-size: 16px;
+      color: #6b7280;
+      margin-bottom: 16px;
+    }
+
+    .profile-bio {
+      font-size: 15px;
+      line-height: 1.6;
+      color: #4b5563;
+      margin-bottom: 16px;
+      max-width: 600px;
+    }
+
+    .verified-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      background: rgba(37, 99, 235, 0.1);
+      border: 1px solid rgba(37, 99, 235, 0.3);
+      border-radius: 20px;
+      font-size: 14px;
+      color: #2563eb;
+      font-weight: 600;
+    }
+
+    /* Editable Fields */
+    .editable {
+      position: relative;
+      display: inline-block;
+      min-width: 60px;
+      cursor: text;
+      padding: 4px 8px;
+      border-radius: 6px;
+      transition: all 0.2s;
+    }
+
+    .editable:hover {
+      background: #f3f4f6;
+    }
+
+    .editable.editing {
+      background: white;
+      border: 2px solid #2563eb;
+      min-width: 200px; /* Asegurar ancho mínimo consistente */
+    }
+
+    .editable input,
+    .editable textarea,
+    .editable select {
+      width: 100%;
+      background: transparent;
+      border: none;
+      color: inherit;
+      font: inherit;
+      outline: none;
+      resize: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .editable input[type="date"] {
+      min-width: 200px; /* Asegurar que el input de fecha tenga ancho consistente */
+    }
+
+    .editable textarea {
+      min-height: 60px;
+    }
+
+    /* Main Grid */
+    .main-grid-redesigned {
+      display: grid;
+      gap: 24px;
+    }
+
+    .top-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    /* Sections */
+    .section-title-primary,
+    .section-title-secondary,
+    .section-title-white {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      color: #1f2937;
+    }
+
+    .section-description {
+      font-size: 14px;
+      color: #6b7280;
+      margin-bottom: 16px;
+    }
+
+    /* Data List */
+    .data-list {
+      list-style: none;
+      display: grid;
+      gap: 12px;
+    }
+
+    .data-list li {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      background: #f9fafb;
+      border-radius: 8px;
+      border: 1px solid #e5e7eb;
+    }
+
+    .data-list .label {
+      font-weight: 600;
+      color: #374151;
+      min-width: 160px;
+    }
+
+    /* Stats */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .stat {
+      text-align: center;
+      padding: 16px;
+      background: #f9fafb;
+      border-radius: 12px;
+      border: 1px solid #e5e7eb;
+    }
+
+    .stat-number-primary {
+      font-size: 32px;
+      font-weight: 700;
+      color: #2563eb;
+      margin-bottom: 4px;
+    }
+
+    .stat-number-secondary {
+      font-size: 32px;
+      font-weight: 700;
+      color: #2563eb;
+      margin-bottom: 4px;
+    }
+
+    .stat-label {
+      font-size: 13px;
+      color: #6b7280;
+    }
+
+    /* Skills */
+    .skills-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .skill-tag-offered,
+    .skill-tag-required {
+      padding: 10px 18px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      user-select: none;
+    }
+
+    .skill-tag-offered {
+      background: rgba(37, 99, 235, 0.1);
+      color: #2563eb;
+      border: 1px solid rgba(37, 99, 235, 0.3);
+    }
+
+    .skill-tag-offered:hover {
+      background: rgba(37, 99, 235, 0.2);
+      transform: translateY(-2px);
+    }
+
+    .skill-tag-required {
+      background: rgba(16, 185, 129, 0.1);
+      color: #059669;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .skill-tag-required:hover {
+      background: rgba(16, 185, 129, 0.2);
+      transform: translateY(-2px);
+    }
+
+    .add-skill-button-primary,
+    .add-skill-button-secondary {
+      padding: 10px 18px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 2px dashed;
+      background: transparent;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+
+    .add-skill-button-primary {
+      color: #2563eb;
+      border-color: rgba(37, 99, 235, 0.4);
+    }
+
+    .add-skill-button-primary:hover {
+      background: rgba(37, 99, 235, 0.1);
+      border-color: rgba(37, 99, 235, 0.6);
+    }
+
+    .add-skill-button-secondary {
+      color: #059669;
+      border-color: rgba(16, 185, 129, 0.4);
+    }
+
+    .add-skill-button-secondary:hover {
+      background: rgba(16, 185, 129, 0.1);
+      border-color: rgba(16, 185, 129, 0.6);
+    }
+
+    .skill-detail-card {
+      padding: 16px;
+      background: #f9fafb;
+      border-radius: 12px;
+      border: 1px solid #e5e7eb;
+      margin-top: 12px;
+    }
+
+    .skill-detail-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #1f2937;
+      margin-bottom: 8px;
+    }
+
+    .skill-detail-text {
+      font-size: 14px;
+      color: #4b5563;
+      line-height: 1.6;
+    }
+
+    /* Map Container */
+    .map-container {
+      margin-top: 24px;
+    }
+
+    #map {
+      width: 100%;
+      height: 250px;
+      border-radius: 8px;
+      border: 1px solid #e5e7eb;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .location-button {
+      width: 100%;
+      padding: 12px;
+      background: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s;
+      margin-bottom: 12px;
+    }
+
+    .location-button:hover:not(:disabled) {
+      background: #1d4ed8;
+      transform: translateY(-2px);
+    }
+
+    .location-button:disabled {
+      background: #93c5fd;
+      cursor: not-allowed;
+    }
+
+    /* Gallery */
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 16px;
+      margin-top: 16px;
+    }
+
+    .gallery-item {
+      position: relative;
+      aspect-ratio: 1;
+      border-radius: 12px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: all 0.3s;
+      border: 2px solid transparent;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+    }
+
+    .gallery-item:hover {
+      transform: scale(1.05);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    }
+
+    .gallery-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .gallery-upload {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(249, 250, 251, 0.5);
+      border: 3px dashed #a5b4fc;
+      cursor: pointer;
+      transition: all 0.3s;
+      aspect-ratio: 1;
+      border-radius: 12px;
+      backdrop-filter: blur(10px);
+    }
+
+    .gallery-upload:hover {
+      background: rgba(243, 244, 246, 0.8);
+      border-color: #6366f1;
+      transform: scale(1.02);
+    }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      backdrop-filter: blur(4px);
+    }
+
+    .modal-content {
+      width: 90%;
+      max-width: 500px;
+      padding: 32px;
+    }
+
+    .modal-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: #1f2937;
+      margin-bottom: 24px;
+    }
+
+    .modal-input {
+      width: 100%;
+      padding: 14px 16px;
+      background: white;
+      color: #1f2937;
+      border: 2px solid #e5e7eb;
+      border-radius: 8px;
+      font-size: 15px;
+      margin-bottom: 16px;
+      transition: border-color 0.2s;
+    }
+
+    .modal-input:focus {
+      outline: none;
+      border-color: #2563eb;
+    }
+
+    .modal-buttons {
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+      margin-top: 24px;
+    }
+
+    .modal-button-cancel,
+    .modal-button-submit {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .modal-button-cancel {
+      background: #f3f4f6;
+      color: #374151;
+    }
+
+    .modal-button-cancel:hover {
+      background: #e5e7eb;
+    }
+
+    .modal-button-submit {
+      background: #2563eb;
+      color: white;
+    }
+
+    .modal-button-submit:hover {
+      background: #1d4ed8;
+      transform: translateY(-2px);
+    }
+
+    /* Context Menu */
+    .context-menu-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 999;
+    }
+
+    .context-menu {
+      position: fixed;
+      background: white;
+      backdrop-filter: blur(12px);
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 8px;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      z-index: 1000;
+      min-width: 150px;
+    }
+.pixel-chart-svg-container {
+  width: 100%;
+  margin-top: 12px;
+}
+
+.pixel-chart-svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+    .context-menu-item {
+      width: 100%;
+      padding: 10px 14px;
+      background: transparent;
+      border: none;
+      color: #374151;
+      text-align: left;
+      cursor: pointer;
+      border-radius: 6px;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      transition: background 0.2s;
+    }
+
+    .context-menu-item:hover {
+      background: #f3f4f6;
+    }
+
+    .context-menu-item.danger {
+      color: #ef4444;
+    }
+
+    .context-menu-item.danger:hover {
+      background: rgba(239, 68, 68, 0.1);
+    }
+
+    /* Icons */
+    .icon-xs { width: 16px; height: 16px; }
+    .icon-sm { width: 20px; height: 20px; }
+    .icon-md { width: 24px; height: 24px; }
+
+    /* Loading */
+    .loading-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      text-align: center;
+    }
+
+    .loading-spinner {
+      margin-top: 20px;
+      font-size: 40px;
+    }
+
+    /* Saving Indicator */
+    .saving-indicator {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #2563eb;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(37, 99, 235, 0.3);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .spinner {
+      width: 16px;
+      height: 16px;
+      border: 2px solid white;
+      border-top-color: transparent;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Reviews Section */
+    .reviews-container {
+      display: grid;
+      gap: 16px;
+      margin-top: 20px;
+    }
+
+    .review-card {
+      padding: 20px;
+      background: #f9fafb;
+      border-radius: 12px;
+      border: 1px solid #e5e7eb;
+    }
+
+    .review-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .review-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 2px solid #e5e7eb;
+    }
+
+    .review-name {
+      font-weight: 600;
+      color: #1f2937;
+      margin-bottom: 4px;
+    }
+
+    .review-rating {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      color: #fbbf24;
+      font-size: 14px;
+    }
+
+    .review-text {
+      color: #4b5563;
+      line-height: 1.6;
+      margin-bottom: 8px;
+    }
+
+    .review-date {
+      font-size: 13px;
+      color: #6b7280;
+    }
+
+    .rating-summary {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding: 24px;
+      background: #f9fafb;
+      border-radius: 12px;
+      margin-bottom: 24px;
+    }
+
+    .rating-score {
+      font-size: 56px;
+      font-weight: 700;
+      color: #fbbf24;
+    }
+
+    .stars-container {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 8px;
+    }
+
+    .star-filled,
+    .star-empty {
+      width: 24px;
+      height: 24px;
+      color: #fbbf24;
+    }
+
+    .star-empty {
+      color: #d1d5db;
+    }
+
+    .star-small {
+      width: 16px;
+      height: 16px;
+      color: #fbbf24;
+    }
+
+    .rating-text {
+      color: #6b7280;
+      font-size: 14px;
+    }
+
+    .view-all-button {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .view-all-button button {
+      padding: 12px 24px;
+      background: #f3f4f6;
+      color: #374151;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .view-all-button button:hover {
+      background: #e5e7eb;
+      border-color: #9ca3af;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .top-row {
+        grid-template-columns: 1fr;
+      }
+
+      .profile-content {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+      }
+
+      .action-buttons-desktop {
+        display: none;
+      }
+
+      .action-buttons-mobile {
+        display: flex;
+        justify-content: center;
+        margin-top: 16px;
+        position: static;
+      }
+
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .gallery-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Pixel Bar Chart Styles */
+    .pixel-chart {
+      margin-top: 20px;
+      padding: 16px;
+      background: #f9fafb;
+      border-radius: 12px;
+      border: 1px solid #e5e7eb;
+    }
+
+    .pixel-chart-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #6b7280;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+
+    .pixel-bars {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-around;
+      height: 120px;
+      gap: 12px;
+    }
+
+    .pixel-bar {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .pixel-bar-fill {
+      width: 100%;
+      background: linear-gradient(to top, currentColor, transparent);
+      border-radius: 4px 4px 0 0;
+      transition: height 0.5s ease;
+      position: relative;
+    }
+
+    .pixel-bar-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: #6b7280;
+    }
+  </style>
 </head>
 <body>
-    <div id="root">
-        <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; background: linear-gradient(145deg, #10151f 0%, #303747 100%); color: white; font-family: Arial, sans-serif;">
-            <div style="border: 4px solid rgba(139, 92, 246, 0.3); border-top: 4px solid #8B5CF6; border-radius: 50%; width: 60px; height: 60px; animation: spin 1s linear infinite;"></div>
-            <h2 style="margin-top: 24px; font-size: 24px;">Cargando SkillConnect...</h2>
-            <p style="color: rgba(255,255,255,0.6); margin-top: 8px;">Compilando componentes React</p>
-            <div id="loading-progress" style="margin-top: 16px; color: rgba(255,255,255,0.5); font-size: 14px;">
-                Inicializando...
-            </div>
-        </div>
+  <div class="app-container">
+    <!-- Loading State -->
+    <div id="loadingState" class="loading-container" style="display: none;">
+      <div>
+        <h2>Cargando datos del usuario...</h2>
+        <div class="loading-spinner"></div>
+      </div>
     </div>
-    
-    <style>
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+
+    <!-- Error State -->
+    <div id="errorState" class="loading-container" style="display: none;">
+      <div>
+        <h2 style="color: #ef4444;">Error al cargar datos</h2>
+        <p id="errorMessage"></p>
+        <button onclick="cargarUsuario()" style="margin-top: 20px; padding: 10px 20px; background: #2563eb; color: white; border: none; border-radius: 8px; cursor: pointer;">
+          Reintentar
+        </button>
+      </div>
+    </div>
+
+    <!-- Saving Indicator -->
+    <div id="savingIndicator" class="saving-indicator" style="display: none;">
+      <div class="spinner"></div>
+      Guardando...
+    </div>
+
+    <!-- Main Content -->
+    <div id="mainContent" class="max-w-5xl">
+      <!-- Profile Header -->
+      <div class="profile-header glass-card">
+        <div class="action-buttons action-buttons-desktop">
+          <button class="logout-button" onclick="showLogoutModal()" title="Cerrar Sesión">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon-sm" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z" clip-rule="evenodd" />
+            </svg>
+            Cerrar Sesión
+          </button>
+        </div>
+
+        <div class="profile-content">
+          <div class="profile-pic-container" id="profilePicContainer">
+            <img class="profile-pic" id="profilePic" src="" alt="Perfil">
+            <div class="camera-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" class="icon-sm" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 4-3v2z" />
+              </svg>
+            </div>
+          </div>
+          <input type="file" id="profileUpload" accept="image/jpeg, image/png, image/gif" style="display: none;">
+
+          <div class="profile-info">
+            <h1 class="profile-name">
+              <span class="editable" id="nombreCompleto" data-field="nombre_Usuario"></span>
+            </h1>
+            <p class="profile-username" id="username">@usuario</p>
+            <div class="profile-bio">
+              <div class="editable" id="descripcion" data-field="descripcion_Usuario"></div>
+            </div>
+            <div class="verified-badge">
+              <svg xmlns="http://www.w3.org/2000/svg" class="icon-sm" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+              </svg>
+              <span>Usuario Verificado</span>
+            </div>
+
+            <div class="action-buttons action-buttons-mobile">
+              <button class="logout-button" onclick="showLogoutModal()" title="Cerrar Sesión">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon-sm" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z" clip-rule="evenodd" />
+                </svg>
+                Cerrar Sesión
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Grid -->
+      <div class="main-grid-redesigned">
+        <!-- Top Row -->
+        <div class="top-row">
+          <!-- Personal Data -->
+          <div class="glass-card location-section">
+            <h2 class="section-title-primary">
+              <svg xmlns="http://www.w3.org/2000/svg" class="icon-md" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
+              </svg>
+              Datos Personales
+            </h2>
+            <ul class="data-list" id="datosPersonales">
+     <!-- Se llenará dinámicamente -->
+            </ul>
+          </div>
+
+          <!-- Stats Section -->
+          <div class="glass-card stats-section">
+            <h2 class="section-title-secondary">
+              <svg xmlns="http://www.w3.org/2000/svg" class="icon-md" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a6 6 0 015.917 5h-2.09a4.001 4.001 0 00-3.827-3V5zM4.173 10A6.002 6.002 0 0110 4v2a4.002 4.002 0 00-3.827 3H4.173zm5.827 6a6.002 6.002 0 01-5.827-5h2.09A4.001 4.001 0 0010 14v2zm0 0v-2a4.002 4.002 0 003.827-3h2.09A6.002 6.002 0 0110 16z" clip-rule="evenodd" />
+              </svg>
+              Estadísticas
+            </h2>
+            <div class="stats-grid">
+              <div class="stat">
+                <p class="stat-number-primary">12</p>
+                <p class="stat-label">Intercambios (HU 13)</p>
+              </div>
+              <div class="stat">
+                <p class="stat-number-secondary">8</p>
+                <p class="stat-label">Favoritos (HU 10)</p>
+              </div>
+              <div class="stat">
+                <p class="stat-number-primary" id="statOfferedSkills">0</p>
+                <p class="stat-label">Habilidades Ofrecidas</p>
+              </div>
+            </div>
+
+            <!-- Pixel Bar Chart -->
+            <div class="pixel-chart">
+              <div class="pixel-chart-title">Resumen</div>
+              
+           
+            </div>
+
+            <!-- Map -->
+            <div class="map-container">
+              <h3 style="color: #e5e7eb; font-size: 14px; font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
+                </svg>
+                Ubicación
+              </h3>
+              
+              <button id="locationBtn" class="location-button">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
+                </svg>
+                Obtener mi ubicación
+              </button>
+
+              <div id="locationMessage" style="display: none; padding: 10px 12px; border-radius: 6px; font-size: 13px; margin-bottom: 12px;"></div>
+
+              <div id="map"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Skills Offered -->
+        <div class="glass-card skills-offered-section">
+          <h2 class="section-title-secondary">Habilidades que Ofrezco</h2>
+          <p class="section-description">Estas son las habilidades que ofrezco para un intercambio.</p>
+          <div class="skills-container" id="offeredSkillsContainer">
+            <!-- Se llenará dinámicamente -->
+          </div>
+          <div id="selectedOfferedDetail" style="display: none;"></div>
+        </div>
+
+        <!-- Skills Required -->
+        <div class="glass-card skills-required-section">
+          <h2 class="section-title-primary">Habilidades que Necesito</h2>
+          <p class="section-description">Busca a otros usuarios con estas habilidades para iniciar un trueque.</p>
+          <div class="skills-container" id="requiredSkillsContainer">
+            <!-- Se llenará dinámicamente -->
+          </div>
+          <div id="selectedRequiredDetail" style="display: none;"></div>
+        </div>
+
+        <!-- Gallery -->
+        <div class="glass-card">
+          <h2 class="section-title-primary">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon-md" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd" />
+            </svg>
+            Galería de Imágenes
+          </h2>
+          <div class="gallery-grid" id="galleryGrid">
+            <!-- Se llenará dinámicamente -->
+          </div>
+          <input type="file" id="galleryUpload" accept="image/jpeg, image/png, image/gif" style="display: none;">
+        </div>
+
+        <!-- Reviews -->
+        <div class="glass-card reviews-section">
+          <h2 class="section-title-white">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon-md" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.91 8.724c-.783-.57-.381-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+            </svg>
+            Calificaciones y Reseñas
+          </h2>
+
+          <div class="rating-summary">
+            <div class="rating-score">4.7</div>
+            <div>
+              <div class="stars-container">
+                <svg class="star-filled" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.91 8.724c-.783-.57-.381-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                </svg>
+                <svg class="star-filled" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.91 8.724c-.783-.57-.381-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                </svg>
+                <svg class="star-filled" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.91 8.724c-.783-.57-.381-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                </svg>
+                <svg class="star-filled" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.91 8.724c-.783-.57-.381-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                </svg>
+                <svg class="star-empty" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.91 8.724c-.783-.57-.381-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                </svg>
+              </div>
+              <p class="rating-text">Basado en 12 intercambios.</p>
+            </div>
+          </div>
+
+          <div class="reviews-container">
+            <div class="review-card">
+              <div class="review-header">
+                <img class="review-avatar" src="https://ui-avatars.com/api/?name=JP&background=10B981&color=ffffff&size=40&bold=true&rounded=true" alt="Usuario">
+                <div>
+                  <p class="review-name">JuanPerez</p>
+                  <div class="review-rating">
+                    <span>5.0</span>
+                    <svg class="star-small" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.91 8.724c-.783-.57-.381-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+              <p class="review-text">"Ana me dio una tutoría de inglés excelente. Muy paciente y con material de apoyo de calidad. ¡Definitivamente la recomiendo!"</p>
+              <p class="review-date">Hace 2 días - Intercambio por Clases de Guitarra</p>
+            </div>
+
+            <div class="review-card">
+              <div class="review-header">
+                <img class="review-avatar" src="https://ui-avatars.com/api/?name=MC&background=4F46E5&color=ffffff&size=40&bold=true&rounded=true" alt="Usuario">
+                <div>
+                  <p class="review-name">Manuel_C</p>
+                  <div class="review-rating">
+                    <span>4.0</span>
+                    <svg class="star-small" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.91 8.724c-.783-.57-.381-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+              <p class="review-text">"La sesión de diseño gráfico fue útil, aunque tardó un poco en responder al inicio. El resultado final fue bueno."</p>
+              <p class="review-date">Hace 1 semana - Intercambio por Reparación de Scooter</p>
+            </div>
+
+            <div class="review-card">
+              <div class="review-header">
+                <img class="review-avatar" src="https://ui-avatars.com/api/?name=DR&background=14B8A6&color=ffffff&size=40&bold=true&rounded=true" alt="Usuario">
+                <div>
+                  <p class="review-name">DianaR</p>
+                  <div class="review-rating">
+                    <span>5.0</span>
+                    <svg class="star-small" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.91 8.724c-.783-.57-.381-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+              <p class="review-text">"¡Un trabajo de SEO excelente! Me ayudó a posicionar mi pequeño negocio en tiempo récord. La mejor opción."</p>
+              <p class="review-date">Hace 3 semanas - Intercambio por Tutoría de Álgebra</p>
+            </div>
+          </div>
+
+          <div class="view-all-button">
+            <button>Ver todas las 12 reseñas</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal for Skills -->
+    <div id="skillModal" class="modal-overlay" style="display: none;">
+      <div class="modal-content glass-card">
+        <h3 class="modal-title" id="modalTitle">Añadir Habilidad</h3>
+        <select id="skillCategory" class="modal-input">
+          <option value="">Seleccione una categoría (opcional)</option>
+        </select>
+        <input type="text" id="skillInput" class="modal-input" placeholder="Ej: Programación en Python">
+        <input type="text" id="skillDescription" class="modal-input" placeholder="Descripción corta (opcional)">
+        <div class="modal-buttons">
+          <button class="modal-button-cancel" onclick="hideSkillModal()">Cancelar</button>
+          <button class="modal-button-submit" onclick="addSkill()">Agregar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Context Menu -->
+    <div id="contextMenuBackdrop" class="context-menu-backdrop" style="display: none;"></div>
+    <div id="contextMenu" class="context-menu" style="display: none;">
+      <button class="context-menu-item" onclick="handleEditSkill()">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon-xs" viewBox="0 0 20 20" fill="currentColor" style="margin-right: 8px;">
+          <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+        </svg>
+        Editar
+      </button>
+      <button class="context-menu-item danger" onclick="handleDeleteSkill()">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon-xs" viewBox="0 0 20 20" fill="currentColor" style="margin-right: 8px;">
+          <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+        </svg>
+        Eliminar
+      </button>
+    </div>
+
+    <!-- Image Context Menu -->
+    <div id="imageContextMenu" class="context-menu" style="display: none;">
+      <button class="context-menu-item" onclick="handleChangeImage()">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon-xs" viewBox="0 0 20 20" fill="currentColor" style="margin-right: 8px;">
+          <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+        </svg>
+        Cambiar
+      </button>
+      <button class="context-menu-item danger" onclick="handleDeleteImage()">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon-xs" viewBox="0 0 20 20" fill="currentColor" style="margin-right: 8px;">
+          <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+        </svg>
+        Eliminar
+      </button>
+    </div>
+
+    <!-- Profile Context Menu -->
+    <div id="profileContextMenu" class="context-menu" style="display: none;">
+      <button class="context-menu-item" onclick="handleEditProfileImage()">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon-xs" viewBox="0 0 20 20" fill="currentColor" style="margin-right: 8px;">
+          <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+        </svg>
+        Editar
+      </button>
+      <button class="context-menu-item danger" onclick="handleDeleteProfileImage()">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon-xs" viewBox="0 0 20 20" fill="currentColor" style="margin-right: 8px;">
+          <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+        </svg>
+        Eliminar
+      </button>
+    </div>
+  </div>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  
+  <!-- Componentes personalizados -->
+  <script src="js/SelectEditable.js"></script>
+  <script src="js/InlineEditable.js"></script>
+  <script src="js/BlurFade.js"></script>
+  <script src="js/GaleriaUniforme.js"></script>
+  <script src="js/PixelBarChart.js"></script>
+  
+  <script>
+    // ======================
+    // VARIABLES GLOBALES
+    // ======================
+    let usuario = {};
+    let offeredSkills = [];
+    let requiredSkills = [];
+    let categorias = [];
+    let galeriaImagenes = [];
+    let geolocalizacion = {
+      latitud: 14.0650,
+      longitud: -87.1715,
+      obteniendo: false,
+      mensaje: '',
+      ubicacionReal: false
+    };
+    let mapInstance = null;
+    let perfilPersonaId = null;
+    let direccionId = null;
+    let geolocalizacionId = null;
+    let usuarioId = null;
+    let guardando = false;
+    let currentSkillType = 'offered';
+    let editSkillIndex = null;
+    let editSkillId = null;
+    let contextMenuData = { type: null, index: null };
+    let imageContextMenuIndex = null;
+
+    // ======================
+    // API BASE URL
+    // ======================
+    const API_BASE = 'http://localhost:3001/api';
+
+    // ======================
+    // INICIALIZACIÓN
+    // ======================
+    document.addEventListener('DOMContentLoaded', () => {
+      // Obtener usuario ID desde localStorage
+      const usuarioIdFromStorage = localStorage.getItem('usuarioId');
+      usuarioId = usuarioIdFromStorage ? parseInt(usuarioIdFromStorage, 10) : null;
+
+      // Verificar sesión
+      if (!usuarioId) {
+        showSessionExpiredModal();
+        return;
+      }
+
+      // Cargar datos
+      cargarUsuario();
+
+      // Event listeners
+      setupEventListeners();
+    });
+
+    // ======================
+    // SETUP EVENT LISTENERS
+    // ======================
+    function setupEventListeners() {
+      // Profile pic upload
+      document.getElementById('profilePicContainer').addEventListener('click', (e) => {
+        e.stopPropagation();
+        document.getElementById('profileUpload').click();
+      });
+
+      document.getElementById('profilePicContainer').addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        showProfileContextMenu(e.clientX, e.clientY);
+      });
+
+      document.getElementById('profileUpload').addEventListener('change', handleProfileImageUpload);
+
+      // Gallery upload
+      document.getElementById('galleryUpload').addEventListener('change', handleGalleryImageUpload);
+
+      // Location button
+      document.getElementById('locationBtn').addEventListener('click', obtenerUbicacion);
+
+      // Close context menus on click outside
+      document.addEventListener('click', () => {
+        closeAllContextMenus();
+      });
+
+      // Close context menus on escape
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          closeAllContextMenus();
+          hideSkillModal();
         }
-    </style>
+      });
 
-    <!-- userData y constantes globales -->
-    <script>
-        const API_BASE_URL = 'http://localhost:3001/api';
+      // Modal overlay click
+      document.getElementById('skillModal').addEventListener('click', (e) => {
+        if (e.target.id === 'skillModal') {
+          hideSkillModal();
+        }
+      });
+    }
 
-        // userData
-        const usuarioInicial = {
-            nombre_Usuario: '',
-            apellido_Usuario: '',
-            descripcion_Usuario: '',
-            imagenUrl_Usuario: '',
-            imagen1Url_Usuario: '',
-            imagen2Url_Usuario: '',
-            imagen3Url_Usuario: '',
-            pais: '',
-            departamento: '',
-            ciudad: '',
-            codigoPostal: '',
-            estadoCivil_Usuario: 'Soltero',
-            genero_Usuario: 'Otro',
-            tipoIdentificacion_Usuario: 'DNI',
-            identificacion_usuario: '',
-            fechaNacimiento: ''
+    // ======================
+    // CARGAR DATOS DEL USUARIO
+    // ======================
+    async function cargarUsuario() {
+      try {
+        showLoading(true);
+
+        // 1. Consultar persona por usuario ID
+        const resPersona = await fetch(`${API_BASE}/personas/by-usuario/${usuarioId}`);
+        const dataPersona = await resPersona.json();
+        
+        if (!resPersona.ok || !dataPersona.success || !dataPersona.data) {
+          throw new Error('No se pudo obtener el perfil de la persona');
+        }
+
+        const personaDB = dataPersona.data;
+        perfilPersonaId = personaDB.id_Perfil_Persona;
+
+        // 2. Consultar dirección (sin mostrar error 404 en consola)
+        let direccionDB = null;
+        try {
+          await fetch(`${API_BASE}/direcciones/persona/${perfilPersonaId}`)
+            .then(async resDireccion => {
+              if (resDireccion.status === 404) {
+                // No hay dirección, dejar null
+              } else {
+                const dataDireccion = await resDireccion.json();
+                if (resDireccion.ok && dataDireccion.success && dataDireccion.data) {
+                  direccionDB = Array.isArray(dataDireccion.data) ? dataDireccion.data[0] : dataDireccion.data;
+                  if (direccionDB) direccionId = direccionDB.id_Direccion;
+                }
+              }
+            })
+            .catch(() => {});
+        } catch (err) {
+          // No mostrar nada
+        }
+
+        // 3. Mapear datos
+        usuario = {
+          nombre_Usuario: personaDB.nombre_Persona || '',
+          apellido_Usuario: personaDB.apellido_Persona || '',
+          descripcion_Usuario: personaDB.descripcionPerfil_Persona || '',
+          imagenUrl_Usuario: personaDB.imagenUrl_Persona || '',
+          imagen1Url_Usuario: personaDB.imagen1Url_Persona || '',
+          imagen2Url_Usuario: personaDB.imagen2Url_Persona || '',
+          imagen3Url_Usuario: personaDB.imagen3Url_Persona || '',
+          pais: direccionDB && (direccionDB.pais_Direccion || direccionDB.pais) || '',
+          departamento: direccionDB && (direccionDB.departamento_Direccion || direccionDB.departamento) || '',
+          ciudad: direccionDB && (direccionDB.ciudad_Direccion || direccionDB.ciudad) || '',
+          codigoPostal: direccionDB && (direccionDB.codigoPostal_Direccion || direccionDB.codigoPostal) || '',
+          estadoCivil_Usuario: personaDB.estadoCivil_Persona || 'Soltero',
+          genero_Usuario: personaDB.genero_Persona || 'Otro',
+          tipoIdentificacion_Usuario: personaDB.tipoIdentificacion_Persona || 'DNI',
+          identificacion_usuario: personaDB.identificacion_Persona || '',
+          fechaNacimiento: personaDB.fechaNac_Persona || ''
         };
 
-        const mapGenero = {
-            'M': 'Masculino',
-            'F': 'Femenino',
-            'O': 'Otro'
-        };
-
-        const mapEstadoCivil = {
-            'S': 'Soltero',
-            'C': 'Casado',
-            'D': 'Divorciado',
-            'V': 'Viudo',
-            'U': 'Unión Libre'
-        };
-
-        // Services - Funciones globales
-        // personasService
-        async function obtenerPersonaPorId(id) {
-            const response = await fetch(`${API_BASE_URL}/personas/${id}`);
-            return response.json();
+        // 4. Cargar imágenes de galería
+        galeriaImagenes = [];
+        if (personaDB.imagen1Url_Persona) {
+          galeriaImagenes.push({ id: 1, url: personaDB.imagen1Url_Persona });
         }
-
-        async function actualizarPersona(id, datos) {
-            const response = await fetch(`${API_BASE_URL}/personas/${id}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(datos)
-            });
-            return response.json();
+        if (personaDB.imagen2Url_Persona) {
+          galeriaImagenes.push({ id: 2, url: personaDB.imagen2Url_Persona });
         }
-
-        // direccionesService
-        async function obtenerDireccionPorPersona(idPersona) {
-            const response = await fetch(`${API_BASE_URL}/direcciones/persona/${idPersona}`);
-            return response.json();
+        if (personaDB.imagen3Url_Persona) {
+          galeriaImagenes.push({ id: 3, url: personaDB.imagen3Url_Persona });
         }
-
-        async function crearDireccion(datos) {
-            const response = await fetch(`${API_BASE_URL}/direcciones`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(datos)
-            });
-            return response.json();
-        }
-
-        async function actualizarDireccion(id, datos) {
-            const response = await fetch(`${API_BASE_URL}/direcciones/${id}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(datos)
-            });
-            return response.json();
-        }
-
-        // habilidadesService
-        async function obtenerHabilidadesPorPersona(idPersona) {
-            const response = await fetch(`${API_BASE_URL}/habilidades/persona/${idPersona}`);
-            return response.json();
-        }
-
-        async function crearHabilidad(datos) {
-            const response = await fetch(`${API_BASE_URL}/habilidades`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(datos)
-            });
-            return response.json();
-        }
-
-        async function actualizarHabilidad(id, datos) {
-            const response = await fetch(`${API_BASE_URL}/habilidades/${id}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(datos)
-            });
-            return response.json();
-        }
-
-        async function eliminarHabilidad(id) {
-            const response = await fetch(`${API_BASE_URL}/habilidades/${id}`, {
-                method: 'DELETE'
-            });
-            return response.json();
-        }
-
-        // categoriasService
-        async function obtenerTodasCategorias() {
-            const response = await fetch(`${API_BASE_URL}/categorias`);
-            return response.json();
-        }
-
-        // geolocalizacionService
-        async function obtenerGeolocalizacionPorDireccion(idDireccion) {
-            const response = await fetch(`${API_BASE_URL}/geolocalizacion/direccion/${idDireccion}`);
-            return response.json();
-        }
-
-        async function crearGeolocalizacion(datos) {
-            const response = await fetch(`${API_BASE_URL}/geolocalizacion`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(datos)
-            });
-            return response.json();
-        }
-
-        async function actualizarGeolocalizacion(id, datos) {
-            const response = await fetch(`${API_BASE_URL}/geolocalizacion/${id}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(datos)
-            });
-            return response.json();
-        }
-    </script>
-
-    <!-- Componentes React en orden: pequeños primero, grandes al final -->
-    <!-- 1. Componentes más pequeños primero -->
-    <script type="text/babel" src="js/PixelBarChart.js" data-type="module" onload="console.log('PixelBarChart cargado'); updateProgress('PixelBarChart cargado...')"></script>
-    
-    <!-- 2. Componentes medianos -->
-    <script type="text/babel" src="js/BlurFade.jsx" data-type="module" onload="console.log('BlurFade cargado'); updateProgress('BlurFade cargado...')"></script>
-    <script type="text/babel" src="js/InlineEditable.jsx" data-type="module" onload="console.log('InlineEditable cargado'); updateProgress('InlineEditable cargado...')"></script>
-    <script type="text/babel" src="js/SelectEditable.jsx" data-type="module" onload="console.log('SelectEditable cargado'); updateProgress('SelectEditable cargado...')"></script>
-    
-    <!-- 3. Componentes que dependen de otros -->
-    <script type="text/babel" src="js/GaleriaUniforme.jsx" data-type="module" onload="console.log('GaleriaUniforme cargado'); updateProgress('GaleriaUniforme cargado...')"></script>
-    
-    <!-- 4. Componente principal (el más grande) al final -->
-    <script type="text/babel" src="js/Perfil_Usuario.js" data-type="module" onload="console.log('Perfil_Usuario cargado'); updateProgress('Perfil_Usuario cargado, renderizando...')"></script>
-
-    <!-- Helper para actualizar el progreso -->
-    <script>
-        function updateProgress(message) {
-            const progressEl = document.getElementById('loading-progress');
-            if (progressEl) {
-                progressEl.textContent = message;
-            }
-        }
-    </script>
-
-    <!-- 5. Renderizar la aplicación después de que todo esté cargado -->
-    <script type="text/babel">
-        // Esperar a que todos los componentes estén disponibles
-        window.addEventListener('load', function() {
-            console.log('Iniciando aplicación...');
-            console.log('Verificando componentes:');
-            console.log('  - React:', typeof React);
-            console.log('  - ReactDOM:', typeof ReactDOM);
-            console.log('  - PixelBarChart:', typeof window.PixelBarChart);
-            console.log('  - BlurFade:', typeof window.BlurFade);
-            console.log('  - InlineEditable:', typeof window.InlineEditable);
-            console.log('  - SelectEditable:', typeof window.SelectEditable);
-            console.log('  - GaleriaUniforme:', typeof window.GaleriaUniforme);
-            console.log('  - Perfil_Usuario:', typeof window.Perfil_Usuario);
-            
-            if (typeof window.Perfil_Usuario === 'undefined') {
-                console.error('ERROR: Perfil_Usuario no está definido');
-                document.getElementById('root').innerHTML = '<div style="color: white; padding: 40px; text-align: center; background: linear-gradient(145deg, #10151f 0%, #303747 100%); min-height: 100vh;"><h1 style="color: #ef4444;">Error: Componente no cargado</h1><p>El componente Perfil_Usuario no se compiló correctamente.</p><p style="margin-top: 20px; color: rgba(255,255,255,0.6);">Revisa la consola (F12) para más detalles</p></div>';
-                return;
-            }
-            
-            try {
-                updateProgress('Renderizando aplicación...');
-                const root = ReactDOM.createRoot(document.getElementById('root'));
-                root.render(React.createElement(window.Perfil_Usuario));
-                console.log('Aplicación renderizada correctamente');
-            } catch (error) {
-                console.error('ERROR al renderizar:', error);
-                document.getElementById('root').innerHTML = '<div style="color: white; padding: 40px; text-align: center; background: linear-gradient(145deg, #10151f 0%, #303747 100%); min-height: 100vh;"><h1 style="color: #ef4444;">Error al renderizar</h1><p>' + error.message + '</p><pre style="background: rgba(0,0,0,0.3); padding: 20px; border-radius: 8px; margin-top: 20px; text-align: left; overflow: auto;">' + error.stack + '</pre></div>';
-            }
+        
+        console.log('Imágenes de galería cargadas desde BD:', galeriaImagenes);
+        console.log('URLs de la BD:', {
+          imagen1: personaDB.imagen1Url_Persona,
+          imagen2: personaDB.imagen2Url_Persona,
+          imagen3: personaDB.imagen3Url_Persona
         });
-    </script>
+
+        // 5. Cargar habilidades
+        try {
+          const resHabilidades = await fetch(`${API_BASE}/habilidades/persona/${perfilPersonaId}`);
+          const dataHabilidades = await resHabilidades.json();
+          if (resHabilidades.ok && dataHabilidades.success && dataHabilidades.data) {
+            const habilidades = dataHabilidades.data;
+            offeredSkills = habilidades
+              .filter(h => h.tipoEstado_Habilidad === 'Ofrece')
+              .map(h => ({
+                id: h.id_Habilidad,
+                name: h.nombre_Habilidad,
+                description: h.descripcion_Habilidad || '',
+                categoryId: h.id_categorias_Habilidades_Servicios
+              }));
+            requiredSkills = habilidades
+              .filter(h => h.tipoEstado_Habilidad === 'Necesita')
+              .map(h => ({
+                id: h.id_Habilidad,
+                name: h.nombre_Habilidad,
+                description: h.descripcion_Habilidad || '',
+                categoryId: h.id_categorias_Habilidades_Servicios
+              }));
+          }
+        } catch (err) {
+          console.error('Error al cargar habilidades:', err);
+        }
+
+        // 6. Cargar categorías
+        try {
+          const resCategorias = await fetch(`${API_BASE}/categorias`);
+          const dataCategorias = await resCategorias.json();
+          if (resCategorias.ok && dataCategorias.success && dataCategorias.data) {
+            categorias = dataCategorias.data;
+          }
+        } catch (err) {
+          console.error('Error al cargar categorías:', err);
+        }
+
+        // 7. Cargar geolocalización
+        if (direccionDB && direccionDB.id_Direccion) {
+          try {
+            const resGeo = await fetch(`${API_BASE}/geolocalizacion/direccion/${direccionDB.id_Direccion}`);
+            const dataGeo = await resGeo.json();
+            if (resGeo.ok && dataGeo.success && dataGeo.data) {
+              const geoDB = dataGeo.data;
+              geolocalizacionId = geoDB.id_Geolocalizacion;
+              geolocalizacion = {
+                latitud: geoDB.latitud_Geolocalizacion,
+                longitud: geoDB.Longitud_Geolocalizacion,
+                obteniendo: false,
+                mensaje: '',
+                ubicacionReal: true
+              };
+            }
+          } catch (err) {
+            console.log('No se encontró geolocalización');
+          }
+        }
+
+        // Renderizar UI
+        renderUsuario();
+        showLoading(false);
+
+      } catch (err) {
+        console.error('Error al cargar usuario:', err);
+        showError(err.message);
+      }
+    }
+
+    // ======================
+    // RENDERIZAR USUARIO
+    // ======================
+    function renderUsuario() {
+      // Profile pic
+      const profilePic = document.getElementById('profilePic');
+      profilePic.src = getImagenPerfil();
+      profilePic.onerror = () => {
+        profilePic.src = getDefaultAvatar();
+      };
+
+      // Nombre
+      const nombreCompleto = document.getElementById('nombreCompleto');
+      nombreCompleto.textContent = `${usuario.nombre_Usuario} ${usuario.apellido_Usuario}`;
+      makeEditable(nombreCompleto, 'nombre_Usuario', (value) => {
+        const parts = value.split(' ');
+        updateUsuario('nombre_Usuario', parts[0] || '');
+        updateUsuario('apellido_Usuario', parts.slice(1).join(' ') || '');
+      });
+
+      // Username
+      const username = document.getElementById('username');
+      username.textContent = `@${usuario.nombre_Usuario}${usuario.apellido_Usuario ? usuario.apellido_Usuario[0] : ''}`;
+
+      // Descripción
+      const descripcion = document.getElementById('descripcion');
+      descripcion.textContent = usuario.descripcion_Usuario || 'Añade una descripción personal';
+      makeEditable(descripcion, 'descripcion_Usuario', (value) => updateUsuario('descripcion_Usuario', value), true);
+
+      // Datos personales
+      renderDatosPersonales();
+
+      // Skills
+      renderSkills();
+
+      // Gallery
+      renderGallery();
+
+      // Stats
+      updateStats();
+
+      // Map
+      initMap();
+
+      // Pixel chart
+      renderPixelChart();
+    }
+
+    // ======================
+    // UTILIDADES DE FORMATO
+    // ======================
+    function formatearFecha(fechaISO) {
+      if (!fechaISO) return 'No especificado';
+      
+      try {
+        const fecha = new Date(fechaISO);
+        const opciones = { year: 'numeric', month: 'long', day: 'numeric' };
+        return fecha.toLocaleDateString('es-ES', opciones);
+      } catch (error) {
+        return fechaISO;
+      }
+    }
+
+    function formatearFechaParaInput(fechaISO) {
+      if (!fechaISO) return '';
+      
+      try {
+        const fecha = new Date(fechaISO);
+        const year = fecha.getFullYear();
+        const month = String(fecha.getMonth() + 1).padStart(2, '0');
+        const day = String(fecha.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+      } catch (error) {
+        return fechaISO;
+      }
+    }
+
+    // ======================
+    // RENDERIZAR DATOS PERSONALES
+    // ======================
+    function renderDatosPersonales() {
+      const datosPersonales = document.getElementById('datosPersonales');
+      datosPersonales.innerHTML = '';
+
+      const campos = [
+        { label: 'País', field: 'pais', value: usuario.pais },
+        { label: 'Departamento', field: 'departamento', value: usuario.departamento },
+        { label: 'Ciudad', field: 'ciudad', value: usuario.ciudad },
+        { label: 'Código Postal', field: 'codigoPostal', value: usuario.codigoPostal },
+        { label: 'Estado Civil', field: 'estadoCivil_Usuario', value: usuario.estadoCivil_Usuario, type: 'select', options: [
+          { value: 'Soltero', label: 'Soltero' },
+          { value: 'Casado', label: 'Casado' },
+          { value: 'Divorciado', label: 'Divorciado' },
+          { value: 'Viudo', label: 'Viudo' }
+        ]},
+        { label: 'Género', field: 'genero_Usuario', value: usuario.genero_Usuario, type: 'select', options: [
+          { value: 'Masculino', label: 'Masculino' },
+          { value: 'Femenino', label: 'Femenino' },
+          { value: 'Otro', label: 'Otro' }
+        ]},
+        { label: 'Tipo de Identificación', field: 'tipoIdentificacion_Usuario', value: usuario.tipoIdentificacion_Usuario, type: 'select', options: [
+          { value: 'DNI', label: 'DNI' },
+          { value: 'Pasaporte', label: 'Pasaporte' }
+        ]},
+        { label: 'Número de Identificación', field: 'identificacion_usuario', value: usuario.identificacion_usuario },
+        { label: 'Fecha de Nacimiento', field: 'fechaNacimiento', value: usuario.fechaNacimiento, type: 'date', displayValue: formatearFecha(usuario.fechaNacimiento) }
+      ];
+
+      campos.forEach(campo => {
+        const li = document.createElement('li');
+        const displayValue = campo.displayValue || campo.value || 'No especificado';
+        li.innerHTML = `
+          <span class="label">${campo.label}:</span>
+          <span class="editable" data-field="${campo.field}">${displayValue}</span>
+        `;
+        datosPersonales.appendChild(li);
+
+        const editableSpan = li.querySelector('.editable');
+        if (campo.type === 'select') {
+          makeSelectEditable(editableSpan, campo.field, campo.options, (value) => updateUsuario(campo.field, value));
+        } else if (campo.type === 'date') {
+          makeEditable(editableSpan, campo.field, (value) => updateUsuario(campo.field, value), false, 'date');
+        } else {
+          makeEditable(editableSpan, campo.field, (value) => updateUsuario(campo.field, value));
+        }
+      });
+    }
+
+    // ======================
+    // HACER ELEMENTO EDITABLE
+    // ======================
+    function makeEditable(element, field, onSave, multiline = false, inputType = 'text') {
+      element.addEventListener('click', () => {
+        if (element.classList.contains('editing')) return;
+
+        const currentDisplayValue = element.textContent;
+        let currentValue = currentDisplayValue;
+        
+        // Si es un campo de fecha, convertir el texto formateado a formato ISO para el input
+        if (inputType === 'date') {
+          currentValue = formatearFechaParaInput(usuario[field]);
+        }
+        
+        element.classList.add('editing');
+
+        if (multiline) {
+          element.innerHTML = `<textarea rows="3">${currentValue}</textarea>`;
+        } else {
+          element.innerHTML = `<input type="${inputType}" value="${currentValue}">`;
+        }
+
+        const input = element.querySelector(multiline ? 'textarea' : 'input');
+        input.focus();
+        if (inputType !== 'date') {
+          input.select();
+        }
+
+        const save = () => {
+          const newValue = input.value;
+          
+          // Si es fecha, mostrar formateado pero guardar en formato ISO
+          if (inputType === 'date') {
+            element.textContent = formatearFecha(newValue);
+          } else {
+            element.textContent = newValue;
+          }
+          
+          element.classList.remove('editing');
+          
+          if (newValue !== currentValue) {
+            onSave(newValue);
+          }
+        };
+
+        input.addEventListener('blur', save);
+        input.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' && !multiline) {
+            e.preventDefault();
+            save();
+          }
+          if (e.key === 'Escape') {
+            element.textContent = currentDisplayValue;
+            element.classList.remove('editing');
+          }
+        });
+      });
+    }
+
+    // ======================
+    // HACER SELECT EDITABLE
+    // ======================
+   function makeSelectEditable(element, field, options, onSave) {
+  element.innerHTML = '';
+  
+  const selectEditable = new SelectEditable(element, {
+    value: usuario[field] || '',
+    options: options.map(opt => ({
+      value: opt.value,
+      label: opt.label
+    })),
+    onSave: (newValue) => {
+      onSave(newValue);
+    },
+    placeholder: 'Seleccionar...'
+  });
+  
+  element._selectEditableInstance = selectEditable;
+  return selectEditable;
+}
+
+    // ======================
+    // ACTUALIZAR USUARIO
+    // ======================
+    async function updateUsuario(campo, valor) {
+      // Actualizar estado local
+      usuario[campo] = valor;
+
+      const camposDireccion = ['pais', 'departamento', 'ciudad', 'codigoPostal'];
+
+      if (camposDireccion.includes(campo)) {
+        try {
+          setGuardando(true);
+          const datosActualizar = { [campo]: valor };
+          if (perfilPersonaId) datosActualizar.idPersona = perfilPersonaId;
+
+          if (direccionId) {
+            const resultado = await fetch(`${API_BASE}/direcciones/${direccionId}`, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(datosActualizar)
+            });
+            const resJson = await resultado.json();
+            if (!resultado.ok || !resJson.success) {
+              console.error('Error al actualizar dirección:', resJson.error);
+            }
+          } else {
+            const nuevaDireccion = {
+              ciudad: campo === 'ciudad' ? valor : usuario.ciudad || '',
+              departamento: campo === 'departamento' ? valor : usuario.departamento || '',
+              pais: campo === 'pais' ? valor : usuario.pais || '',
+              codigoPostal: campo === 'codigoPostal' ? valor : usuario.codigoPostal || '',
+              idPersona: perfilPersonaId
+            };
+            const resultado = await fetch(`${API_BASE}/direcciones`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(nuevaDireccion)
+            });
+            const resJson = await resultado.json();
+            if (resJson.success && resJson.data) {
+              direccionId = resJson.data.id;
+            }
+          }
+          setGuardando(false);
+        } catch (error) {
+          console.error('Error al actualizar dirección:', error);
+          setGuardando(false);
+        }
+      } else {
+        const camposBD = {
+          'nombre_Usuario': 'nombre_Persona',
+          'apellido_Usuario': 'apellido_Persona',
+          'descripcion_Usuario': 'descripcionPerfil_Persona',
+          'imagenUrl_Usuario': 'imagenUrl_Persona',
+          'imagen1Url_Usuario': 'imagen1Url_Persona',
+          'imagen2Url_Usuario': 'imagen2Url_Persona',
+          'imagen3Url_Usuario': 'imagen3Url_Persona',
+          'estadoCivil_Usuario': 'estadoCivil_Persona',
+          'genero_Usuario': 'genero_Persona',
+          'tipoIdentificacion_Usuario': 'tipoIdentificacion_Persona',
+          'identificacion_usuario': 'identificacion_Persona',
+          'fechaNacimiento': 'fechaNac_Persona'
+        };
+
+        const campoDB = camposBD[campo];
+        if (campoDB) {
+          try {
+            setGuardando(true);
+            const datosActualizar = { [campoDB]: valor };
+            const resultado = await fetch(`${API_BASE}/personas/${usuarioId}`, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(datosActualizar)
+            });
+            const resJson = await resultado.json();
+            if (!resultado.ok || !resJson.success) {
+              console.error('Error al actualizar en BD:', resJson.error);
+            }
+            setGuardando(false);
+          } catch (error) {
+            console.error('Error al actualizar usuario:', error);
+            setGuardando(false);
+          }
+        }
+      }
+    }
+
+    // ======================
+    // IMAGEN DE PERFIL
+    // ======================
+    function getIniciales() {
+      const nombre = usuario.nombre_Usuario || '';
+      const apellido = usuario.apellido_Usuario || '';
+      return (nombre.charAt(0) + apellido.charAt(0)).toUpperCase() || 'U';
+    }
+
+    function getDefaultAvatar() {
+      const iniciales = getIniciales();
+      const colors = ['4F46E5', '10B981', '8B5CF6', '14B8A6', 'F59E0B', 'EF4444'];
+      const colorIndex = (usuario.nombre_Usuario?.length || 0) % colors.length;
+      const bgColor = colors[colorIndex];
+      return `https://ui-avatars.com/api/?name=${iniciales}&background=${bgColor}&color=ffffff&size=200&bold=true&rounded=true`;
+    }
+
+    function getImagenPerfil() {
+      const url = usuario.imagenUrl_Usuario;
+      if (!url || url.trim() === '') {
+        return getDefaultAvatar();
+      }
+      return url;
+    }
+
+    async function handleProfileImageUpload(event) {
+      const file = event.target.files[0];
+      if (file) {
+        try {
+          setGuardando(true);
+          const oldImageUrl = usuario.imagenUrl_Usuario;
+          const formData = new FormData();
+          formData.append('image', file);
+          if (oldImageUrl && oldImageUrl.includes('r2.dev')) {
+            formData.append('oldImageUrl', oldImageUrl);
+          }
+
+          const response = await fetch(`${API_BASE}/upload`, {
+            method: 'POST',
+            body: formData
+          });
+
+          const result = await response.json();
+          if (result.success) {
+            await updateUsuario('imagenUrl_Usuario', result.url);
+            document.getElementById('profilePic').src = result.url;
+          } else {
+            alert('Error al subir la imagen. Inténtalo de nuevo.');
+          }
+          setGuardando(false);
+        } catch (error) {
+          console.error('Error al subir imagen:', error);
+          alert('Error de conexión al subir la imagen.');
+          setGuardando(false);
+        }
+      }
+      event.target.value = '';
+    }
+
+    async function handleDeleteProfileImage() {
+      try {
+        setGuardando(true);
+        const oldImageUrl = usuario.imagenUrl_Usuario;
+        if (oldImageUrl && oldImageUrl.includes('r2.dev')) {
+          await fetch(`${API_BASE}/upload`, {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ imageUrl: oldImageUrl })
+          });
+        }
+        await updateUsuario('imagenUrl_Usuario', '');
+        document.getElementById('profilePic').src = getDefaultAvatar();
+        setGuardando(false);
+      } catch (error) {
+        console.error('Error al eliminar foto de perfil:', error);
+        setGuardando(false);
+      }
+      closeAllContextMenus();
+    }
+
+    function handleEditProfileImage() {
+      document.getElementById('profileUpload').click();
+      closeAllContextMenus();
+    }
+
+    // ======================
+    // SKILLS
+    // ======================
+    function renderSkills() {
+      const offeredContainer = document.getElementById('offeredSkillsContainer');
+      const requiredContainer = document.getElementById('requiredSkillsContainer');
+
+      offeredContainer.innerHTML = '';
+      requiredContainer.innerHTML = '';
+
+      offeredSkills.forEach((skill, index) => {
+        const tag = document.createElement('span');
+        tag.className = 'skill-tag-offered';
+        tag.textContent = skill.name;
+        tag.addEventListener('click', () => showSkillDetail(skill, 'offered'));
+        tag.addEventListener('contextmenu', (e) => {
+          e.preventDefault();
+          showSkillContextMenu(e.clientX, e.clientY, 'offered', index);
+        });
+        offeredContainer.appendChild(tag);
+      });
+
+      const addOfferedBtn = document.createElement('button');
+      addOfferedBtn.className = 'add-skill-button-primary';
+      addOfferedBtn.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon-sm" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" />
+        </svg>
+        Añadir
+      `;
+      addOfferedBtn.addEventListener('click', () => showSkillModal('offered'));
+      offeredContainer.appendChild(addOfferedBtn);
+
+      requiredSkills.forEach((skill, index) => {
+        const tag = document.createElement('span');
+        tag.className = 'skill-tag-required';
+        tag.textContent = skill.name;
+        tag.addEventListener('click', () => showSkillDetail(skill, 'required'));
+        tag.addEventListener('contextmenu', (e) => {
+          e.preventDefault();
+          showSkillContextMenu(e.clientX, e.clientY, 'required', index);
+        });
+        requiredContainer.appendChild(tag);
+      });
+
+      const addRequiredBtn = document.createElement('button');
+      addRequiredBtn.className = 'add-skill-button-secondary';
+      addRequiredBtn.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon-sm" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" />
+        </svg>
+        Añadir
+      `;
+      addRequiredBtn.addEventListener('click', () => showSkillModal('required'));
+      requiredContainer.appendChild(addRequiredBtn);
+
+      updateStats();
+    }
+
+    function showSkillDetail(skill, type) {
+      const detailId = type === 'offered' ? 'selectedOfferedDetail' : 'selectedRequiredDetail';
+      const detailDiv = document.getElementById(detailId);
+      
+      const categoryName = getNombreCategoria(skill.categoryId);
+      
+      detailDiv.innerHTML = `
+        <div class="skill-detail-card">
+          <p class="skill-detail-title">${skill.name}</p>
+          ${categoryName ? `
+            <p style="font-size: 13px; color: #94a3b8; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z" />
+              </svg>
+              ${categoryName}
+            </p>
+          ` : ''}
+          <p class="skill-detail-text">${skill.description || 'Sin descripción.'}</p>
+        </div>
+      `;
+      detailDiv.style.display = 'block';
+    }
+
+    function getNombreCategoria(categoryId) {
+      if (!categoryId) return null;
+      const categoria = categorias.find(cat => cat.id_categoria_Habilidad_Servicio === categoryId);
+      return categoria ? categoria.nombre_categoria_Habilidad : null;
+    }
+
+    function showSkillModal(type) {
+      currentSkillType = type;
+      editSkillIndex = null;
+      editSkillId = null;
+      
+      document.getElementById('modalTitle').textContent = 
+        type === 'offered' ? 'Añadir Habilidad Ofrecida' : 'Añadir Habilidad Requerida';
+      
+      document.getElementById('skillInput').value = '';
+      document.getElementById('skillDescription').value = '';
+      document.getElementById('skillCategory').value = '';
+      
+      // Populate categories
+      const categorySelect = document.getElementById('skillCategory');
+      categorySelect.innerHTML = '<option value="">Seleccione una categoría (opcional)</option>';
+      categorias.forEach(cat => {
+        const option = document.createElement('option');
+        option.value = cat.id_categoria_Habilidad_Servicio;
+        option.textContent = cat.nombre_categoria_Habilidad;
+        categorySelect.appendChild(option);
+      });
+      
+      document.getElementById('skillModal').style.display = 'flex';
+    }
+
+    function hideSkillModal() {
+      document.getElementById('skillModal').style.display = 'none';
+    }
+
+    async function addSkill() {
+      const skillInput = document.getElementById('skillInput').value.trim();
+      const skillDescription = document.getElementById('skillDescription').value.trim();
+      const skillCategory = document.getElementById('skillCategory').value;
+
+      if (!skillInput) {
+        alert('El nombre de la habilidad no puede estar vacío');
+        return;
+      }
+
+      const newSkill = {
+        name: skillInput,
+        description: skillDescription,
+        categoryId: skillCategory ? parseInt(skillCategory) : null
+      };
+
+      if (editSkillIndex !== null) {
+        await updateSkill(currentSkillType === 'offered', editSkillIndex, newSkill);
+      } else {
+        await createSkill(currentSkillType === 'offered', newSkill);
+      }
+
+      hideSkillModal();
+      renderSkills();
+    }
+
+    async function createSkill(isOffered, skill) {
+      try {
+        setGuardando(true);
+        const habilidadData = {
+          tipoEstado: isOffered ? 'Ofrece' : 'Necesita',
+          nombre: skill.name,
+          descripcion: skill.description || null,
+          idPersona: perfilPersonaId,
+          idCategoria: skill.categoryId || null
+        };
+
+        const response = await fetch(`${API_BASE}/habilidades`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(habilidadData)
+        });
+
+        const result = await response.json();
+        if (result.success) {
+          const nuevaHabilidad = {
+            id: result.data.id,
+            name: skill.name,
+            description: skill.description || '',
+            categoryId: skill.categoryId
+          };
+          
+          if (isOffered) {
+            offeredSkills.push(nuevaHabilidad);
+          } else {
+            requiredSkills.push(nuevaHabilidad);
+          }
+        }
+        setGuardando(false);
+      } catch (error) {
+        console.error('Error al crear habilidad:', error);
+        setGuardando(false);
+      }
+    }
+
+    async function updateSkill(isOffered, index, skill) {
+      try {
+        setGuardando(true);
+        const source = isOffered ? offeredSkills : requiredSkills;
+        const habilidadActual = source[index];
+        
+        if (!habilidadActual || !habilidadActual.id) {
+          console.error('No se encontró el ID de la habilidad');
+          setGuardando(false);
+          return;
+        }
+        
+        const habilidadData = {
+          tipoEstado: isOffered ? 'Ofrece' : 'Necesita',
+          nombre: skill.name,
+          descripcion: skill.description || null,
+          idPersona: perfilPersonaId,
+          idCategoria: skill.categoryId || null
+        };
+        
+        const response = await fetch(`${API_BASE}/habilidades/${habilidadActual.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(habilidadData)
+        });
+        
+        const result = await response.json();
+        if (result.success) {
+          habilidadActual.name = skill.name;
+          habilidadActual.description = skill.description || '';
+          habilidadActual.categoryId = skill.categoryId;
+        }
+        setGuardando(false);
+      } catch (error) {
+        console.error('Error al actualizar habilidad:', error);
+        setGuardando(false);
+      }
+    }
+
+    async function removeSkill(isOffered, index) {
+      try {
+        setGuardando(true);
+        const source = isOffered ? offeredSkills : requiredSkills;
+        const habilidad = source[index];
+        
+        if (!habilidad || !habilidad.id) {
+          console.error('No se encontró el ID de la habilidad');
+          setGuardando(false);
+          return;
+        }
+        
+        const response = await fetch(`${API_BASE}/habilidades/${habilidad.id}`, {
+          method: 'DELETE'
+        });
+        
+        const result = await response.json();
+        if (result.success) {
+          if (isOffered) {
+            offeredSkills.splice(index, 1);
+          } else {
+            requiredSkills.splice(index, 1);
+          }
+        }
+        setGuardando(false);
+      } catch (error) {
+        console.error('Error al eliminar habilidad:', error);
+        setGuardando(false);
+      }
+    }
+
+    function handleEditSkill() {
+      if (contextMenuData.type === null || contextMenuData.index === null) return;
+      
+      const isOffered = contextMenuData.type === 'offered';
+      const source = isOffered ? offeredSkills : requiredSkills;
+      const skill = source[contextMenuData.index];
+      
+      currentSkillType = contextMenuData.type;
+      editSkillIndex = contextMenuData.index;
+      editSkillId = skill?.id || null;
+      
+      document.getElementById('modalTitle').textContent = 
+        isOffered ? 'Editar Habilidad Ofrecida' : 'Editar Habilidad Requerida';
+      
+      document.getElementById('skillInput').value = skill?.name || '';
+      document.getElementById('skillDescription').value = skill?.description || '';
+      document.getElementById('skillCategory').value = skill?.categoryId || '';
+      
+      // Populate categories
+      const categorySelect = document.getElementById('skillCategory');
+      categorySelect.innerHTML = '<option value="">Seleccione una categoría (opcional)</option>';
+      categorias.forEach(cat => {
+        const option = document.createElement('option');
+        option.value = cat.id_categoria_Habilidad_Servicio;
+        option.textContent = cat.nombre_categoria_Habilidad;
+        if (cat.id_categoria_Habilidad_Servicio === skill?.categoryId) {
+          option.selected = true;
+        }
+        categorySelect.appendChild(option);
+      });
+      
+      document.getElementById('skillModal').style.display = 'flex';
+      closeAllContextMenus();
+    }
+
+    async function handleDeleteSkill() {
+      if (contextMenuData.type === null || contextMenuData.index === null) return;
+      
+      const isOffered = contextMenuData.type === 'offered';
+      await removeSkill(isOffered, contextMenuData.index);
+      
+      closeAllContextMenus();
+      renderSkills();
+    }
+
+    // ======================
+    // GALERÍA
+    // ======================
+  
+    function renderGallery() {
+      const galleryGrid = document.getElementById('galleryGrid');
+      galleryGrid.innerHTML = '';
+
+      // Renderizar imágenes existentes
+      galeriaImagenes.forEach((img, index) => {
+        if (img && img.url) {
+          const item = document.createElement('div');
+          item.className = 'gallery-item';
+          
+          const imgElement = document.createElement('img');
+          imgElement.src = img.url;
+          imgElement.alt = `Galería ${index + 1}`;
+          imgElement.onerror = () => {
+            // Si la imagen falla al cargar, mostrar placeholder
+            item.innerHTML = `
+              <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: rgba(229, 231, 235, 0.5); color: #9ca3af;">
+                <svg xmlns="http://www.w3.org/2000/svg" style="width: 48px; height: 48px;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+              </div>
+            `;
+          };
+          
+          item.appendChild(imgElement);
+          item.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+            showImageContextMenu(e.clientX, e.clientY, index);
+          });
+          galleryGrid.appendChild(item);
+        }
+      });
+
+      // Agregar placeholder de subida si hay espacio disponible
+      if (galeriaImagenes.length < 3) {
+        const uploadItem = document.createElement('div');
+        uploadItem.className = 'gallery-item gallery-upload';
+        uploadItem.innerHTML = `
+          <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
+            <svg xmlns="http://www.w3.org/2000/svg" style="width: 56px; height: 56px; color: #818cf8;" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M5.5 13a3.5 3.5 0 01-.369-6.98 4 4 0 117.753-1.977A4.5 4.5 0 1113.5 13H11V9.413l1.293 1.293a1 1 0 001.414-1.414l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414L9 9.414V13H5.5z" />
+              <path d="M9 13h2v5a1 1 0 11-2 0v-5z" />
+            </svg>
+            <span style="color: #6366f1; font-size: 13px; font-weight: 600;">Subir imagen</span>
+          </div>
+        `;
+        uploadItem.addEventListener('click', () => {
+          document.getElementById('galleryUpload').click();
+        });
+        galleryGrid.appendChild(uploadItem);
+      }
+    }
+
+    async function handleGalleryImageUpload(event) {
+      const file = event.target.files[0];
+      if (file && galeriaImagenes.length < 3) {
+        try {
+          setGuardando(true);
+          
+          console.log('Subiendo imagen de galería...', file.name);
+          console.log('Imágenes actuales antes de subir:', galeriaImagenes.length);
+          
+          const formData = new FormData();
+          formData.append('image', file);
+
+          const response = await fetch(`${API_BASE}/upload`, {
+            method: 'POST',
+            body: formData
+          });
+
+          const result = await response.json();
+          if (result.success) {
+            const newImageId = Date.now();
+            
+            console.log('Imagen subida exitosamente a R2:', result.url);
+            
+            // Añadir la nueva imagen a la galería con la URL de R2
+            const nuevasImagenes = [
+              ...galeriaImagenes,
+              { 
+                id: newImageId, 
+                title: result.fileName || `Imagen ${newImageId}`, 
+                url: result.url
+              }
+            ].slice(0, 3); // Asegurar que no excedamos el límite
+            
+            galeriaImagenes = nuevasImagenes;
+            
+            console.log('Array de imágenes actualizado:', galeriaImagenes);
+
+            // Guardar las URLs en la base de datos
+            await guardarImagenesGaleria();
+            renderGallery();
+            
+            console.log('Proceso de subida completado');
+          } else {
+            console.error('Error al subir imagen:', result.error);
+            alert('Error al subir la imagen. Inténtalo de nuevo.');
+          }
+          setGuardando(false);
+        } catch (error) {
+          console.error('Error al subir imagen de galería:', error);
+          alert('Error de conexión al subir la imagen.');
+          setGuardando(false);
+        }
+      }
+      
+      // Limpiar el valor del input file para permitir seleccionar el mismo archivo nuevamente
+      event.target.value = '';
+    }
+
+    async function guardarImagenesGaleria() {
+      try {
+        // Extraer las URLs de las imágenes (máximo 3 para la galería)
+        const imagen1 = galeriaImagenes.length > 0 ? galeriaImagenes[0].url : '';
+        const imagen2 = galeriaImagenes.length > 1 ? galeriaImagenes[1].url : '';
+        const imagen3 = galeriaImagenes.length > 2 ? galeriaImagenes[2].url : '';
+        
+        console.log('Guardando imágenes en BD:', { imagen1, imagen2, imagen3 });
+        
+        // Actualizar los tres campos secuencialmente con delay
+        await updateUsuario('imagen1Url_Usuario', imagen1);
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
+        await updateUsuario('imagen2Url_Usuario', imagen2);
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
+        await updateUsuario('imagen3Url_Usuario', imagen3);
+        
+        console.log('Imágenes guardadas exitosamente en BD');
+      } catch (error) {
+        console.error('Error al guardar imágenes de galería:', error);
+      }
+    }
+
+    async function handleChangeImage() {
+      if (imageContextMenuIndex === null) return;
+      
+      // Guardar el índice actual antes de cerrar el menú
+      const currentIndex = imageContextMenuIndex;
+      
+      // Disparar el input de archivo para seleccionar nueva imagen
+      const fileInput = document.createElement('input');
+      fileInput.type = 'file';
+      fileInput.accept = 'image/jpeg, image/png, image/gif';
+      
+      fileInput.onchange = async (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          try {
+            setGuardando(true);
+            
+            // Obtener URL de imagen antigua
+            const oldImageUrl = galeriaImagenes[currentIndex]?.url;
+            
+            // Crear FormData para enviar el archivo
+            const formData = new FormData();
+            formData.append('image', file);
+            
+            // Si existe una imagen antigua en R2, enviarla para que se elimine
+            if (oldImageUrl && oldImageUrl.includes('r2.dev')) {
+              formData.append('oldImageUrl', oldImageUrl);
+            }
+
+            // Subir imagen a Cloudflare R2 (automáticamente eliminará la antigua)
+            const response = await fetch(`${API_BASE}/upload`, {
+              method: 'POST',
+              body: formData
+            });
+
+            const result = await response.json();
+            if (result.success) {
+              // Actualizar la imagen en la galería con la URL de R2
+              galeriaImagenes[currentIndex] = {
+                id: Date.now(),
+                title: result.fileName,
+                url: result.url
+              };
+
+              // Guardar los cambios en la base de datos
+              await guardarImagenesGaleria();
+              renderGallery();
+              
+              console.log('Imagen de galería reemplazada en R2:', result.url);
+              if (result.replacedOld) {
+                console.log('Imagen anterior eliminada de R2');
+              }
+            } else {
+              console.error('Error al cambiar imagen:', result.error);
+              alert('Error al cambiar la imagen. Inténtalo de nuevo.');
+            }
+
+            setGuardando(false);
+          } catch (error) {
+            console.error('Error al cambiar imagen de galería:', error);
+            alert('Error de conexión al cambiar la imagen.');
+            setGuardando(false);
+          }
+        }
+      };
+      
+      fileInput.click();
+      closeAllContextMenus();
+    }
+
+    async function handleDeleteImage() {
+      if (imageContextMenuIndex === null) return;
+      
+      try {
+        setGuardando(true);
+        
+        // Obtener la URL de la imagen a eliminar
+        const imagenAEliminar = galeriaImagenes[imageContextMenuIndex];
+        
+        // Si la imagen está en R2, eliminarla
+        if (imagenAEliminar && imagenAEliminar.url && imagenAEliminar.url.includes('r2.dev')) {
+          try {
+            const response = await fetch(`${API_BASE}/upload`, {
+              method: 'DELETE',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({ imageUrl: imagenAEliminar.url })
+            });
+            
+            const result = await response.json();
+            if (result.success) {
+              console.log('Imagen eliminada de R2:', imagenAEliminar.url);
+            }
+          } catch (error) {
+            console.error('Error al eliminar de R2 (continuando):', error);
+          }
+        }
+        
+        // Actualizar el estado local (filtrar la imagen eliminada)
+        const nuevasImagenes = galeriaImagenes.filter((_, i) => i !== imageContextMenuIndex);
+        galeriaImagenes = nuevasImagenes;
+        
+        // Guardar los cambios en la base de datos
+        await guardarImagenesGaleria();
+        renderGallery();
+        
+        setGuardando(false);
+      } catch (error) {
+        console.error('Error al eliminar imagen:', error);
+        setGuardando(false);
+      }
+      
+      closeAllContextMenus();
+    }
+
+    // ======================
+    // GEOLOCALIZACIÓN Y MAPA
+    // ======================
+    function initMap() {
+      if (!window.L) {
+        setTimeout(initMap, 100);
+        return;
+      }
+
+      if (mapInstance) {
+        mapInstance.remove();
+        mapInstance = null;
+      }
+
+      try {
+        const zoomLevel = geolocalizacion.ubicacionReal ? 15 : 6;
+        const map = window.L.map('map', {
+          center: [geolocalizacion.latitud, geolocalizacion.longitud],
+          zoom: zoomLevel,
+          scrollWheelZoom: true,
+          dragging: true,
+          zoomControl: true
+        });
+
+        window.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '© OpenStreetMap contributors',
+          maxZoom: 19,
+          minZoom: 2
+        }).addTo(map);
+
+        if (geolocalizacion.ubicacionReal) {
+          window.L.marker([geolocalizacion.latitud, geolocalizacion.longitud])
+            .addTo(map)
+            .bindPopup('Tu ubicación')
+            .openPopup();
+        }
+
+        mapInstance = map;
+
+        setTimeout(() => {
+          if (mapInstance) {
+            mapInstance.invalidateSize();
+          }
+        }, 250);
+      } catch (error) {
+        console.error('Error al inicializar mapa:', error);
+      }
+    }
+
+    async function obtenerUbicacion() {
+      if (!navigator.geolocation) {
+        showLocationMessage('Tu navegador no soporta la geolocalización.', 'error');
+        return;
+      }
+
+      const locationBtn = document.getElementById('locationBtn');
+      locationBtn.disabled = true;
+      locationBtn.innerHTML = `
+        <svg class="animate-spin" width="16" height="16" viewBox="0 0 24 24" fill="none">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        Obteniendo ubicación...
+      `;
+
+      showLocationMessage('Obteniendo ubicación...', 'info');
+
+      const options = { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 };
+
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          const latitude = position.coords.latitude;
+          const longitude = position.coords.longitude;
+
+          geolocalizacion = {
+            latitud: latitude,
+            longitud: longitude,
+            ubicacionReal: true,
+            obteniendo: false,
+            mensaje: 'Buscando dirección...'
+          };
+
+          showLocationMessage('Buscando dirección...', 'info');
+
+          try {
+            const response = await fetch(
+              `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}`
+            );
+
+            if (!response.ok) throw new Error('No se pudo obtener la dirección.');
+
+            const data = await response.json();
+            const addr = data.address;
+
+            const pais = addr.country || '';
+            const departamento = addr.state || addr.region || '';
+            const ciudad = addr.city || addr.town || addr.village || '';
+            const codigoPostal = addr.postcode || '';
+
+            if (pais) await updateUsuario('pais', pais);
+            if (departamento) await updateUsuario('departamento', departamento);
+            if (ciudad) await updateUsuario('ciudad', ciudad);
+            if (codigoPostal) await updateUsuario('codigoPostal', codigoPostal);
+
+            // Guardar coordenadas en BD
+            if (direccionId) {
+              try {
+                if (geolocalizacionId) {
+                  await fetch(`${API_BASE}/geolocalizacion/${geolocalizacionId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                      latitud: latitude,
+                      longitud: longitude,
+                      idDireccion: direccionId
+                    })
+                  });
+                } else {
+                  const resGeo = await fetch(`${API_BASE}/geolocalizacion`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                      latitud: latitude,
+                      longitud: longitude,
+                      idDireccion: direccionId
+                    })
+                  });
+                  const dataGeo = await resGeo.json();
+                  if (dataGeo.success && dataGeo.data) {
+                    geolocalizacionId = dataGeo.data.id_Geolocalizacion_Nueva;
+                  }
+                }
+              } catch (errGeo) {
+                console.error('Error al guardar geolocalización:', errGeo);
+              }
+            }
+
+            showLocationMessage('¡Ubicación y dirección obtenidas exitosamente!', 'success');
+            renderDatosPersonales();
+            initMap();
+
+            setTimeout(() => {
+              hideLocationMessage();
+            }, 5000);
+
+          } catch (err) {
+            showLocationMessage('Coordenadas obtenidas, pero no se pudo encontrar la dirección.', 'warning');
+            initMap();
+          }
+
+          locationBtn.disabled = false;
+          locationBtn.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
+            </svg>
+            Obtener mi ubicación
+          `;
+        },
+        (err) => {
+          let mensaje = '';
+          switch(err.code) {
+            case err.PERMISSION_DENIED:
+              mensaje = 'Permiso denegado. Permite el acceso a tu ubicación.';
+              break;
+            case err.POSITION_UNAVAILABLE:
+              mensaje = 'Ubicación no disponible.';
+              break;
+            case err.TIMEOUT:
+              mensaje = 'La solicitud ha caducado.';
+              break;
+            default:
+              mensaje = 'Error desconocido al obtener ubicación.';
+              break;
+          }
+          showLocationMessage(mensaje, 'error');
+          
+          locationBtn.disabled = false;
+          locationBtn.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
+            </svg>
+            Obtener mi ubicación
+          `;
+        },
+        options
+      );
+    }
+
+    function showLocationMessage(message, type) {
+      const messageDiv = document.getElementById('locationMessage');
+      messageDiv.textContent = message;
+      messageDiv.style.display = 'block';
+      
+      const colors = {
+        success: { bg: 'rgba(16, 185, 129, 0.1)', color: '#10b981', border: 'rgba(16, 185, 129, 0.2)' },
+        error: { bg: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', border: 'rgba(239, 68, 68, 0.2)' },
+        warning: { bg: 'rgba(251, 191, 36, 0.1)', color: '#fbbf24', border: 'rgba(251, 191, 36, 0.2)' },
+        info: { bg: 'rgba(79, 70, 229, 0.1)', color: '#a5b4fc', border: 'rgba(79, 70, 229, 0.2)' }
+      };
+      
+      const style = colors[type] || colors.info;
+      messageDiv.style.backgroundColor = style.bg;
+      messageDiv.style.color = style.color;
+      messageDiv.style.border = `1px solid ${style.border}`;
+    }
+
+    function hideLocationMessage() {
+      document.getElementById('locationMessage').style.display = 'none';
+    }
+
+// ======================
+// PIXEL BAR CHART - CON COLORES COORDINADOS
+// ======================
+function renderPixelChart() {
+  const container = document.querySelector('.pixel-chart');
+  if (!container) return;
+  
+  // Buscar o crear el contenedor del SVG
+  let svgContainer = container.querySelector('.pixel-chart-svg-container');
+  if (!svgContainer) {
+    svgContainer = document.createElement('div');
+    svgContainer.className = 'pixel-chart-svg-container';
+    
+    // Insertar después del título
+    const title = container.querySelector('.pixel-chart-title');
+    if (title && title.nextSibling) {
+      container.insertBefore(svgContainer, title.nextSibling);
+    } else {
+      container.appendChild(svgContainer);
+    }
+  }
+  
+  // Limpiar contenido anterior
+  svgContainer.innerHTML = '';
+  
+  // 🎨 COLORES COORDINADOS CON TU DISEÑO
+  const data = [
+    { 
+      label: 'Int', 
+      value: 12, 
+      fill: '#2563eb',      // Azul primario (igual al botón "Enviar Solicitud")
+      highlight: '#1d4ed8'  // Azul más oscuro para la tapa
+    },
+    { 
+      label: 'Fav', 
+      value: 8, 
+      fill: '#10B981',      // Verde (igual al avatar)
+      highlight: '#059669'  // Verde más oscuro
+    },
+    { 
+      label: 'Hab', 
+      value: offeredSkills.length, 
+      fill: '#8B5CF6',      // Morado/Púrpura
+      highlight: '#7C3AED'  // Morado más oscuro
+    }
+  ];
+  
+  // Configuración del SVG
+  const width = 320;
+  const height = 200;
+  const maxValue = Math.max(...data.map(d => d.value), 1);
+  
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+  svg.setAttribute('class', 'pixel-chart-svg');
+  svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+  svg.style.width = '100%';
+  svg.style.height = 'auto';
+  
+  // 🎨 Fondo con gradiente sutil (más moderno)
+  const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+  const gradient = document.createElementNS('http://www.w3.org/2000/svg', 'linearGradient');
+  gradient.setAttribute('id', 'bgGradient');
+  gradient.setAttribute('x1', '0%');
+  gradient.setAttribute('y1', '0%');
+  gradient.setAttribute('x2', '0%');
+  gradient.setAttribute('y2', '100%');
+  
+  const stop1 = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
+  stop1.setAttribute('offset', '0%');
+  stop1.setAttribute('style', 'stop-color:#f9fafb;stop-opacity:1');
+  
+  const stop2 = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
+  stop2.setAttribute('offset', '100%');
+  stop2.setAttribute('style', 'stop-color:#e5e7eb;stop-opacity:1');
+  
+  gradient.appendChild(stop1);
+  gradient.appendChild(stop2);
+  defs.appendChild(gradient);
+  svg.appendChild(defs);
+  
+  // Fondo
+  const bgRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+  bgRect.setAttribute('x', '0');
+  bgRect.setAttribute('y', '0');
+  bgRect.setAttribute('width', width);
+  bgRect.setAttribute('height', height);
+  bgRect.setAttribute('fill', 'url(#bgGradient)');
+  bgRect.setAttribute('rx', '8'); // Bordes redondeados
+  svg.appendChild(bgRect);
+  
+  // Marco
+  const frameRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+  frameRect.setAttribute('x', '8');
+  frameRect.setAttribute('y', '12');
+  frameRect.setAttribute('width', width - 16);
+  frameRect.setAttribute('height', height - 24);
+  frameRect.setAttribute('fill', 'transparent');
+  frameRect.setAttribute('stroke', '#d1d5db');
+  frameRect.setAttribute('stroke-width', '1');
+  frameRect.setAttribute('shape-rendering', 'crispEdges');
+  svg.appendChild(frameRect);
+  
+  // Grid horizontal (más sutil)
+  const gridYs = [152, 122, 92, 62, 32];
+  const gridGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  gridGroup.setAttribute('stroke', '#e5e7eb');
+  gridGroup.setAttribute('stroke-width', '1');
+  gridGroup.setAttribute('stroke-dasharray', '2,2');
+  gridGroup.setAttribute('shape-rendering', 'crispEdges');
+  
+  gridYs.forEach(gy => {
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    line.setAttribute('x1', '16');
+    line.setAttribute('y1', gy);
+    line.setAttribute('x2', '304');
+    line.setAttribute('y2', gy);
+    gridGroup.appendChild(line);
+  });
+  svg.appendChild(gridGroup);
+  
+  // Ejes
+  const xAxis = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+  xAxis.setAttribute('x1', '16');
+  xAxis.setAttribute('y1', '156');
+  xAxis.setAttribute('x2', '304');
+  xAxis.setAttribute('y2', '156');
+  xAxis.setAttribute('stroke', '#9ca3af');
+  xAxis.setAttribute('stroke-width', '2');
+  xAxis.setAttribute('shape-rendering', 'crispEdges');
+  svg.appendChild(xAxis);
+  
+  const yAxis = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+  yAxis.setAttribute('x1', '16');
+  yAxis.setAttribute('y1', '20');
+  yAxis.setAttribute('x2', '16');
+  yAxis.setAttribute('y2', '156');
+  yAxis.setAttribute('stroke', '#9ca3af');
+  yAxis.setAttribute('stroke-width', '2');
+  yAxis.setAttribute('shape-rendering', 'crispEdges');
+  svg.appendChild(yAxis);
+  
+  // Barras con animación
+  const groupOffsets = [48, 128, 208];
+  const barW = 44;
+  const capH = 4;
+  const baseY = 156;
+  
+  data.slice(0, 3).forEach((d, i) => {
+    const h = Math.round((d.value / maxValue) * 120);
+    const y = baseY - h;
+    const x = groupOffsets[i];
+    const capY = y - capH;
+    
+    const barGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    barGroup.setAttribute('transform', `translate(${x},0)`);
+    
+    // Sombra de la barra (efecto 3D sutil)
+    const shadow = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    shadow.setAttribute('x', '2');
+    shadow.setAttribute('y', y + 2);
+    shadow.setAttribute('width', barW);
+    shadow.setAttribute('height', h);
+    shadow.setAttribute('fill', 'rgba(0,0,0,0.1)');
+    shadow.setAttribute('rx', '4');
+    barGroup.appendChild(shadow);
+    
+    // Barra principal con bordes redondeados
+    const bar = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    bar.setAttribute('x', '0');
+    bar.setAttribute('y', y);
+    bar.setAttribute('width', barW);
+    bar.setAttribute('height', h);
+    bar.setAttribute('fill', d.fill);
+    bar.setAttribute('stroke', 'rgba(255,255,255,0.2)');
+    bar.setAttribute('stroke-width', '1');
+    bar.setAttribute('rx', '4');
+    bar.setAttribute('ry', '4');
+    
+    // Animación de aparición
+    const animate = document.createElementNS('http://www.w3.org/2000/svg', 'animate');
+    animate.setAttribute('attributeName', 'height');
+    animate.setAttribute('from', '0');
+    animate.setAttribute('to', h);
+    animate.setAttribute('dur', '0.8s');
+    animate.setAttribute('fill', 'freeze');
+    bar.appendChild(animate);
+    
+    const animateY = document.createElementNS('http://www.w3.org/2000/svg', 'animate');
+    animateY.setAttribute('attributeName', 'y');
+    animateY.setAttribute('from', baseY);
+    animateY.setAttribute('to', y);
+    animateY.setAttribute('dur', '0.8s');
+    animateY.setAttribute('fill', 'freeze');
+    bar.appendChild(animateY);
+    
+    barGroup.appendChild(bar);
+    
+    // Brillo en la barra (efecto glossy)
+    const shine = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    shine.setAttribute('x', '2');
+    shine.setAttribute('y', y + 2);
+    shine.setAttribute('width', barW - 4);
+    shine.setAttribute('height', Math.max(h / 3, 10));
+    shine.setAttribute('fill', 'rgba(255,255,255,0.3)');
+    shine.setAttribute('rx', '3');
+    barGroup.appendChild(shine);
+    
+    // Tapa superior (más destacada)
+    const cap = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    cap.setAttribute('x', '0');
+    cap.setAttribute('y', capY);
+    cap.setAttribute('width', barW);
+    cap.setAttribute('height', capH);
+    cap.setAttribute('fill', d.highlight);
+    cap.setAttribute('rx', '2');
+    barGroup.appendChild(cap);
+    
+    // Etiqueta con mejor contraste
+    const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    label.setAttribute('x', barW / 2);
+    label.setAttribute('y', '172');
+    label.setAttribute('text-anchor', 'middle');
+    label.setAttribute('fill', '#4b5563');
+    label.setAttribute('font-size', '12');
+    label.setAttribute('font-weight', '700');
+    label.textContent = d.label;
+    barGroup.appendChild(label);
+    
+    svg.appendChild(barGroup);
+  });
+  
+  svgContainer.appendChild(svg);
+}
+
+// Función helper para oscurecer colores
+function darken(hex, amount = 0.3) {
+  try {
+    const c = hex.replace('#', '');
+    const num = parseInt(c, 16);
+    let r = (num >> 16) & 0xff;
+    let g = (num >> 8) & 0xff;
+    let b = num & 0xff;
+    r = Math.max(0, Math.round(r * (1 - amount)));
+    g = Math.max(0, Math.round(g * (1 - amount)));
+    b = Math.max(0, Math.round(b * (1 - amount)));
+    return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
+  } catch {
+    return hex;
+  }
+}
+    // ======================
+    // ESTADÍSTICAS
+    // ======================
+    function updateStats() {
+      document.getElementById('statOfferedSkills').textContent = offeredSkills.length;
+      renderPixelChart();
+    }
+
+    // ======================
+    // CONTEXT MENUS
+    // ======================
+    function showSkillContextMenu(x, y, type, index) {
+      contextMenuData = { type, index };
+      const menu = document.getElementById('contextMenu');
+      const backdrop = document.getElementById('contextMenuBackdrop');
+      
+      menu.style.left = x + 'px';
+      menu.style.top = y + 'px';
+      menu.style.display = 'block';
+      backdrop.style.display = 'block';
+    }
+
+    function showImageContextMenu(x, y, index) {
+      imageContextMenuIndex = index;
+      const menu = document.getElementById('imageContextMenu');
+      const backdrop = document.getElementById('contextMenuBackdrop');
+      
+      menu.style.left = x + 'px';
+      menu.style.top = y + 'px';
+      menu.style.display = 'block';
+      backdrop.style.display = 'block';
+    }
+
+    function showProfileContextMenu(x, y) {
+      const menu = document.getElementById('profileContextMenu');
+      const backdrop = document.getElementById('contextMenuBackdrop');
+      
+      menu.style.left = x + 'px';
+      menu.style.top = y + 'px';
+      menu.style.display = 'block';
+      backdrop.style.display = 'block';
+    }
+
+    function closeAllContextMenus() {
+      document.getElementById('contextMenu').style.display = 'none';
+      document.getElementById('imageContextMenu').style.display = 'none';
+      document.getElementById('profileContextMenu').style.display = 'none';
+      document.getElementById('contextMenuBackdrop').style.display = 'none';
+      contextMenuData = { type: null, index: null };
+      imageContextMenuIndex = null;
+    }
+
+    // ======================
+    // UI HELPERS
+    // ======================
+    function showLoading(show) {
+      document.getElementById('loadingState').style.display = show ? 'flex' : 'none';
+      document.getElementById('mainContent').style.display = show ? 'none' : 'block';
+      document.getElementById('errorState').style.display = 'none';
+    }
+
+    function showError(message) {
+      document.getElementById('errorMessage').textContent = message;
+      document.getElementById('errorState').style.display = 'flex';
+      document.getElementById('loadingState').style.display = 'none';
+      document.getElementById('mainContent').style.display = 'none';
+    }
+
+    function setGuardando(saving) {
+      guardando = saving;
+      document.getElementById('savingIndicator').style.display = saving ? 'flex' : 'none';
+    }
+
+    // ======================
+    // MODAL DE SESIÓN EXPIRADA
+    // ======================
+    function showSessionExpiredModal() {
+      const modalHTML = `
+        <div class="custom-modal-overlay" id="sessionModal" style="z-index: 10001;">
+          <div class="custom-modal" onclick="event.stopPropagation()">
+            <div class="modal-header">
+              <div class="modal-icon" style="background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%); color: #dc2626;">🔒</div>
+              <div class="modal-title">Sesión No Iniciada</div>
+            </div>
+            <div class="modal-message">
+              No has iniciado sesión. Necesitas iniciar sesión para acceder a tu perfil.
+            </div>
+            <div class="modal-actions">
+              <button class="modal-btn modal-btn-confirm" onclick="redirectToLogin()" style="width: 100%;">
+                Ir al Login
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      document.body.insertAdjacentHTML('beforeend', modalHTML);
+      
+      // Auto-redirigir después de 3 segundos
+      setTimeout(() => {
+        redirectToLogin();
+      }, 3000);
+    }
+
+    function redirectToLogin() {
+      window.location.href = '../login.html';
+    }
+
+    // ======================
+    // MODAL DE CERRAR SESIÓN
+    // ======================
+    function showLogoutModal() {
+      const modalHTML = `
+        <div class="custom-modal-overlay" id="logoutModal" onclick="closeLogoutModal(event)">
+          <div class="custom-modal" onclick="event.stopPropagation()">
+            <div class="modal-header">
+              <div class="modal-icon">⚠</div>
+              <div class="modal-title">Cerrar Sesión</div>
+            </div>
+            <div class="modal-message">
+              ¿Estás seguro de que deseas cerrar sesión? Tendrás que iniciar sesión nuevamente para acceder a tu perfil.
+            </div>
+            <div class="modal-actions">
+              <button class="modal-btn modal-btn-cancel" onclick="closeLogoutModal()">
+                Cancelar
+              </button>
+              <button class="modal-btn modal-btn-confirm" onclick="confirmLogout()">
+                Cerrar Sesión
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      document.body.insertAdjacentHTML('beforeend', modalHTML);
+    }
+
+    function closeLogoutModal(event) {
+      if (event && event.target.id !== 'logoutModal') return;
+      const modal = document.getElementById('logoutModal');
+      if (modal) {
+        modal.style.animation = 'fadeOut 0.3s ease';
+        setTimeout(() => modal.remove(), 300);
+      }
+    }
+
+    function confirmLogout() {
+      // Limpiar localStorage
+      localStorage.removeItem('usuarioId');
+      localStorage.removeItem('token');
+      localStorage.removeItem('usuario');
+      
+      // Redirigir al login o página principal
+      window.location.href = '../login.html'; // Ajusta la ruta según tu estructura
+    }
+
+    // Animación de salida del modal
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes fadeOut {
+        from { opacity: 1; }
+        to { opacity: 0; }
+      }
+    `;
+    document.head.appendChild(style);
+  </script>
+  
 </body>
 </html>
+ 
+

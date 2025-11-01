@@ -1,3 +1,21 @@
+const express = require('express');
+const router = express.Router();
+// ENDPOINT: Obtener perfil persona por usuarioId (GET /personas/by-usuario/:usuarioId)
+router.get('/by-usuario/:usuarioId', async (req, res) => {
+    const usuarioId = parseInt(req.params.usuarioId);
+    if (isNaN(usuarioId)) {
+        return res.status(400).json({ success: false, message: 'ID de usuario no válido' });
+    }
+    try {
+        const [rows] = await db.execute('SELECT * FROM Personas WHERE id_Usuario = ?', [usuarioId]);
+        if (rows.length === 0) {
+            return res.status(404).json({ success: false, message: 'No se encontró persona para este usuario' });
+        }
+        res.json({ success: true, data: rows[0] });
+    } catch (error) {
+        res.status(500).json({ success: false, message: 'Error al buscar persona', error: error.message });
+    }
+});
 // Personas.js
 // ========================================
 // API Personas - SkillConnect2025
@@ -6,15 +24,40 @@
 // Campos de imágenes:
 // - imagenUrl: Foto de perfil principal
 // - imagen1Url: Primera imagen de galería
-// - imagen2Url: Segunda imagen de galería
+// - - imagen2Url: Segunda imagen de galería
 // - imagen3Url: Tercera imagen de galería
 // ========================================
 
-const express = require('express');
-const router = express.Router();
+
 
 // Importar configuración centralizada de la base de datos
 const db = require('../db');
+
+// Definición de las constantes de validación
+const GENEROS_VALIDOS = ['Masculino', 'Femenino', 'Otro'];
+const ESTADOS_CIVILES_VALIDOS = ['Soltero', 'Casado', 'Divorciado', 'Viudo'];
+const TIPOS_IDENTIFICACION_VALIDOS = ['DNI', 'Pasaporte'];
+const CAMPOS_REQUERIDOS_REEMPLAZO = [
+    'nombre_Persona', 'apellido_Persona', 'fechaNac_Persona', 'genero_Persona', // ✅ CORREGIDO: fechaNac_Persona
+    'estadoCivil_Persona', 'tipoIdentificacion_Persona', 'identificacion_Persona',
+    'imagenUrl_Persona', 'imagen1Url_Persona', 'imagen2Url_Persona', 'imagen3Url_Persona',
+    'descripcionPerfil_Persona', 'disponibilidad'
+];
+
+/**
+ * Función auxiliar para verificar si todos los campos requeridos para el PUT están en el body.
+ * @param {object} body - El cuerpo de la solicitud (req.body).
+ * @returns {boolean} - true si todos los campos están presentes.
+ */
+function validarCamposReemplazo(body) {
+    for (const field of CAMPOS_REQUERIDOS_REEMPLAZO) {
+        if (!(field in body)) {
+            return false;
+        }
+    }
+    return true;
+}
+
 
 // ----------------------------------------------------
 // ENDPOINT: Obtener TODAS las personas (GET /personas)
@@ -24,7 +67,6 @@ router.get('/', async (req, res) => {
         // Llamar al procedimiento almacenado que devuelve todas las personas
         const [resultado] = await db.execute('CALL sp_Personas_ObtenerTodo()');
         
-        // El resultado de los procedimientos almacenados en mysql2 suele ser un array de arrays
         const personas = resultado[0]; 
         
         res.json({
@@ -47,39 +89,59 @@ router.get('/', async (req, res) => {
 // ----------------------------------------------------
 router.get('/:id', async (req, res) => {
     const id = parseInt(req.params.id);
-    
-    // Verificación básica de ID
+
     if (isNaN(id)) {
-        return res.status(400).json({ 
+        return res.status(400).json({
             success: false,
-            message: 'ID no válido' 
+            message: 'ID no válido'
         });
     }
 
     try {
-        // Llamar al procedimiento almacenado
-        const [resultado] = await db.execute('CALL sp_Personas_ObtenerPorId(?)', [id]);
-        
-        // Obtener los datos de la persona
-        const persona = resultado[0][0]; // Acceder al primer resultado del primer array
-        
-        // Si no existe, devolver error 404
+        const [rows] = await db.execute(
+            `SELECT 
+                p.id_Perfil_Persona,
+                p.nombre_Persona,
+                p.apellido_Persona,
+                p.fechaNac_Persona,
+                p.genero_Persona,
+                p.estadoCivil_Persona,
+                p.tipoIdentificacion_Persona,
+                p.identificacion_Persona,
+                p.imagenUrl_Persona,
+                p.imagen1Url_Persona,
+                p.imagen2Url_Persona,
+                p.imagen3Url_Persona,
+                p.descripcionPerfil_Persona,
+                p.disponibilidad,
+                p.id_Usuario,
+                u.correo,
+                u.nombre AS nombre_usuario_cuenta,
+                u.activo
+            FROM Personas p
+            INNER JOIN Usuarios u ON p.id_Usuario = u.id_usuario
+            WHERE u.id_usuario = ?
+            LIMIT 1`,
+            [id]
+        );
+
+        const persona = rows[0];
+
         if (!persona) {
-            return res.status(404).json({ 
+            return res.status(404).json({
                 success: false,
-                message: 'Persona no encontrada' 
+                message: 'Perfil de usuario no encontrado'
             });
         }
-        
-        // Devolver los datos
+
         res.json({
             success: true,
             data: persona
         });
-        
+
     } catch (error) {
         console.error(`Error al obtener persona con ID ${id}:`, error.message);
-        res.status(500).json({ 
+        res.status(500).json({
             success: false,
             error: 'Error del servidor al obtener la persona'
         });
@@ -91,104 +153,77 @@ router.get('/:id', async (req, res) => {
 // ----------------------------------------------------
 router.post('/', async (req, res) => {
     const { 
-        nombre,
-        apellido,
-        fechaNac,
-        genero,
-        estadoCivil,
-        tipoIdentificacion,
-        identificacion,
-        imagenUrl,
-        imagen1Url,
-        imagen2Url,
-        imagen3Url,
-        descripcionPerfil
+        id_Usuario,
+        nombre_Persona,
+        apellido_Persona,
+        fechaNac_Persona, // ✅ CORREGIDO
+        genero_Persona,
+        estadoCivil_Persona,
+        tipoIdentificacion_Persona,
+        identificacion_Persona,
+        imagenUrl_Persona,
+        imagen1Url_Persona,
+        imagen2Url_Persona,
+        imagen3Url_Persona,
+        descripcionPerfil_Persona,
+        disponibilidad
     } = req.body;
     
-    // Validación de campos requeridos
-    if (!nombre || !apellido || !identificacion) {
+    // Validación de campos mínimos
+    if (!id_Usuario || !nombre_Persona || !apellido_Persona || !identificacion_Persona) {
         return res.status(400).json({ 
             success: false, 
-            message: 'Faltan campos requeridos: nombre, apellido e identificación' 
+            message: 'Faltan campos requeridos: id_Usuario, nombre, apellido e identificación' 
         });
     }
 
     // Validación de enums
-    const generosValidos = ['Masculino', 'Femenino', 'Otro'];
-    const estadosCivilesValidos = ['Soltero', 'Casado', 'Divorciado', 'Viudo'];
-    const tiposIdentificacionValidos = ['DNI', 'Pasaporte'];
-
-    if (genero && !generosValidos.includes(genero)) {
-        return res.status(400).json({ 
-            success: false, 
-            message: 'Género no válido. Debe ser: Masculino, Femenino u Otro' 
-        });
+    if (genero_Persona && !GENEROS_VALIDOS.includes(genero_Persona)) {
+        return res.status(400).json({ success: false, message: 'Género no válido.' });
     }
-
-    if (estadoCivil && !estadosCivilesValidos.includes(estadoCivil)) {
-        return res.status(400).json({ 
-            success: false, 
-            message: 'Estado civil no válido. Debe ser: Soltero, Casado, Divorciado o Viudo' 
-        });
+    if (estadoCivil_Persona && !ESTADOS_CIVILES_VALIDOS.includes(estadoCivil_Persona)) {
+        return res.status(400).json({ success: false, message: 'Estado civil no válido.' });
     }
-
-    if (tipoIdentificacion && !tiposIdentificacionValidos.includes(tipoIdentificacion)) {
-        return res.status(400).json({ 
-            success: false, 
-            message: 'Tipo de identificación no válido. Debe ser: DNI o Pasaporte' 
-        });
+    if (tipoIdentificacion_Persona && !TIPOS_IDENTIFICACION_VALIDOS.includes(tipoIdentificacion_Persona)) {
+        return res.status(400).json({ success: false, message: 'Tipo de identificación no válido.' });
     }
 
     try {
-        // Llamar al procedimiento almacenado con todos los parámetros
-        const [resultado] = await db.execute(
-            'CALL sp_Personas_Insertar(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-            [
-                nombre,
-                apellido,
-                fechaNac || null,
-                genero || null,
-                estadoCivil || null,
-                tipoIdentificacion || null,
-                identificacion,
-                imagenUrl || null,
-                imagen1Url || null,
-                imagen2Url || null,
-                imagen3Url || null,
-                descripcionPerfil || null
-            ]
-        );
-        
-        // Obtener el ID insertado del resultado
-        const idInsertado = resultado[0][0] ? resultado[0][0].id_Perfil_Persona_Nuevo : null;
+        // Llamar al SP de REEMPLAZO (DELETE + INSERT)
+        await db.execute(
+             `CALL SP_REEMPLAZAR_PERFIL_PERSONA(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+             [
+                 id_Usuario,
+                 nombre_Persona,
+                 apellido_Persona,
+                 fechaNac_Persona || null, // ✅ CORREGIDO
+                 genero_Persona || null,
+                 estadoCivil_Persona || null,
+                 tipoIdentificacion_Persona || null,
+                 identificacion_Persona,
+                 imagenUrl_Persona || null,
+                 imagen1Url_Persona || null,
+                 imagen2Url_Persona || null,
+                 imagen3Url_Persona || null,
+                 descripcionPerfil_Persona || null,
+                 disponibilidad || null
+             ]
+         );
         
         res.status(201).json({
             success: true,
-            message: 'Persona creada exitosamente',
-            data: { 
-                id: idInsertado,
-                nombre, 
-                apellido, 
-                identificacion,
-                descripcionPerfil
-            }
+            message: 'Persona creada/reemplazada exitosamente',
+            data: { id_Usuario, nombre_Persona, apellido_Persona }
         });
         
     } catch (error) {
-        console.error('Error al crear persona:', error.message);
+        console.error('Error al crear/reemplazar persona:', error.message);
         
-        // Manejar errores específicos (como duplicado de identificación)
         if (error.code === 'ER_DUP_ENTRY') {
-            return res.status(409).json({ 
-                success: false,
-                error: 'Ya existe una persona con esa identificación'
-            });
+            return res.status(409).json({ success: false, error: 'Ya existe una persona con esa identificación o el id_Usuario está duplicado (revisar unicidad).' });
         }
         
-        res.status(500).json({ 
-            success: false,
-            error: 'Error del servidor al crear la persona'
-        });
+        res.status(500).json({ success: false, error: 'Error del servidor al crear la persona' });
     }
 });
 
@@ -197,114 +232,58 @@ router.post('/', async (req, res) => {
 // ----------------------------------------------------
 router.put('/:id', async (req, res) => {
     const id = parseInt(req.params.id);
-    const { 
-        nombre,
-        apellido,
-        fechaNac,
-        genero,
-        estadoCivil,
-        tipoIdentificacion,
-        identificacion,
-        imagenUrl,
-        imagen1Url,
-        imagen2Url,
-        imagen3Url,
-        descripcionPerfil
-    } = req.body;
-
-    if (isNaN(id)) {
-        return res.status(400).json({ 
-            success: false,
-            message: 'ID no válido' 
-        });
+    // 1. VALIDACIÓN DEL ID
+    if (isNaN(id) || id <= 0) {
+        return res.status(400).json({ success: false, message: 'ID de usuario no válido.' });
     }
 
-    // Validación de enums si se proporcionan
-    const generosValidos = ['Masculino', 'Femenino', 'Otro'];
-    const estadosCivilesValidos = ['Soltero', 'Casado', 'Divorciado', 'Viudo'];
-    const tiposIdentificacionValidos = ['DNI', 'Pasaporte'];
-
-    if (genero && !generosValidos.includes(genero)) {
-        return res.status(400).json({ 
-            success: false, 
-            message: 'Género no válido. Debe ser: Masculino, Femenino u Otro' 
-        });
+    // 2. Validar y construir el SET dinámico solo con los campos enviados
+    const camposPermitidos = [
+        'nombre_Persona', 'apellido_Persona', 'fechaNac_Persona', 'genero_Persona',
+        'estadoCivil_Persona', 'tipoIdentificacion_Persona', 'identificacion_Persona',
+        'imagenUrl_Persona', 'imagen1Url_Persona', 'imagen2Url_Persona', 'imagen3Url_Persona',
+        'descripcionPerfil_Persona', 'disponibilidad'
+    ];
+    const camposActualizar = Object.keys(req.body).filter(campo => camposPermitidos.includes(campo));
+    if (camposActualizar.length === 0) {
+        return res.status(400).json({ success: false, message: 'No se enviaron campos válidos para actualizar.' });
     }
 
-    if (estadoCivil && !estadosCivilesValidos.includes(estadoCivil)) {
-        return res.status(400).json({ 
-            success: false, 
-            message: 'Estado civil no válido. Debe ser: Soltero, Casado, Divorciado o Viudo' 
-        });
+    // Validación de enums si se envían
+    if ('genero_Persona' in req.body && !GENEROS_VALIDOS.includes(req.body.genero_Persona)) {
+        return res.status(400).json({ success: false, message: 'Género no válido.' });
+    }
+    if ('estadoCivil_Persona' in req.body && !ESTADOS_CIVILES_VALIDOS.includes(req.body.estadoCivil_Persona)) {
+        return res.status(400).json({ success: false, message: 'Estado civil no válido.' });
+    }
+    if ('tipoIdentificacion_Persona' in req.body && !TIPOS_IDENTIFICACION_VALIDOS.includes(req.body.tipoIdentificacion_Persona)) {
+        return res.status(400).json({ success: false, message: 'Tipo de identificación no válido.' });
     }
 
-    if (tipoIdentificacion && !tiposIdentificacionValidos.includes(tipoIdentificacion)) {
-        return res.status(400).json({ 
-            success: false, 
-            message: 'Tipo de identificación no válido. Debe ser: DNI o Pasaporte' 
-        });
-    }
-    
+    // 3. Construir la consulta UPDATE dinámica
+    const setClause = camposActualizar.map(campo => `${campo} = ?`).join(', ');
+    const valores = camposActualizar.map(campo => req.body[campo]);
+    valores.push(id); // Para el WHERE
+
     try {
-        // Primero verificar si la persona existe
-        const [verificacion] = await db.execute('CALL sp_Personas_ObtenerPorId(?)', [id]);
-        
-        if (!verificacion[0] || verificacion[0].length === 0) {
-            return res.status(404).json({ 
-                success: false,
-                message: 'Persona no encontrada' 
-            });
-        }
-
-        // Obtener datos actuales para mantener los valores no actualizados
-        const personaActual = verificacion[0][0];
-
-        // Llamar al procedimiento almacenado de actualización
-        await db.execute(
-            'CALL sp_Personas_Actualizar(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-            [
-                id,
-                nombre !== undefined ? nombre : personaActual.nombre_Persona,
-                apellido !== undefined ? apellido : personaActual.apellido_Persona,
-                fechaNac !== undefined ? fechaNac : personaActual.fechaNac_Persona,
-                genero !== undefined ? genero : personaActual.genero_Persona,
-                estadoCivil !== undefined ? estadoCivil : personaActual.estadoCivil_Persona,
-                tipoIdentificacion !== undefined ? tipoIdentificacion : personaActual.tipoIdentificacion_Persona,
-                identificacion !== undefined ? identificacion : personaActual.identificacion_Persona,
-                imagenUrl !== undefined ? imagenUrl : personaActual.imagenUrl_Persona,
-                imagen1Url !== undefined ? imagen1Url : personaActual.imagen1Url_Persona,
-                imagen2Url !== undefined ? imagen2Url : personaActual.imagen2Url_Persona,
-                imagen3Url !== undefined ? imagen3Url : personaActual.imagen3Url_Persona,
-                descripcionPerfil !== undefined ? descripcionPerfil : personaActual.descripcionPerfil_Persona
-            ]
+        const [result] = await db.execute(
+            `UPDATE Personas SET ${setClause} WHERE id_Usuario = ?`,
+            valores
         );
-        
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ success: false, message: 'Perfil de usuario no encontrado' });
+        }
         res.json({
             success: true,
-            message: `Persona con ID ${id} actualizada exitosamente`,
-            data: { 
-                id,
-                nombre: nombre !== undefined ? nombre : personaActual.nombre_Persona,
-                apellido: apellido !== undefined ? apellido : personaActual.apellido_Persona,
-                descripcionPerfil: descripcionPerfil !== undefined ? descripcionPerfil : personaActual.descripcionPerfil_Persona
-            }
+            message: `Perfil de usuario ${id} actualizado exitosamente`,
+            data: { id, campos_actualizados: camposActualizar }
         });
-
     } catch (error) {
         console.error(`Error al actualizar persona con ID ${id}:`, error.message);
-        
-        // Manejar error de identificación duplicada
         if (error.code === 'ER_DUP_ENTRY') {
-            return res.status(409).json({ 
-                success: false,
-                error: 'Ya existe una persona con esa identificación'
-            });
+            return res.status(409).json({ success: false, error: 'Ya existe una persona con esa identificación.' });
         }
-        
-        res.status(500).json({ 
-            success: false,
-            error: 'Error del servidor al actualizar la persona'
-        });
+        res.status(500).json({ success: false, error: 'Error del servidor al actualizar la persona' });
     }
 });
 
@@ -315,45 +294,42 @@ router.delete('/:id', async (req, res) => {
     const id = parseInt(req.params.id);
     
     if (isNaN(id)) {
-        return res.status(400).json({ 
-            success: false,
-            message: 'ID no válido' 
-        });
+        return res.status(400).json({ success: false, message: 'ID no válido' });
     }
     
     try {
-        // Primero verificar si la persona existe
-        const [verificacion] = await db.execute('CALL sp_Personas_ObtenerPorId(?)', [id]);
+        // Ejecutar el DELETE directo para borrar el perfil de la persona
+        const [result] = await db.execute(
+            'DELETE FROM Personas WHERE id_Usuario = ?', 
+            [id]
+        );
         
-        if (!verificacion[0] || verificacion[0].length === 0) {
+        if (result.affectedRows === 0) {
             return res.status(404).json({ 
                 success: false,
-                message: 'Persona no encontrada' 
+                message: 'Perfil de Persona no encontrado para el ID de Usuario proporcionado.' 
             });
         }
-
-        // Llamar al procedimiento almacenado para la eliminación
-        await db.execute('CALL sp_Personas_Eliminar(?)', [id]);
         
         res.json({
             success: true,
-            message: `Persona con ID ${id} eliminada exitosamente`
+            message: `Perfil de Persona asociado al Usuario ${id} eliminado exitosamente`
         });
         
     } catch (error) {
-        console.error(`Error al eliminar persona con ID ${id}:`, error.message);
+        console.error(`Error al eliminar perfil de persona con ID ${id}:`, error.message);
         
-        // Manejar restricciones de clave foránea (si la persona tiene habilidades, etc.)
+        // Manejar restricciones de clave foránea
         if (error.code === 'ER_ROW_IS_REFERENCED_2') {
             return res.status(409).json({ 
                 success: false,
-                error: 'No se puede eliminar la persona porque tiene registros relacionados (habilidades, ubicaciones, etc.)'
+                error: 'No se puede eliminar el perfil porque tiene registros relacionados (habilidades, etc.).'
             });
         }
         
         res.status(500).json({ 
             success: false,
-            error: 'Error del servidor al eliminar la persona'
+            error: 'Error del servidor al eliminar el perfil.'
         });
     }
 });

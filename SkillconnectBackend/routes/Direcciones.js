@@ -86,12 +86,12 @@ router.get('/persona/:idPersona', async (req, res) => {
         const direccion = resultado[0][0];
         
         if (!direccion) {
-            return res.status(404).json({ 
-                success: false,
-                message: 'Dirección no encontrada para esta persona' 
+            // Devolver 200 con objeto vacío si no hay dirección
+            return res.status(200).json({
+                success: true,
+                data: null
             });
         }
-        
         res.json({
             success: true,
             data: direccion
@@ -172,12 +172,13 @@ router.post('/', async (req, res) => {
 // ----------------------------------------------------
 router.put('/:id', async (req, res) => {
     const id = parseInt(req.params.id);
-    const { 
+    // Permitir actualización parcial
+    const {
         ciudad,
         departamento,
         pais,
         codigoPostal,
-        idPersona
+        idPersona // puede venir o no
     } = req.body;
 
     if (isNaN(id)) {

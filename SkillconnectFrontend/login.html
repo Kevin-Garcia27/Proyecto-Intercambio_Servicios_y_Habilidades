@@ -71,7 +71,7 @@
         </form>
         
         <div class="mt-6 text-center">
-            <a href="register.html" class="text-sm font-medium text-indigo-600 hover:text-indigo-500">
+            <a href="registro_prueba.html" class="text-sm font-medium text-indigo-600 hover:text-indigo-500">
                 ¿No tienes cuenta? Regístrate aquí
             </a>
         </div>
@@ -94,7 +94,7 @@
         // Espera que el DOM esté listo
         document.addEventListener("DOMContentLoaded", () => {
             const form = document.getElementById("login-form");
-            const LOGIN_URL = "http://localhost:3001/api/login"; // URL del backend
+            const LOGIN_URL = "http://localhost:3001/api/login-jwt"; //  Usar endpoint con JWT
 
             if (!form) return; // Salir si el formulario no existe
 
@@ -118,11 +118,17 @@
 
                     if (res.ok) {
                         // INICIO DE SESIÓN EXITOSO
-                        showMessage(" " + data.mensaje + ". Redirigiendo al dashboard...", "bg-green-100 text-green-700");
+                        
+                        // CRÍTICO: Guardar TOKEN JWT en localStorage
+                        localStorage.setItem('authToken', data.token);
+                        localStorage.setItem('usuarioId', data.usuarioId);
+                        localStorage.setItem('correoUsuario', data.correo);
+                        
+                        showMessage("Redirigiendo al dashboard...", "bg-green-100 text-green-700");
 
-                        // REDIRECCIÓN CRÍTICA DESPUÉS DE UN SEGUNDO
+                        // REDIRECCIÓN AL DASHBOARD DESPUÉS DE 1 SEGUNDO
                         setTimeout(() => {
-                            window.location.href = "dashboard.html"; 
+                            window.location.href = "Dashboard.html"; 
                         }, 1000); 
 
                     } else {
@@ -133,7 +139,7 @@
                 } catch (error) {
                     // Fallo de conexión o error de red (Ej: Servidor apagado)
                     console.error("Error al conectar con el backend:", error);
-                    showMessage("⚠️ Error de conexión con el servidor. Verifica que el backend esté activo.", "bg-yellow-100 text-yellow-700");
+                    showMessage(" Error de conexión con el servidor. Verifica que el backend esté activo.", "bg-yellow-100 text-yellow-700");
                 }
             });
         });

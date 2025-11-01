@@ -25,8 +25,8 @@ const port = process.env.PORT || 3001;
 app.use(cors({
     // El frontend ahora corre en el puerto 5500 gracias a Live Server
     // origin: 'http://127.0.0.1:5500'
-    origin: 'http://localhost:3000' // deben habilitar este  
-    // origin: 'http://127.0.0.1:5500' 
+    // origin: 'http://localhost:3000' // deben habilitar este  
+    origin: 'http://127.0.0.1:5050' 
 }));
 
 // 3. Middleware para procesar JSON (SOLO UNA VEZ)
