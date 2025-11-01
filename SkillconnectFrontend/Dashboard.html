@@ -3,106 +3,1288 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel de Navegación Rápida</title>
+    <title>Dashboard - SkillConnect</title>
     <!-- Incluir Tailwind CSS desde CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Iconify -->
+    <script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f4f7f9; /* Fondo muy claro */
-        }
-        /* Estilo general para los bloques de navegación (como los que dibujaste) */
-        .nav-block {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 250px; /* Altura fija para hacerlos prominentes */
-            background-color: white;
-            padding: 1.5rem;
-            border-radius: 1rem; /* Más redondeado */
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            transition: transform 0.2s, box-shadow 0.2s;
-            cursor: pointer;
-            border: 1px solid #e5e7eb;
-            text-align: center;
+            background-color: #f4f7f9;
+            min-height: 100vh;
         }
 
-        .nav-block:hover {
-            transform: translateY(-4px); /* Efecto de elevación al pasar el ratón */
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        /* Tarjetas de perfil de usuario */
+        .user-card {
+            background: white;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transition: all 0.3s ease;
+            overflow: hidden;
+            border: 1px solid #e5e7eb;
+        }
+
+        .user-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        .user-avatar {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+            border: 4px solid white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .skill-badge {
+            background: rgba(37, 99, 235, 0.1);
+            color: #2563eb;
+            border: 1px solid rgba(37, 99, 235, 0.3);
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            display: inline-block;
+            margin: 0.25rem;
+        }
+
+        .request-button {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            transition: all 0.3s ease;
+        }
+
+        .request-button:hover {
+            transform: scale(1.05);
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.4);
+        }
+
+        /* Animación para los botones de filtro */
+        .filter-button {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .filter-button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(59, 130, 246, 0.1);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .filter-button:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .filter-button:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 8px 16px rgba(59, 130, 246, 0.2);
+            border-color: #3b82f6;
+        }
+
+        .filter-button:active {
+            transform: translateY(0) scale(1);
+        }
+
+        .filter-button .iconify {
+            transition: transform 0.3s ease;
+        }
+
+        .filter-button:hover .iconify {
+            transform: rotate(10deg) scale(1.1);
+        }
+
+        .search-container {
+            background: white;
+            border-radius: 9999px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Estilos del Modal de Cerrar Sesión */
+        .custom-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+
+        .custom-modal {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from { 
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .modal-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #d97706;
+            font-size: 24px;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1f2937;
+        }
+
+        .modal-message {
+            color: #6b7280;
+            line-height: 1.6;
+            margin-bottom: 24px;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+
+        .modal-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 14px;
+        }
+
+        .modal-btn-cancel {
+            background: #f3f4f6;
+            color: #4b5563;
+        }
+
+        .modal-btn-cancel:hover {
+            background: #e5e7eb;
+        }
+
+        .modal-btn-confirm {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+        }
+
+        .modal-btn-confirm:hover {
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(239, 68, 68, 0.4);
+        }
+
+        .stats-card {
+            background: white;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e5e7eb;
+        }
+
+        /* Estilos para el Sidebar */
+        #sidebar {
+            transform: translateX(-100%);
+            transition: transform 0.3s ease-in-out;
+            z-index: 50;
+        }
+
+        #sidebar.open {
+            transform: translateX(0);
+        }
+
+        /* En desktop, el sidebar empuja el contenido */
+        @media (min-width: 1024px) {
+            #sidebar {
+                position: fixed;
+                transform: translateX(-320px); /* Ancho del sidebar */
+                z-index: 40; /* Menor z-index que el header */
+            }
+
+            #sidebar.open {
+                transform: translateX(0);
+            }
+
+            #mainContent {
+                transition: margin-left 0.3s ease-in-out;
+                margin-left: 0;
+            }
+
+            #mainContent.shifted {
+                margin-left: 320px; /* Ancho del sidebar */
+            }
+
+            /* El overlay no se muestra en desktop */
+            #overlay {
+                display: none !important;
+            }
+        }
+
+        /* En mobile, el sidebar aparece sobre el contenido */
+        @media (max-width: 1023px) {
+            #sidebar {
+                position: fixed;
+                z-index: 50;
+            }
+        }
+
+        /* Overlay */
+        #overlay {
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+            pointer-events: none;
+        }
+
+        #overlay.show {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+        }
+
+        /* En desktop, el overlay nunca se muestra */
+        @media (min-width: 1024px) {
+            #overlay {
+                display: none !important;
+                opacity: 0 !important;
+                visibility: hidden !important;
+                pointer-events: none !important;
+            }
+        }
+
+        /* Animación del botón hamburguesa */
+        .hamburger-line {
+            transition: all 0.3s ease-in-out;
+        }
+
+        .hamburger.open .line1 {
+            transform: rotate(-45deg) translate(-5px, 6px);
+        }
+
+        .hamburger.open .line2 {
+            opacity: 0;
+        }
+
+        .hamburger.open .line3 {
+            transform: rotate(45deg) translate(-5px, -6px);
+        }
+
+        /* En desktop, ocultar el botón hamburguesa cuando el sidebar está abierto */
+        @media (min-width: 1024px) {
+            .hamburger.open {
+                opacity: 0;
+                pointer-events: none;
+                transform: scale(0.8);
+            }
+        }
+
+        /* Estilos para los items del sidebar */
+        .sidebar-item {
+            transition: background-color 0.2s, padding-left 0.2s;
+        }
+
+        .sidebar-item:hover {
+            background-color: rgba(239, 68, 68, 0.1);
+            padding-left: 1.5rem;
+        }
+
+        .sidebar-item.active {
+            background-color: rgba(239, 68, 68, 0.15);
+            border-left: 4px solid #ef4444;
+            padding-left: 1.25rem;
+        }
+
+        /* Sistema de vistas (SPA) */
+        .view-section {
+            display: none;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .view-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Animación de carga */
+        .skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+        }
+
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        /* Badge de estado online */
+        .online-badge {
+            width: 16px;
+            height: 16px;
+            background: #10b981;
+            border: 3px solid white;
+            border-radius: 50%;
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+        }
+
+        /* Estilos para el chat */
+        #message-container {
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE and Edge */
         }
         
-        .icon {
-            width: 4rem;
-            height: 4rem;
-            margin-bottom: 0.75rem;
-            color: #2563eb; /* Azul primario */
+        #message-container::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, Opera */
         }
     </style>
 </head>
 <body>
 
+    <!-- Overlay oscuro para cuando el sidebar esté abierto -->
+    <div id="overlay" class="fixed inset-0 bg-black bg-opacity-50 z-40"></div>
+
+    <!-- Sidebar Desplegable -->
+    <aside id="sidebar" class="fixed top-0 left-0 w-80 h-full bg-white shadow-2xl z-50 overflow-y-auto">
+        <div class="p-6">
+            <!-- Encabezado del Sidebar -->
+            <div class="flex items-center justify-between mb-8">
+                <h2 class="text-2xl font-bold text-gray-800">Menú</h2>
+                <button id="closeSidebar" class="p-2 rounded-lg hover:bg-gray-100 transition">
+                    <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Información del Usuario -->
+            <div class="mb-8 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg">
+                <div class="flex items-center space-x-3">
+                    <img id="sidebarUserImage" 
+                         src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48'%3E%3Crect width='48' height='48' fill='%233b82f6'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='20' fill='white'%3EUS%3C/text%3E%3C/svg%3E" 
+                         alt="Usuario" 
+                         class="w-12 h-12 rounded-full object-cover border-2 border-blue-500 flex-shrink-0">
+                    <div class="flex-1 min-w-0">
+                        <p id="sidebarUserName" class="font-semibold text-gray-800 truncate">Usuario</p>
+                        <p class="text-sm text-gray-500">Bienvenido de nuevo</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navegación del Sidebar -->
+            <nav class="space-y-2">
+                <a href="#" onclick="navigateTo('home'); return false;" data-view="home" class="sidebar-item active flex items-center space-x-3 p-3 rounded-lg text-gray-700">
+                    <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                    </svg>
+                    <span class="font-medium">Inicio</span>
+                </a>
+
+                <a href="#" onclick="navigateTo('perfil'); return false;" data-view="perfil" class="sidebar-item flex items-center space-x-3 p-3 rounded-lg text-gray-700">
+                    <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                    </svg>
+                    <span class="font-medium">Mi Perfil</span>
+                </a>
+
+                <a href="#" onclick="navigateTo('mensajes'); return false;" data-view="mensajes" class="sidebar-item flex items-center space-x-3 p-3 rounded-lg text-gray-700">
+                    <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 4v-4z"></path>
+                    </svg>
+                    <span class="font-medium">Solicitudes y Mensajes</span>
+                </a>
+
+                <a href="#" onclick="navigateTo('busqueda'); return false;" data-view="busqueda" class="sidebar-item flex items-center space-x-3 p-3 rounded-lg text-gray-700">
+                    <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                    <span class="font-medium">Buscar Habilidades</span>
+                </a>
+
+                <a href="#" onclick="navigateTo('solicitud'); return false;" data-view="solicitud" class="sidebar-item flex items-center space-x-3 p-3 rounded-lg text-gray-700">
+                    <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
+                    </svg>
+                    <span class="font-medium">Solicitud de Intercambio</span>
+                </a>
+
+                <div class="my-4 border-t border-gray-200"></div>
+
+                <a href="#" onclick="navigateTo('configuracion'); return false;" data-view="configuracion" class="sidebar-item flex items-center space-x-3 p-3 rounded-lg text-gray-700">
+                    <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    </svg>
+                    <span class="font-medium">Configuración</span>
+                </a>
+
+                <a href="#" onclick="logout(); return false;" class="sidebar-item flex items-center space-x-3 p-3 rounded-lg text-red-600 hover:bg-red-50">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                    </svg>
+                    <span class="font-medium">Cerrar Sesión</span>
+                </a>
+            </nav>
+        </div>
+    </aside>
+
     <!-- Contenedor Principal -->
-    <div class="min-h-screen">
+    <div id="mainContent" class="min-h-screen pb-12">
 
         <!-- Barra de Navegación -->
-        <header class="bg-white shadow-sm sticky top-0 z-10 border-b border-gray-200">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex justify-between items-center">
-                <div class="text-2xl font-bold text-gray-900">
-                    Dashboard
+        <header class="bg-white shadow-md sticky top-0 z-30">
+            <div class="w-full px-6 lg:px-12 py-4 flex justify-between items-center">
+                <!-- Lado izquierdo: Hamburguesa + Logo -->
+                <div class="flex items-center space-x-4">
+                    <!-- Botón Hamburguesa -->
+                    <button id="hamburgerBtn" class="hamburger p-2 rounded-lg hover:bg-gray-100 transition">
+                        <div class="space-y-1.5">
+                            <div class="hamburger-line line1 w-6 h-0.5 bg-gray-700"></div>
+                            <div class="hamburger-line line2 w-6 h-0.5 bg-gray-700"></div>
+                            <div class="hamburger-line line3 w-6 h-0.5 bg-gray-700"></div>
+                        </div>
+                    </button>
+
+                    <!-- Logo -->
+                    <div class="flex items-center space-x-2">
+                        <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                        <h1 class="text-2xl font-bold text-blue-600">
+                            SkillConnect
+                        </h1>
+                    </div>
                 </div>
+
+                <!-- Lado derecho: Notificaciones -->
+                <button class="p-2 rounded-lg hover:bg-gray-100 transition relative">
+                    <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+                    </svg>
+                    <span class="absolute top-1 right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white"></span>
+                </button>
             </div>
         </header>
 
-        <!-- Contenido Central: Los 3 Bloques de Navegación -->
-        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-            <h1 class="text-3xl font-bold text-gray-800 mb-8 text-center">Selecciona una Sección</h1>
+        <!-- Sección Hero con Búsqueda -->
+        <div id="homeView" class="view-section active">
+            <div class="w-full px-6 lg:px-12 py-8">
+                <div class="text-center mb-8">
+                    <h2 class="text-4xl font-bold text-gray-800 mb-4">Descubre Talentos Increíbles</h2>
+                    <p class="text-lg text-gray-600">Conecta con personas que pueden ayudarte a crecer</p>
+                </div>
 
-            <!-- Grid Responsive para los 3 Bloques -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Barra de búsqueda mejorada -->
+                <div class="max-w-4xl mx-auto mb-8">
+                    <div class="search-container flex items-center px-6 py-4">
+                        <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                        <input 
+                            type="text" 
+                            id="searchInput"
+                            placeholder="Buscar por nombre, habilidad o ubicación..." 
+                            class="flex-1 ml-4 outline-none text-gray-700 placeholder-gray-400"
+                        >
+                        <button class="request-button text-white px-6 py-2 rounded-full font-semibold">
+                            Buscar
+                        </button>
+                    </div>
+                </div>
 
-                <!-- 1. Bloque: Mi Perfil de Usuario -->
-                <a href="./Perfil_Usuario/perfil.html" class="nav-block group">
-                    <!-- Icono de Usuario -->
-                    <svg class="icon group-hover:text-blue-700 transition duration-150" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                    </svg>
-                    <h2 class="text-xl font-semibold text-gray-800 group-hover:text-blue-600">Mi Perfil</h2>
-                    <p class="text-sm text-gray-500 mt-1">Administra tus habilidades y datos.</p>
-                </a>
-
-                <!-- 2. Bloque: Solicitudes de Intercambio (Mensajes) -->
-                <a href="mensajeria.html" class="nav-block group">
-                    <!-- Icono de Mensaje -->
-                    <svg class="icon group-hover:text-blue-700 transition duration-150" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 4v-4z"></path>
-                    </svg>
-                    <h2 class="text-xl font-semibold text-gray-800 group-hover:text-blue-600">Solicitudes y Mensajes</h2>
-                    <p class="text-sm text-gray-500 mt-1">Revisa tus conversaciones y propuestas.</p>
-                </a>
-
-                <!-- 3. Bloque: Búsqueda de Habilidades -->
-                <a href="busqueda.html" class="nav-block group">
-                    <!-- Icono de Búsqueda -->
-                    <svg class="icon group-hover:text-blue-700 transition duration-150" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                    </svg>
-                    <h2 class="text-xl font-semibold text-gray-800 group-hover:text-blue-600">Buscar Habilidades</h2>
-                    <p class="text-sm text-gray-500 mt-1">Encuentra a otros usuarios con habilidades.</p>
-                </a>
-                <a href="solicitud_intercambio.html" class="nav-block group">
-                    <!-- Icono de Búsqueda -->
-<svg class="icon group-hover:text-blue-700 transition duration-150" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
-</svg>
-<h2 class="text-xl font-semibold text-gray-800 group-hover:text-blue-600">Solicitud de Intercambio</h2>
-<p class="text-sm text-gray-500 mt-1">Crea solicitudes de intercambio de habilidades.</p>
-                </a>
+                <!-- Filtros rápidos -->
+                <div class="flex flex-wrap justify-center gap-3 mb-8">
+                    <button class="filter-button px-6 py-2 bg-white text-gray-700 rounded-full hover:bg-blue-50 hover:text-blue-600 transition border border-gray-200 shadow-sm flex items-center gap-2">
+                        <span class="iconify" data-icon="mdi:palette" data-width="20" data-height="20"></span>
+                        Diseño
+                    </button>
+                    <button class="filter-button px-6 py-2 bg-white text-gray-700 rounded-full hover:bg-blue-50 hover:text-blue-600 transition border border-gray-200 shadow-sm flex items-center gap-2">
+                        <span class="iconify" data-icon="mdi:code-tags" data-width="20" data-height="20"></span>
+                        Programación
+                    </button>
+                    <button class="filter-button px-6 py-2 bg-white text-gray-700 rounded-full hover:bg-blue-50 hover:text-blue-600 transition border border-gray-200 shadow-sm flex items-center gap-2">
+                        <span class="iconify" data-icon="mdi:camera" data-width="20" data-height="20"></span>
+                        Fotografía
+                    </button>
+                    <button class="filter-button px-6 py-2 bg-white text-gray-700 rounded-full hover:bg-blue-50 hover:text-blue-600 transition border border-gray-200 shadow-sm flex items-center gap-2">
+                        <span class="iconify" data-icon="mdi:music" data-width="20" data-height="20"></span>
+                        Música
+                    </button>
+                    <button class="filter-button px-6 py-2 bg-white text-gray-700 rounded-full hover:bg-blue-50 hover:text-blue-600 transition border border-gray-200 shadow-sm flex items-center gap-2">
+                        <span class="iconify" data-icon="mdi:pencil" data-width="20" data-height="20"></span>
+                        Escritura
+                    </button>
+                </div>
             </div>
-        </main>
+
+            <!-- Contenido Principal: Grid de Perfiles -->
+            <main class="w-full px-6 lg:px-12">
+                
+                <!-- Estadísticas rápidas -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 max-w-6xl mx-auto">
+                    <div class="stats-card p-6 text-center">
+                        <div class="text-3xl font-bold text-blue-600 mb-2">1,234</div>
+                        <div class="text-gray-600">Usuarios Activos</div>
+                    </div>
+                    <div class="stats-card p-6 text-center">
+                        <div class="text-3xl font-bold text-blue-600 mb-2">567</div>
+                        <div class="text-gray-600">Habilidades Disponibles</div>
+                    </div>
+                    <div class="stats-card p-6 text-center">
+                        <div class="text-3xl font-bold text-blue-600 mb-2">890</div>
+                        <div class="text-gray-600">Intercambios Exitosos</div>
+                    </div>
+                </div>
+
+                <h3 class="text-2xl font-bold text-gray-800 mb-6 max-w-6xl mx-auto">Usuarios Recomendados</h3>
+
+                <!-- Grid de Tarjetas de Usuarios -->
+                <div id="usersGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                    <!-- Las tarjetas se generarán dinámicamente con JavaScript -->
+                </div>
+            </main>
+        </div>
+
+        <!-- Vista: Mi Perfil -->
+        <div id="perfilView" class="view-section">
+            <iframe 
+                src="./Perfil_Usuario/perfil.html" 
+                id="perfilIframe"
+                style="width: 100%; height: calc(100vh - 80px); border: none; display: block;"
+                title="Perfil de Usuario">
+            </iframe>
+        </div>
+
+        <!-- Vista: Solicitudes y Mensajes -->
+        <div id="mensajesView" class="view-section">
+            <div class="w-full px-6 lg:px-12 py-8">
+                <div class="max-w-7xl mx-auto">
+                    <div class="bg-white rounded-2xl shadow-xl overflow-hidden" style="height: calc(100vh - 180px);">
+                        
+                        <!-- Chat Layout -->
+                        <div class="flex flex-col md:flex-row h-full">
+                            
+                            <!-- Lista de Conversaciones (Sidebar izquierdo) -->
+                            <div class="md:w-1/3 border-r border-gray-200 bg-gray-50 flex flex-col">
+                                <header class="p-4 border-b bg-white">
+                                    <h2 class="text-xl font-bold text-gray-800">Mensajes</h2>
+                                </header>
+                                
+                                <!-- Conversación activa -->
+                                <div class="p-3 flex items-center space-x-3 bg-indigo-100 border-l-4 border-indigo-600 cursor-pointer">
+                                    <div class="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center text-white font-semibold">
+                                        JD
+                                    </div>
+                                    <div class="flex-grow">
+                                        <p class="text-sm font-semibold text-gray-900 truncate">Juan Delgado</p>
+                                        <p class="text-xs text-indigo-700 truncate">Escribiendo un mensaje...</p>
+                                    </div>
+                                </div>
+
+                                <!-- Otras conversaciones -->
+                                <div class="p-3 flex items-center space-x-3 hover:bg-gray-100 cursor-pointer">
+                                    <div class="w-10 h-10 bg-yellow-500 rounded-full flex items-center justify-center text-white font-semibold">
+                                        MP
+                                    </div>
+                                    <div class="flex-grow">
+                                        <p class="text-sm font-semibold text-gray-900">María Pérez</p>
+                                        <p class="text-xs text-gray-500 truncate">Claro, lo reviso mañana.</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="p-3 flex items-center space-x-3 hover:bg-gray-100 cursor-pointer">
+                                    <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-semibold">
+                                        CG
+                                    </div>
+                                    <div class="flex-grow">
+                                        <p class="text-sm font-semibold text-gray-900">Carlos Gómez</p>
+                                        <p class="text-xs text-gray-500 truncate">¿Aceptas el intercambio?</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex-grow overflow-y-auto"></div>
+                            </div>
+
+                            <!-- Área de Chat (Derecha) -->
+                            <div class="md:w-2/3 flex flex-col">
+                                
+                                <!-- Header del Chat -->
+                                <header class="p-4 border-b bg-white flex justify-between items-center">
+                                    <h2 class="text-lg font-semibold text-gray-800">Conversando con Juan Delgado</h2>
+                                    <button class="text-sm text-indigo-600 hover:text-indigo-800">Ver Perfil</button>
+                                </header>
+
+                                <!-- Contenedor de Mensajes -->
+                                <div id="message-container" class="flex-grow p-4 overflow-y-auto space-y-4 bg-gray-50">
+                                    
+                                    <!-- Mensaje recibido -->
+                                    <div class="flex justify-start">
+                                        <div class="bg-gray-200 p-3 rounded-xl rounded-tl-none max-w-xs text-sm shadow">
+                                            Hola, ¿te parece bien que hagamos el intercambio de Python por Diseño la próxima semana?
+                                            <span class="block text-right text-xs text-gray-500 mt-1">10:05 AM</span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Mensaje enviado -->
+                                    <div class="flex justify-end">
+                                        <div class="bg-indigo-600 text-white p-3 rounded-xl rounded-tr-none max-w-xs text-sm shadow">
+                                            Sí, perfecto. ¿Martes a las 4 PM te funciona?
+                                            <span class="block text-right text-xs text-indigo-300 mt-1">10:07 AM</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Mensaje recibido -->
+                                    <div class="flex justify-start">
+                                        <div class="bg-gray-200 p-3 rounded-xl rounded-tl-none max-w-xs text-sm shadow">
+                                            Sí, martes a las 4 PM me va genial. ¡Nos vemos!
+                                            <span class="block text-right text-xs text-gray-500 mt-1">10:10 AM</span>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                <!-- Input de Mensaje -->
+                                <div class="p-4 border-t bg-white">
+                                    <form id="chat-form" class="flex space-x-3">
+                                        <input 
+                                            type="text" 
+                                            id="message-input"
+                                            placeholder="Escribe un mensaje..."
+                                            required
+                                            class="flex-grow px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                        >
+                                        <button 
+                                            type="submit" 
+                                            class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-full transition duration-150 ease-in-out shadow-lg"
+                                        >
+                                            Enviar
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vista: Buscar Habilidades -->
+        <div id="busquedaView" class="view-section">
+            <iframe 
+                src="./busqueda.html" 
+                id="busquedaIframe"
+                style="width: 100%; height: calc(100vh - 80px); border: none; display: block;"
+                title="Búsqueda de Habilidades">
+            </iframe>
+        </div>
+
+        <!-- Vista: Solicitud de Intercambio -->
+        <div id="solicitudView" class="view-section">
+            <iframe 
+                src="./solicitud_intercambio.html" 
+                id="solicitudIframe"
+                style="width: 100%; height: calc(100vh - 80px); border: none; display: block;"
+                title="Solicitud de Intercambio">
+            </iframe>
+        </div>
+
+        <!-- Vista: Configuración -->
+        <div id="configuracionView" class="view-section">
+            <div class="w-full px-6 lg:px-12 py-8">
+                <div class="max-w-4xl mx-auto">
+                    <div class="bg-white rounded-2xl shadow-xl p-8">
+                        <h2 class="text-3xl font-bold text-gray-800 mb-6">Configuración</h2>
+                        <p class="text-gray-600 mb-4">Ajusta las preferencias de tu cuenta.</p>
+                        
+                        <div class="space-y-4 mt-6">
+                            <div class="border-b pb-4">
+                                <h3 class="font-semibold text-gray-700 mb-2">Preferencias de Notificaciones</h3>
+                                <label class="flex items-center space-x-3">
+                                    <input type="checkbox" class="w-4 h-4 text-purple-600" checked>
+                                    <span class="text-gray-600">Recibir notificaciones por email</span>
+                                </label>
+                            </div>
+                            
+                            <div class="border-b pb-4">
+                                <h3 class="font-semibold text-gray-700 mb-2">Privacidad</h3>
+                                <label class="flex items-center space-x-3">
+                                    <input type="checkbox" class="w-4 h-4 text-purple-600" checked>
+                                    <span class="text-gray-600">Perfil visible para otros usuarios</span>
+                                </label>
+                            </div>
+                            
+                            <div class="pt-4">
+                                <button class="request-button px-6 py-3 text-white rounded-lg font-semibold">
+                                    Guardar Cambios
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
+
+    <!-- JavaScript para controlar el Sidebar y Tarjetas de Usuarios -->
+    <script>
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
+        const hamburgerBtn = document.getElementById('hamburgerBtn');
+        const closeSidebar = document.getElementById('closeSidebar');
+        const usersGrid = document.getElementById('usersGrid');
+        const mainContent = document.getElementById('mainContent');
+
+        // Sistema de navegación SPA (Single Page Application)
+        let currentView = 'home';
+
+        function navigateTo(viewName) {
+            // Ocultar todas las vistas
+            document.querySelectorAll('.view-section').forEach(view => {
+                view.classList.remove('active');
+            });
+
+            // Mostrar la vista seleccionada
+            const targetView = document.getElementById(viewName + 'View');
+            if (targetView) {
+                targetView.classList.add('active');
+                currentView = viewName;
+            }
+
+            // Actualizar estado activo en el sidebar
+            document.querySelectorAll('.sidebar-item').forEach(item => {
+                item.classList.remove('active');
+            });
+
+            const activeItem = document.querySelector(`[data-view="${viewName}"]`);
+            if (activeItem) {
+                activeItem.classList.add('active');
+            }
+
+            // Cerrar el sidebar automáticamente en móvil
+            if (window.innerWidth < 1024) {
+                closeSidebarFn();
+            }
+
+            // Scroll al inicio
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Función para abrir el sidebar
+        function openSidebar() {
+            sidebar.classList.add('open');
+            mainContent.classList.add('shifted');
+            hamburgerBtn.classList.add('open');
+            
+            // Solo mostrar overlay y prevenir scroll en móvil
+            if (window.innerWidth < 1024) {
+                overlay.classList.add('show');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        // Función para cerrar el sidebar
+        function closeSidebarFn() {
+            sidebar.classList.remove('open');
+            mainContent.classList.remove('shifted');
+            overlay.classList.remove('show');
+            hamburgerBtn.classList.remove('open');
+            document.body.style.overflow = '';
+        }
+
+        // Datos de ejemplo de usuarios (en producción vendrían del backend)
+        const mockUsers = [
+            {
+                id: 1,
+                name: "María González",
+                profession: "Diseñadora UX/UI",
+                location: "Barcelona, España",
+                skills: ["Figma", "Adobe XD", "Prototipado"],
+                bio: "Apasionada por crear experiencias digitales increíbles. Me encanta enseñar diseño.",
+                rating: 4.8,
+                exchanges: 23,
+                online: true,
+                avatar: "MG"
+            },
+            {
+                id: 2,
+                name: "Carlos Ruiz",
+                profession: "Desarrollador Full Stack",
+                location: "Madrid, España",
+                skills: ["React", "Node.js", "MongoDB"],
+                bio: "Desarrollador con 5 años de experiencia. Busco mejorar mis habilidades de diseño.",
+                rating: 4.9,
+                exchanges: 31,
+                online: true,
+                avatar: "CR"
+            },
+            {
+                id: 3,
+                name: "Ana Martínez",
+                profession: "Fotógrafa Profesional",
+                location: "Valencia, España",
+                skills: ["Fotografía", "Lightroom", "Edición"],
+                bio: "Especialista en fotografía de retrato y paisaje. Dispuesta a compartir conocimientos.",
+                rating: 4.7,
+                exchanges: 18,
+                online: false,
+                avatar: "AM"
+            },
+            {
+                id: 4,
+                name: "Diego López",
+                profession: "Marketing Digital",
+                location: "Sevilla, España",
+                skills: ["SEO", "Google Ads", "Analytics"],
+                bio: "Experto en estrategias digitales. Me interesa aprender programación web.",
+                rating: 4.6,
+                exchanges: 15,
+                online: true,
+                avatar: "DL"
+            },
+            {
+                id: 5,
+                name: "Laura Sánchez",
+                profession: "Escritora y Editora",
+                location: "Bilbao, España",
+                skills: ["Redacción", "Copywriting", "SEO Content"],
+                bio: "Escribo contenido que conecta. Busco colaborar con diseñadores creativos.",
+                rating: 4.9,
+                exchanges: 27,
+                online: true,
+                avatar: "LS"
+            },
+            {
+                id: 6,
+                name: "Roberto Pérez",
+                profession: "Músico y Productor",
+                location: "Granada, España",
+                skills: ["Guitarra", "Producción Musical", "Logic Pro"],
+                bio: "Productor musical con estudio propio. Ofrezco clases de guitarra y producción.",
+                rating: 4.8,
+                exchanges: 20,
+                online: false,
+                avatar: "RP"
+            }
+        ];
+
+        // Función para generar las tarjetas de usuarios
+        function renderUserCards() {
+            usersGrid.innerHTML = mockUsers.map(user => `
+                <div class="user-card">
+                    <!-- Banner superior con gradiente -->
+                    <div class="h-24 bg-gradient-to-r from-blue-400 via-blue-500 to-blue-600"></div>
+                    
+                    <!-- Contenido de la tarjeta -->
+                    <div class="p-6 -mt-16">
+                        <!-- Avatar con badge de estado -->
+                        <div class="relative inline-block mb-4">
+                            <div class="user-avatar">
+                                <span class="text-white text-3xl font-bold">${user.avatar}</span>
+                            </div>
+                            ${user.online ? '<div class="online-badge"></div>' : ''}
+                        </div>
+
+                        <!-- Información del usuario -->
+                        <h3 class="text-xl font-bold text-gray-800 mb-1">${user.name}</h3>
+                        <p class="text-blue-600 font-medium mb-2">${user.profession}</p>
+                        
+                        <!-- Ubicación -->
+                        <div class="flex items-center text-gray-500 text-sm mb-3">
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            </svg>
+                            ${user.location}
+                        </div>
+
+                        <!-- Bio -->
+                        <p class="text-gray-600 text-sm mb-4 line-clamp-2">${user.bio}</p>
+
+                        <!-- Habilidades -->
+                        <div class="mb-4">
+                            ${user.skills.map(skill => `<span class="skill-badge">${skill}</span>`).join('')}
+                        </div>
+
+                        <!-- Estadísticas -->
+                        <div class="flex justify-between items-center mb-4 text-sm text-gray-600">
+                            <div class="flex items-center">
+                                <svg class="w-4 h-4 text-yellow-400 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                                </svg>
+                                <span class="font-semibold">${user.rating}</span>
+                            </div>
+                            <div>
+                                <span class="font-semibold">${user.exchanges}</span> intercambios
+                            </div>
+                        </div>
+
+                        <!-- Botones de acción -->
+                        <div class="grid grid-cols-2 gap-3">
+                            <button onclick="viewProfile(${user.id})" class="px-4 py-2 border-2 border-blue-500 text-blue-600 rounded-lg font-semibold hover:bg-blue-50 transition">
+                                Ver Perfil
+                            </button>
+                            <button onclick="sendRequest(${user.id}, '${user.name}')" class="request-button px-4 py-2 text-white rounded-lg font-semibold">
+                                Solicitar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Función para ver perfil de usuario
+        function viewProfile(userId) {
+            console.log('Ver perfil del usuario:', userId);
+            // Aquí puedes redirigir a una página de perfil detallado
+            alert(`Función de ver perfil - Usuario ID: ${userId}\n\n(Esta funcionalidad se implementará con el backend)`);
+        }
+
+        // Función para enviar solicitud de intercambio
+        function sendRequest(userId, userName) {
+            console.log('Enviar solicitud al usuario:', userId);
+            
+            // Mostrar confirmación
+            if (confirm(`¿Deseas enviar una solicitud de intercambio a ${userName}?`)) {
+                // Aquí se haría la petición al backend
+                // Por ahora solo mostramos un mensaje de éxito
+                showNotification(`✅ Solicitud enviada a ${userName} exitosamente!`);
+            }
+        }
+
+        // Función para mostrar notificaciones
+        function showNotification(message) {
+            // Crear elemento de notificación
+            const notification = document.createElement('div');
+            notification.className = 'fixed top-20 right-4 bg-green-500 text-white px-6 py-4 rounded-lg shadow-lg z-50 transform transition-all duration-300 translate-x-full';
+            notification.textContent = message;
+            document.body.appendChild(notification);
+
+            // Animación de entrada
+            setTimeout(() => {
+                notification.classList.remove('translate-x-full');
+            }, 100);
+
+            // Eliminar después de 3 segundos
+            setTimeout(() => {
+                notification.classList.add('translate-x-full');
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        // ========================================
+        // MODAL DE CERRAR SESIÓN
+        // ========================================
+        function logout() {
+            showLogoutModal();
+        }
+
+        function showLogoutModal() {
+            const modalHTML = `
+                <div class="custom-modal-overlay" id="logoutModal" onclick="closeLogoutModal(event)">
+                    <div class="custom-modal" onclick="event.stopPropagation()">
+                        <div class="modal-header">
+                            <div class="modal-icon">⚠</div>
+                            <div class="modal-title">Cerrar Sesión</div>
+                        </div>
+                        <div class="modal-message">
+                            ¿Estás seguro de que deseas cerrar sesión? Tendrás que iniciar sesión nuevamente para acceder a tu perfil.
+                        </div>
+                        <div class="modal-actions">
+                            <button class="modal-btn modal-btn-cancel" onclick="closeLogoutModal()">
+                                Cancelar
+                            </button>
+                            <button class="modal-btn modal-btn-confirm" onclick="confirmLogout()">
+                                Cerrar Sesión
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+        }
+
+        function closeLogoutModal(event) {
+            if (event && event.target.id !== 'logoutModal') return;
+            const modal = document.getElementById('logoutModal');
+            if (modal) {
+                modal.style.animation = 'fadeOut 0.3s ease';
+                setTimeout(() => modal.remove(), 300);
+            }
+        }
+
+        function confirmLogout() {
+            // Limpiar localStorage (igual que en perfil.html)
+            localStorage.removeItem('usuarioId');
+            localStorage.removeItem('token');
+            localStorage.removeItem('usuario');
+            
+            // Redirigir al login
+            window.location.href = 'login.html';
+        }
+
+        // Event listeners
+        hamburgerBtn.addEventListener('click', openSidebar);
+        closeSidebar.addEventListener('click', closeSidebarFn);
+        overlay.addEventListener('click', closeSidebarFn);
+
+        // Cerrar sidebar con tecla ESC
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeSidebarFn();
+            }
+        });
+
+        // Funcionalidad de búsqueda
+        const searchInput = document.getElementById('searchInput');
+        searchInput.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            const filteredUsers = mockUsers.filter(user => 
+                user.name.toLowerCase().includes(searchTerm) ||
+                user.profession.toLowerCase().includes(searchTerm) ||
+                user.skills.some(skill => skill.toLowerCase().includes(searchTerm)) ||
+                user.location.toLowerCase().includes(searchTerm)
+            );
+            
+            if (searchTerm === '') {
+                renderUserCards();
+            } else {
+                usersGrid.innerHTML = filteredUsers.map(user => `
+                    <div class="user-card">
+                        <div class="h-24 bg-gradient-to-r from-blue-400 via-blue-500 to-blue-600"></div>
+                        <div class="p-6 -mt-16">
+                            <div class="relative inline-block mb-4">
+                                <div class="user-avatar">
+                                    <span class="text-white text-3xl font-bold">${user.avatar}</span>
+                                </div>
+                                ${user.online ? '<div class="online-badge"></div>' : ''}
+                            </div>
+                            <h3 class="text-xl font-bold text-gray-800 mb-1">${user.name}</h3>
+                            <p class="text-blue-600 font-medium mb-2">${user.profession}</p>
+                            <div class="flex items-center text-gray-500 text-sm mb-3">
+                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                </svg>
+                                ${user.location}
+                            </div>
+                            <p class="text-gray-600 text-sm mb-4 line-clamp-2">${user.bio}</p>
+                            <div class="mb-4">
+                                ${user.skills.map(skill => `<span class="skill-badge">${skill}</span>`).join('')}
+                            </div>
+                            <div class="flex justify-between items-center mb-4 text-sm text-gray-600">
+                                <div class="flex items-center">
+                                    <svg class="w-4 h-4 text-yellow-400 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                                    </svg>
+                                    <span class="font-semibold">${user.rating}</span>
+                                </div>
+                                <div>
+                                    <span class="font-semibold">${user.exchanges}</span> intercambios
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-3">
+                                <button onclick="viewProfile(${user.id})" class="px-4 py-2 border-2 border-blue-500 text-blue-600 rounded-lg font-semibold hover:bg-blue-50 transition">
+                                    Ver Perfil
+                                </button>
+                                <button onclick="sendRequest(${user.id}, '${user.name}')" class="request-button px-4 py-2 text-white rounded-lg font-semibold">
+                                    Solicitar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        });
+
+        // ========================================
+        // CARGAR INFORMACIÓN DEL USUARIO EN SIDEBAR
+        // ========================================
+        const API_BASE = 'http://localhost:3001/api';
+        
+        async function cargarDatosUsuario() {
+            try {
+                const usuarioId = localStorage.getItem('usuarioId');
+                
+                if (!usuarioId) {
+                    console.log('No hay usuario logueado');
+                    return;
+                }
+
+                // Consultar persona por usuario ID
+                const resPersona = await fetch(`${API_BASE}/personas/by-usuario/${usuarioId}`);
+                const dataPersona = await resPersona.json();
+                
+                if (!resPersona.ok || !dataPersona.success || !dataPersona.data) {
+                    console.error('No se pudo obtener el perfil de la persona');
+                    return;
+                }
+
+                const personaDB = dataPersona.data;
+                
+                // Actualizar imagen de perfil
+                const sidebarUserImage = document.getElementById('sidebarUserImage');
+                if (personaDB.imagenUrl_Persona) {
+                    sidebarUserImage.src = personaDB.imagenUrl_Persona;
+                } else {
+                    // Imagen por defecto con iniciales
+                    sidebarUserImage.src = 'https://ui-avatars.com/api/?name=' + 
+                        encodeURIComponent((personaDB.nombre_Persona || 'U') + ' ' + (personaDB.apellido_Persona || '')) + 
+                        '&background=3b82f6&color=fff&size=48';
+                }
+                
+                // Actualizar nombre
+                const sidebarUserName = document.getElementById('sidebarUserName');
+                const nombreCompleto = `${personaDB.nombre_Persona || ''} ${personaDB.apellido_Persona || ''}`.trim();
+                sidebarUserName.textContent = nombreCompleto || 'Usuario';
+                
+            } catch (error) {
+                console.error('Error al cargar datos del usuario:', error);
+            }
+        }
+
+        // Cargar datos del usuario al iniciar
+        cargarDatosUsuario();
+
+        // Renderizar las tarjetas al cargar la página
+        renderUserCards();
+
+        // ========================================
+        // FUNCIONALIDAD DEL CHAT
+        // ========================================
+        function initializeChat() {
+            const form = document.getElementById('chat-form');
+            const input = document.getElementById('message-input');
+            const container = document.getElementById('message-container');
+
+            if (!form || !input || !container) return;
+
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const messageText = input.value.trim();
+
+                if (messageText) {
+                    addMessageToChat(messageText, 'sent');
+                    input.value = ''; // Limpia el input
+                    scrollToBottom();
+
+                    // Simula una respuesta del receptor después de 1.5 segundos
+                    setTimeout(() => {
+                        addMessageToChat("Mensaje recibido y leído. ✅", 'received');
+                        scrollToBottom();
+                    }, 1500);
+                }
+            });
+
+            function addMessageToChat(text, type) {
+                const now = new Date();
+                const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+                const messageDiv = document.createElement('div');
+                const bubbleDiv = document.createElement('div');
+                const timeSpan = document.createElement('span');
+                
+                timeSpan.className = 'block text-right text-xs mt-1';
+                timeSpan.textContent = timeString;
+
+                if (type === 'sent') {
+                    // Mensaje Mío (Emisor)
+                    messageDiv.className = 'flex justify-end';
+                    bubbleDiv.className = 'bg-indigo-600 text-white p-3 rounded-xl rounded-tr-none max-w-xs text-sm shadow';
+                    timeSpan.classList.add('text-indigo-300');
+                } else {
+                    // Mensaje de Juan (Receptor)
+                    messageDiv.className = 'flex justify-start';
+                    bubbleDiv.className = 'bg-gray-200 p-3 rounded-xl rounded-tl-none max-w-xs text-sm shadow';
+                    timeSpan.classList.add('text-gray-500');
+                }
+                
+                bubbleDiv.textContent = text;
+                bubbleDiv.appendChild(timeSpan);
+                messageDiv.appendChild(bubbleDiv);
+                container.appendChild(messageDiv);
+            }
+
+            function scrollToBottom() {
+                container.scrollTop = container.scrollHeight;
+            }
+            
+            // Asegura que al cargar se vea el último mensaje
+            scrollToBottom();
+        }
+
+        // Inicializar el chat cuando se carga la página
+        initializeChat();
+    </script>
 
     <!-- Protección de sesión -->
     <script src="js/auth-guard.js"></script>
