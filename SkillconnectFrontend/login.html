@@ -318,43 +318,58 @@
 
             // LOGIN TRADICIONAL CON EMAIL Y PASSWORD
             form.addEventListener("submit", async (e) => {
-                e.preventDefault();
+    e.preventDefault();
 
-                const correo = document.getElementById("email").value;
-                const contrasena = document.getElementById("password").value;
+    const correo = document.getElementById("email").value;
+    const contrasena = document.getElementById("password").value;
 
-                showMessage("Validando credenciales...", "bg-blue-100 text-blue-700");
+    showMessage("Validando credenciales...", "bg-blue-100 text-blue-700");
 
-                try {
-                    const res = await fetch(LOGIN_URL, {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ correo, contrasena })
-                    });
+    try {
+        const res = await fetch(LOGIN_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ correo, contrasena })
+        });
 
-                    const data = await res.json();
+        const data = await res.json();
 
-                    if (res.ok) {
-                localStorage.setItem('authToken', data.token);
-                localStorage.setItem('token', data.token);
-                localStorage.setItem('usuarioId', data.usuarioId);
-                localStorage.setItem('correoUsuario', data.correo);
-                        
-                        showMessage("Redirigiendo al descubrir...", "bg-green-100 text-green-700");
+        if (res.ok) {
+            // Guardar datos en localStorage
+            localStorage.setItem('authToken', data.token);
+            localStorage.setItem('token', data.token);
+            localStorage.setItem('usuarioId', data.usuario.id_usuario);
+            localStorage.setItem('correoUsuario', data.usuario.correo);
+            localStorage.setItem('userRole', data.usuario.id_rol);
+            
+          
+            // LÓGICA DE REDIRECCIÓN BASADA EN ROL
+            let redirectPage = "Descubrir.html"; // Valor por defecto para roles 2, 3, etc.
+            const userRole = parseInt(data.usuario.id_rol); // Convertir a número
 
-                        setTimeout(() => {
-                            window.location.href = "Descubrir.html"; 
-                        }, 1000); 
+            // Si el rol es 1 (Administrador)
+            if (userRole === 1) { 
+                redirectPage = "Reportes.html"; // Redirigir a la página de reportes
+            }
+            
+            // ** EL MENSAJE AHORA ES DINÁMICO **
+            // Mostrará "Redirigiendo a Descubrir.html..." o "Redirigiendo a Reportes.html..."
+            showMessage(`Redirigiendo a ${redirectPage}...`, "bg-green-100 text-green-700");
 
-                    } else {
-                        showMessage("Error: " + (data.error || "Error de Descubrir de sesión"), "bg-red-100 text-red-700");
-                    }
+            setTimeout(() => {
+                window.location.href = redirectPage; // Usar la página determinada por el rol
+            }, 1000); 
 
-                } catch (error) {
-                    console.error("Error al conectar con el backend:", error);
-                    showMessage("Error de conexión con el servidor.", "bg-yellow-100 text-yellow-700");
-                }
-            });
+        } else {
+            // Se asume que el backend devuelve 'error' en caso de fallo.
+            showMessage("Error: " + (data.error || "Error de inicio de sesión"), "bg-red-100 text-red-700");
+        }
+
+    } catch (error) {
+        console.error("Error al conectar con el backend:", error);
+        showMessage("Error de conexión con el servidor.", "bg-yellow-100 text-yellow-700");
+    }
+});
             
             // LOGIN CON GOOGLE (SIN FIREBASE - USANDO BACKEND)
             const googleBtn = document.getElementById("google-login-btn");

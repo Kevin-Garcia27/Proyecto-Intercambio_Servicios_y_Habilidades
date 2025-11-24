@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reportes y Estadísticas - SkillConnect</title>
+    <!-- Incluye Tailwind CSS --><script src="https://cdn.tailwindcss.com"></script>
+    <!-- Iconos de Font Awesome --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6; /* Gris claro de fondo */
+        }
+        .container-fluid {
+            padding: 2rem;
+        }
+        /* Estilos para la gráfica de barras simulada */
+        .bar-chart-container {
+            display: flex;
+            align-items: flex-end;
+            height: 150px; /* Altura fija para la gráfica */
+            border-left: 1px solid #ccc;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 5px;
+            position: relative;
+        }
+        .bar {
+            width: 30px; /* Ancho de cada barra */
+            margin: 0 10px;
+            background-color: #3b82f6; /* Azul de Tailwind */
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: center;
+        }
+        .bar-label {
+            position: absolute;
+            bottom: -20px;
+            font-size: 0.75rem;
+            color: #555;
+        }
+        .bar-value {
+            position: absolute;
+            top: -20px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            color: #333;
+        }
+        /* Estilos para la gráfica de pastel simulada */
+        .pie-chart {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background-image: conic-gradient(
+                #3b82f6 0% 60%, /* Usuarios */
+                #ef4444 60% 100% /* Intercambios */
+            );
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .pie-center {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background-color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: bold;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container-fluid">
+    <h1 class="text-3xl font-bold text-gray-800 mb-6">Panel de Administración: Reportes y Estadísticas</h1>
+    <p class="text-gray-600 mb-8">Información clave para la gestión de SkillConnect.</p>
+
+    <!-- Sección de Tarjetas de Resumen --><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+
+        <!-- Tarjeta 1: Usuarios Registrados (ACTUALIZADO) --><div class="bg-white p-6 rounded-xl shadow-lg border-t-4 border-blue-500 hover:shadow-xl transition duration-300">
+            <div class="flex items-center justify-between">
+                <p class="text-sm font-medium text-gray-500 uppercase">Usuarios Totales</p>
+                <i class="fas fa-users text-blue-500 text-2xl"></i>
+            </div>
+            <p class="text-3xl font-extrabold text-gray-900 mt-1">12</p>
+            <span class="text-xs text-green-500">Nuevos usuarios: 2</span>
+        </div>
+
+        <!-- Tarjeta 2: Intercambios Finalizados (ACTUALIZADO) --><div class="bg-white p-6 rounded-xl shadow-lg border-t-4 border-red-500 hover:shadow-xl transition duration-300">
+            <div class="flex items-center justify-between">
+                <p class="text-sm font-medium text-gray-500 uppercase">Intercambios Exitosos</p>
+                <i class="fas fa-handshake text-red-500 text-2xl"></i>
+            </div>
+            <p class="text-3xl font-extrabold text-gray-900 mt-1">20</p>
+            <span class="text-xs text-yellow-600">3 pendientes de cierre</span>
+        </div>
+
+        <!-- Tarjeta 3: Habilidades Populares (Color Verde) --><div class="bg-white p-6 rounded-xl shadow-lg border-t-4 border-green-500 hover:shadow-xl transition duration-300">
+            <div class="flex items-center justify-between">
+                <p class="text-sm font-medium text-gray-500 uppercase">Habilidad #1</p>
+                <i class="fas fa-code text-green-500 text-2xl"></i>
+            </div>
+            <p class="text-3xl font-extrabold text-gray-900 mt-1">Programación JS</p>
+            <span class="text-xs text-gray-500">5 usuarios la ofrecen</span>
+        </div>
+
+        <!-- Tarjeta 4: Reportes Abiertos (Color Amarillo/Naranja de Alerta) --><div class="bg-white p-6 rounded-xl shadow-lg border-t-4 border-yellow-500 hover:shadow-xl transition duration-300">
+            <div class="flex items-center justify-between">
+                <p class="text-sm font-medium text-gray-500 uppercase">Reportes Pendientes</p>
+                <i class="fas fa-exclamation-triangle text-yellow-500 text-2xl"></i>
+            </div>
+            <p class="text-3xl font-extrabold text-gray-900 mt-1">4</p>
+            <span class="text-xs text-red-600">¡Necesitan atención inmediata!</span>
+        </div>
+    </div>
+
+    <!-- Sección de Gráficos (Simulación) --><div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        <!-- Gráfico 1: Usuarios y Intercambios (Barras Simuladas) --><div class="bg-white p-6 rounded-xl shadow-lg">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">Usuarios vs. Intercambios Exitosos</h2>
+            <div class="bar-chart-container">
+                <div class="bar" style="height: calc((12 / 20) * 100%); background-color: #3b82f6;">
+                    <span class="bar-value">12</span>
+                    <span class="bar-label">Usuarios</span>
+                </div>
+                <div class="bar" style="height: 100%; background-color: #ef4444;">
+                    <span class="bar-value">20</span>
+                    <span class="bar-label">Intercambios</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gráfico 2: Representación en Pastel (Simulado) --><div class="bg-white p-6 rounded-xl shadow-lg flex flex-col items-center justify-center">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">Proporción de Actividad</h2>
+            <div class="pie-chart">
+                <div class="pie-center">Total</div>
+            </div>
+            <div class="flex justify-center mt-4 space-x-4 text-sm text-gray-600">
+                <div class="flex items-center">
+                    <span class="w-3 h-3 bg-blue-500 rounded-full mr-2"></span> Usuarios (12)
+                </div>
+                <div class="flex items-center">
+                    <span class="w-3 h-3 bg-red-500 rounded-full mr-2"></span> Intercambios (20)
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    // Aquí iría el JavaScript para cargar los datos y generar los gráficos reales.
+    // Para las gráficas reales, integrarías librerías como Chart.js, D3.js o ApexCharts.
+    // Por ejemplo, con Chart.js:
+    /*
+    const ctxBar = document.getElementById('barChart').getContext('2d');
+    new Chart(ctxBar, {
+        type: 'bar',
+        data: {
+            labels: ['Usuarios Totales', 'Intercambios Exitosos'],
+            datasets: [{
+                label: 'Cantidad',
+                data: [12, 20],
+                backgroundColor: ['#3b82f6', '#ef4444'],
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+    */
+</script>
+
+</body>
+</html>
