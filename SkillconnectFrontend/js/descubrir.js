@@ -1,4 +1,17 @@
-﻿const sidebar = document.getElementById("sidebar");
+﻿// Helper para traducciones
+var t = (key) => {
+  if (window.t_real && typeof window.t_real === 'function') return window.t_real(key);
+  if (window.t && typeof window.t === 'function' && window.t !== t) return window.t(key);
+  const fallbacks = {
+    'users.showing': 'Mostrando',
+    'users.of': 'de',
+    'users.user': 'usuario',
+    'users.users': 'usuarios'
+  };
+  return fallbacks[key] || key;
+};
+
+const sidebar = document.getElementById("sidebar");
 const overlay = document.getElementById("overlay");
 const hamburgerBtn = document.getElementById("hamburgerBtn");
 const closeSidebar = document.getElementById("closeSidebar");
@@ -5905,7 +5918,7 @@ function mostrarModalCalificacionDashboard(
     "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50";
   modal.style.zIndex = "9999";
   modal.innerHTML = `
-                <div class="bg-white rounded-xl shadow-xl max-w-md w-full mx-4" style="animation: scaleIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);">
+                <div class="bg-white rounded-xl shadow-xl max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto" style="animation: scaleIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);">
 
                     <!-- Header -->
                     <div style="padding: 24px 24px 0;">
@@ -6873,7 +6886,7 @@ window.addEventListener("beforeunload", () => {
       .replace(/[\u{1F1E0}-\u{1F1FF}]/gu, "")
       .replace(/[\u{2600}-\u{26FF}]/gu, "")
       .replace(/[\u{2700}-\u{27BF}]/gu, "")
-      .replace(/👋|🤖|✨|💡|🎯|📚|💻|🔍|✅|❌/g, "")
+      .replace(/👋|🤖|✨|💡|🎯|📚|💻|🔍|✅| /g, "")
       .replace(/&amp;/g, "y")
       .replace(/&lt;/g, "")
       .replace(/&gt;/g, "")

@@ -402,7 +402,7 @@ router.post('/enviar-detallada', async (req, res) => {
             modalidad
         } = req.body;
 
-        console.log('📩 Solicitud detallada recibida:', {
+        console.log('   Solicitud detallada recibida:', {
             solicitanteId,
             receptorId,
             fechaPropuesta,

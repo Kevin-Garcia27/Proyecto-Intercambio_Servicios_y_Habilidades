@@ -14,14 +14,16 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- Chart.js para gráficos dinámicos -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="js/translations.js"></script>
     <!-- Plugin Chart.js: datalabels para mostrar valores encima de las barras -->
     <script
         src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f3f4f6;
-            /* Gris claro de fondo */
+            background-color: #0f172a;
+            /* Azul-gris muy oscuro, casi negro */
+            min-height: 100vh;
         }
 
         .container-fluid {
@@ -127,136 +129,174 @@
             font-weight: bold;
             color: #333;
         }
+
+        /* Estilo para bordes externos de tablas */
+        .table-wrapper {
+            border: 1px solid rgba(0, 0, 0, 0.15);
+            /* Negro suave con transparencia */
+            border-radius: 12px;
+            overflow: hidden;
+            background-color: white;
+        }
+
+        /* Asegurar que los select tengan espacio para abrir hacia abajo */
+        #mainSheet {
+            min-height: 90vh;
+            padding-bottom: 8rem;
+        }
     </style>
 </head>
 
 <body>
 
-    <div class="container-fluid">
-        <h1 class="text-3xl font-bold text-gray-800 mb-6">Panel de Administración: Reportes y Estadísticas</h1>
-        <p class="text-gray-600 mb-8">Información clave para la gestión de SkillConnect.</p>
-
-        <!-- Sección de Tarjetas de Resumen -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-
-            <!-- Tarjeta 1: Usuarios Registrados (Dinámico) -->
-            <div
-                class="bg-white p-6 rounded-xl shadow-lg border-t-4 border-blue-500 hover:shadow-xl transition duration-300">
-                <div class="flex items-center justify-between">
-                    <p class="text-sm font-medium text-gray-500 uppercase">Usuarios Totales</p>
-                    <span class="iconify text-blue-500" data-icon="mdi:account-multiple" data-inline="false"
-                        style="font-size:24px;"></span>
-                </div>
-                <p id="usuariosTotal" class="text-3xl font-extrabold text-gray-900 mt-1">—</p>
-                <span id="usuariosNuevos" class="text-xs text-green-500">Nuevos usuarios: —</span>
-            </div>
-
-            <!-- Tarjeta 2: Intercambios Finalizados (Dinámico) -->
-            <div
-                class="bg-white p-6 rounded-xl shadow-lg border-t-4 border-red-500 hover:shadow-xl transition duration-300">
-                <div class="flex items-center justify-between">
-                    <p class="text-sm font-medium text-gray-500 uppercase">Intercambios Exitosos</p>
-                    <span class="iconify text-red-500" data-icon="mdi:handshake" data-inline="false"
-                        style="font-size:24px;"></span>
-                </div>
-                <p id="intercambiosTotal" class="text-3xl font-extrabold text-gray-900 mt-1">—</p>
-                <span id="intercambiosPendientes" class="text-xs text-yellow-600">— pendientes de cierre</span>
-            </div>
-
-            <!-- Tarjeta 3: Habilidad Top (Dinámico, fallback) -->
-            <div
-                class="bg-white p-6 rounded-xl shadow-lg border-t-4 border-green-500 hover:shadow-xl transition duration-300">
-                <div class="flex items-center justify-between">
-                    <p class="text-sm font-medium text-gray-500 uppercase">Habilidad #1</p>
-                    <span class="iconify text-green-500" data-icon="mdi:language-javascript" data-inline="false"
-                        style="font-size:24px;"></span>
-                </div>
-                <p id="habilidadTop" class="text-3xl font-extrabold text-gray-900 mt-1">—</p>
-                <span id="habilidadTopCount" class="text-xs text-gray-500">— usuarios la ofrecen</span>
-            </div>
-
-            <!-- Tarjeta 4: Reportes Abiertos (Dinámico) -->
-            <div
-                class="bg-white p-6 rounded-xl shadow-lg border-t-4 border-yellow-500 hover:shadow-xl transition duration-300">
-                <div class="flex items-center justify-between">
-                    <p class="text-sm font-medium text-gray-500 uppercase">Reportes Pendientes</p>
-                    <span class="iconify text-yellow-500" data-icon="mdi:alert-circle" data-inline="false"
-                        style="font-size:24px;"></span>
-                </div>
-                <p id="reportesPendientes" class="text-3xl font-extrabold text-gray-900 mt-1">—</p>
-                <span class="text-xs text-red-600">¡Necesitan atención inmediata!</span>
-            </div>
+    <!-- Hoja Principal Única -->
+    <div id="mainSheet" class="bg-white rounded-2xl shadow-xl p-8 lg:p-12">
+        <div class="mb-10 pb-6 border-b border-black/20">
+            <h1 class="text-4xl font-extrabold text-gray-900 tracking-tight" data-i18n="reports.title">Panel de
+                Administración</h1>
+            <p class="text-gray-500 mt-2 text-lg" data-i18n="reports.subtitle">Reportes, métricas y gestión de técnicos
+                en un solo lugar.</p>
         </div>
+
+
 
         <!-- Sección de Gráficos (Simulación) -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
-            <!-- Tabla 1: Usuarios reportados (reemplaza la gráfica de barras) -->
-            <div class="bg-white p-6 rounded-xl shadow-lg">
-                <h2 class="text-xl font-semibold text-gray-800 mb-4">Usuarios reportados</h2>
-                <p class="text-sm text-gray-600 mb-4">Usuarios que han recibido más solicitudes/reportes.</p>
-                <div id="reportCountsContainer" class="overflow-x-auto">
+            <!-- Columna 1: Usuarios reportados -->
+            <div class="flex flex-col">
+                <div class="mb-4">
+                    <h2 class="text-xl font-bold text-gray-800 flex items-center gap-2">
+                        <span class="iconify text-red-500" data-icon="mdi:alert-octagon"></span>
+                        <span data-i18n="reports.reportedUsers">Usuarios reportados</span>
+                    </h2>
+                    <p class="text-xs text-gray-400" data-i18n="reports.reportedUsersDesc">Usuarios con mayor índice de
+                        incidencias.</p>
+                </div>
+                <div id="reportCountsContainer" class="overflow-x-auto table-wrapper">
                     <table id="reportCountsTable" class="w-full table-auto border-collapse">
                         <thead>
-                            <tr class="text-left text-sm text-gray-600 border-b">
-                                <th class="py-2 px-3">Usuario Reportado</th>
-                                <th class="py-2 px-3">Email</th>
-                                <th class="py-2 px-3">Perfil ID</th>
-                                <th class="py-2 px-3">Cantidad de reportes</th>
-                                <th class="py-2 px-3">Último reporte</th>
-                                <th class="py-2 px-3">Motivo (último)</th>
-                                <th class="py-2 px-3">Acciones</th>
+                            <tr
+                                class="text-left text-[10px] font-bold text-black uppercase tracking-widest bg-gray-50/50 border-b border-black/20">
+                                <th class="py-3 px-4" data-i18n="table.user">Usuario</th>
+                                <th class="py-3 px-4" data-i18n="table.email">Email</th>
+                                <th class="py-3 px-4 text-center" data-i18n="table.id">ID</th>
+                                <th class="py-3 px-4 text-center" data-i18n="table.reports">Reps</th>
+                                <th class="py-3 px-4 text-center" data-i18n="table.action">Acción</th>
                             </tr>
                         </thead>
                         <tbody id="reportCountsTbody">
                             <tr>
-                                <td colspan="2" class="p-4 text-sm text-gray-500">Cargando...</td>
+                                <td colspan="5" class="py-10 text-center text-gray-300 italic"
+                                    data-i18n="table.loading">Cargando datos...</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
 
-            <!-- Gráfico 2: Representación en Pastel (Simulado) -->
-            <div class="bg-white p-6 rounded-xl shadow-lg flex flex-col items-center justify-center">
-                <h2 class="text-xl font-semibold text-gray-800 mb-4">Proporción de Actividad</h2>
-                <div>
-                    <canvas id="pieChart" style="width:100%;height:160px"></canvas>
+            <!-- Columna 2: Gráfico - Métricas -->
+            <div class="flex flex-col">
+                <div class="mb-4 text-right lg:text-left">
+                    <h2 class="text-xl font-bold text-gray-800 flex items-center gap-2 lg:justify-start justify-end">
+                        <span class="iconify text-blue-500" data-icon="mdi:chart-bar"></span>
+                        <span data-i18n="reports.globalPerformance">Desempeño Global</span>
+                    </h2>
+                    <p class="text-xs text-gray-400" data-i18n="reports.performanceDesc">Promedios generales de
+                        satisfacción.</p>
                 </div>
-                <div class="flex justify-center mt-4 space-x-4 text-sm text-gray-600" id="pieLegend">
-                    <!-- legend filled by JS -->
+                <div class="p-4 bg-gray-50 rounded-2xl border border-black/20">
+                    <canvas id="barChart" style="width:100%;height:280px"></canvas>
                 </div>
             </div>
 
         </div>
 
         <!-- Sección: Solicitudes de Verificación -->
-        <div id="verificationSection" class="bg-white p-6 rounded-xl shadow-lg mt-8">
-            <h2 class="text-xl font-semibold text-gray-800 mb-4">Solicitudes de Verificación de Usuarios</h2>
-            <p class="text-sm text-gray-600 mb-4">Listado de solicitudes pendientes. Puedes aceptar, rechazar o eliminar
-                cada solicitud.</p>
+        <div id="verificationSection" class="mt-16 pt-10 border-t border-black/20">
+            <div class="mb-8">
+                <h2 class="text-2xl font-bold text-gray-800 flex items-center gap-3">
+                    <span class="iconify text-yellow-500" data-icon="mdi:account-check-outline"></span>
+                    <span data-i18n="reports.verificationRequests">Solicitudes de Verificación</span>
+                </h2>
+                <p class="text-sm text-gray-400" data-i18n="reports.verificationDesc">Cola de validadores para identidad
+                    y certificaciones.</p>
+            </div>
 
-            <div id="verificationTableContainer" class="overflow-x-auto">
+            <div id="verificationTableContainer" class="overflow-x-auto table-wrapper">
                 <table id="verificationTable" class="w-full table-auto border-collapse">
                     <thead>
-                        <tr class="text-left text-sm text-gray-600 border-b">
-                            <th class="py-2 px-3">ID</th>
-                            <th class="py-2 px-3">Perfil ID</th>
-                            <th class="py-2 px-3">Nombre</th>
-                            <th class="py-2 px-3">Estado</th>
-                            <th class="py-2 px-3">Fecha</th>
-                            <th class="py-2 px-3">Hora</th>
-                            <th class="py-2 px-3">Acciones</th>
+                        <tr
+                            class="text-left text-[10px] font-bold text-black uppercase tracking-widest bg-gray-50/50 border-b border-black/20">
+                            <th class="py-4 px-4 text-center w-16" data-i18n="table.id">ID</th>
+                            <th class="py-4 px-4" data-i18n="table.technician">Técnico</th>
+                            <th class="py-4 px-4" data-i18n="table.status">Estado</th>
+                            <th class="py-4 px-4" data-i18n="table.dateTime">Fecha / Hora</th>
+                            <th class="py-4 px-4 text-center" data-i18n="table.actions">Acciones</th>
                         </tr>
                     </thead>
                     <tbody id="verificationTbody">
                         <tr>
-                            <td colspan="7" class="p-4 text-sm text-gray-500">Cargando solicitudes...</td>
+                            <td colspan="5" class="py-12 text-center text-gray-300" data-i18n="table.loading">Cargando
+                                solicitudes pendientes...
+                            </td>
                         </tr>
                     </tbody>
                 </table>
             </div>
         </div>
+
+        <!-- Sección: Directorio de Técnicos -->
+        <div id="directorioSection" class="mt-16 pt-10 border-t border-black/20">
+            <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
+                <div>
+                    <h3 class="text-2xl font-bold text-gray-800" data-i18n="reports.directory">Directorio General</h3>
+                    <p class="text-sm text-gray-400" data-i18n="reports.directoryDesc">Listado íntegro de profesionales
+                        registrados.</p>
+                </div>
+                <div class="flex gap-2 flex-wrap items-center">
+                    <div class="relative">
+                        <span class="iconify absolute left-3 top-2.5 text-gray-400" data-icon="mdi:magnify"></span>
+                        <input type="text" id="busquedaNombre" oninput="filtrarTecnicos()" placeholder="Buscar..."
+                            data-i18n-placeholder="reports.search"
+                            class="pl-9 pr-3 py-2 text-xs border border-black/20 rounded-xl bg-gray-50 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all w-48">
+                    </div>
+                    <select id="filtroEspecialidad" onchange="filtrarTecnicos()"
+                        class="border border-black/20 rounded-xl px-3 py-2 text-xs bg-gray-50 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="" data-i18n="reports.specialty">Especialidad</option>
+                    </select>
+                    <select id="filtroUbicacion" onchange="filtrarTecnicos()"
+                        class="border border-black/20 rounded-xl px-3 py-2 text-xs bg-gray-50 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="" data-i18n="reports.location">Ubicación</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto table-wrapper">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr
+                            class="text-[10px] font-bold text-black uppercase tracking-widest bg-gray-50/50 border-b border-black/20">
+                            <th class="py-4 px-4 w-16" data-i18n="table.photo">Foto</th>
+                            <th class="py-4 px-4" data-i18n="table.fullName">Nombre Completo</th>
+                            <th class="py-4 px-4" data-i18n="table.expertise">Expertise</th>
+                            <th class="py-4 px-4" data-i18n="table.location">Ubicación</th>
+                            <th class="py-4 px-4 text-center" data-i18n="table.availability">Disponibilidad</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaTecnicosH3">
+                        <tr>
+                            <td colspan="5" class="py-12 text-center text-gray-300 italic" data-i18n="table.syncing">
+                                Sincronizando directorio...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div> <!-- Fin mainSheet -->
+    </div> <!-- Fin container-fluid -->
+    </div>
     </div>
 
     <script>
@@ -288,6 +328,21 @@
     </script>
 
     <script>
+        // Helper para traducciones
+        var t = (key) => {
+            if (window.t_real && typeof window.t_real === 'function') return window.t_real(key);
+            if (window.t && typeof window.t === 'function' && window.t !== t) return window.t(key);
+            return key;
+        };
+
+        // Helper para evitar XSS
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
         // ----- Código para manejar solicitudes de verificación -----
         async function cargarSolicitudesVerificacion() {
             const tbody = document.getElementById('verificationTbody');
@@ -378,41 +433,34 @@
                         if (s === '3' || s === 'rechazada' || s === 'rechazado') return 'rechazada';
                         return s;
                     }
-                    const estado = normalizeEstado(r.estado || 'pendiente');
+                    const normalizedEstado = normalizeEstado(r.estado || 'pendiente');
+                    const estadoKey = normalizedEstado === 'aprobada' ? 'status.approved' : (normalizedEstado === 'rechazada' ? 'status.rejected' : 'status.pending');
+                    const estadoTraducido = t(estadoKey);
 
-                    // Construir acciones disponibles para el administrador según estado
-                    let accionesHtml = '';
-                    if (isAdmin) {
-                        if (estado === 'pendiente') {
-                            accionesHtml = `<td class="py-2 px-3 text-sm">
-                            <button onclick="actualizarSolicitud(${r.id}, 'aprobada')" class="bg-green-100 text-green-700 px-3 py-1 rounded mr-2 mb-1">Aceptar</button>
-                            <button onclick="actualizarSolicitud(${r.id}, 'rechazada')" class="bg-red-100 text-red-700 px-3 py-1 rounded mr-2 mb-1">Rechazar</button>
-                            <button onclick="eliminarSolicitud(${r.id})" class="bg-gray-100 text-gray-700 px-3 py-1 rounded mb-1 hover:bg-gray-200">Eliminar</button>
-                        </td>`;
-                        } else if (estado === 'aprobada') {
-                            accionesHtml = `<td class="py-2 px-3 text-sm">
-                            <button onclick="actualizarSolicitud(${r.id}, 'rechazada')" class="bg-red-100 text-red-700 px-3 py-1 rounded mr-2 mb-1">Rechazar</button>
-                            <button onclick="eliminarSolicitud(${r.id})" class="bg-gray-100 text-gray-700 px-3 py-1 rounded mb-1 hover:bg-gray-200">Eliminar</button>
-                        </td>`;
-                        } else if (estado === 'rechazada') {
-                            accionesHtml = `<td class="py-2 px-3 text-sm">
-                            <button onclick="actualizarSolicitud(${r.id}, 'aprobada')" class="bg-green-100 text-green-700 px-3 py-1 rounded mr-2 mb-1">Aceptar</button>
-                            <button onclick="eliminarSolicitud(${r.id})" class="bg-gray-100 text-gray-700 px-3 py-1 rounded mb-1 hover:bg-gray-200">Eliminar</button>
-                        </td>`;
-                        }
-                    } else {
-                        accionesHtml = '<td class="py-2 px-3 text-sm text-gray-500">—</td>';
-                    }
+                    const badgeColor = normalizedEstado === 'pendiente' ? 'bg-yellow-100 text-yellow-700' : (normalizedEstado === 'aprobada' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700');
 
                     return `
-                    <tr class="border-b hover:bg-gray-50">
-                        <td class="py-2 px-3 text-sm text-gray-700">${r.id || ''}</td>
-                        <td class="py-2 px-3 text-sm text-gray-700">${perfilId || ''}</td>
-                        <td class="py-2 px-3 text-sm text-gray-700">${escapeHtml(nombre)}</td>
-                        <td class="py-2 px-3 text-sm text-gray-700">${escapeHtml(estado)}</td>
-                        <td class="py-2 px-3 text-sm text-gray-700">${escapeHtml(fechaStr)}</td>
-                        <td class="py-2 px-3 text-sm text-gray-700">${escapeHtml(horaStr)}</td>
-                        ${accionesHtml}
+                    <tr class="border-b border-black/5 hover:bg-gray-50 transition-colors">
+                        <td class="py-4 px-4 text-center text-gray-400 font-mono text-[10px]">${r.id || ''}</td>
+                        <td class="py-4 px-4">
+                            <div class="text-sm font-bold text-gray-700">${escapeHtml(nombre)}</div>
+                            <div class="text-[10px] text-gray-500 font-medium">Perfil: #${perfilId || ''}</div>
+                        </td>
+                        <td class="py-4 px-4 text-center">
+                            <span class="px-3 py-1 rounded-md text-[10px] font-black uppercase tracking-widest ${badgeColor}">${escapeHtml(estadoTraducido)}</span>
+                        </td>
+                        <td class="py-4 px-4">
+                            <div class="text-xs text-gray-500 font-medium">${escapeHtml(fechaStr)}</div>
+                            <div class="text-[10px] text-gray-400 italic">${escapeHtml(horaStr)}</div>
+                        </td>
+                        <td class="py-4 px-4">
+                            <div class="flex justify-center gap-2">
+                                ${isAdmin ? `
+                                    <button onclick="actualizarSolicitud(${r.id}, 'aprobada')" class="p-2 bg-green-50 text-green-600 border border-green-200 rounded-lg hover:bg-green-600 hover:text-white transition-all shadow-sm"><span class="iconify" data-icon="mdi:check-bold"></span></button>
+                                    <button onclick="actualizarSolicitud(${r.id}, 'rechazada')" class="p-2 bg-red-50 text-red-600 border border-red-200 rounded-lg hover:bg-red-600 hover:text-white transition-all shadow-sm"><span class="iconify" data-icon="mdi:close-thick"></span></button>
+                                ` : '-'}
+                            </div>
+                        </td>
                     </tr>
                 `;
                 }).join('');
@@ -612,6 +660,7 @@
                 // Carga inicial
                 cargarSolicitudesVerificacion();
                 cargarEstadisticasReportes();
+                cargarTecnicosDirectorio();
 
                 // Iniciar polling automático
                 iniciarPollingVerificacion();
@@ -881,6 +930,447 @@
         }
     </script>
 
+    <!-- Script para H3: Métricas de Desempeño y Directorio de Técnicos -->
+    <script>
+        // Redefinición de cargarEstadisticasReportes para usar el nuevo endpoint de H3
+        // Redefinición de cargarEstadisticasReportes para usar el nuevo endpoint de H3
+        // Redefinición de cargarEstadisticasReportes para usar el nuevo endpoint de H3
+        window.cargarEstadisticasReportes = async function () {
+            console.log('[H3] Cargando estadísticas desde /api/metricas-desempeno...');
+            const API_BASE = `${window.APP_CONFIG.BACKEND_URL}`;
+
+            // Cargar tabla de reportes (Lógica restaurada)
+            cargarTablaReportes();
+
+            try {
+                const resp = await fetch(`${API_BASE}/api/metricas`);
+                const json = await resp.json();
+
+                if (json.success) {
+                    const m = json.data;
+
+
+
+                    // Renderizar Gráfico de Barras - Métricas de Desempeño Promedio
+                    try {
+                        const barCtx = document.getElementById('barChart');
+                        if (!barCtx) return;
+
+                        if (!window.Chart) {
+                            console.error('[H3] Chart.js no está cargado');
+                            barCtx.parentElement.innerHTML = '<p class="text-gray-500 text-center py-10">Error: Librería de gráficos no disponible</p>';
+                            return;
+                        }
+
+                        console.log('[H3] Datos recibidos para gráfica:', m);
+
+                        if (json.success && m && m.metricas_promedio) {
+                            const metricas = m.metricas_promedio;
+                            const totalCalificados = metricas.total_tecnicos_calificados || 0;
+
+                            console.log(`[H3] técnicos calificados: ${totalCalificados}`);
+
+                            if (totalCalificados === 0) {
+                                barCtx.style.display = 'none';
+                                let fallbackMsg = document.getElementById('chartFallbackMsg');
+                                if (!fallbackMsg) {
+                                    fallbackMsg = document.createElement('p');
+                                    fallbackMsg.id = 'chartFallbackMsg';
+                                    fallbackMsg.className = 'text-gray-500 text-center py-10';
+                                    fallbackMsg.textContent = 'Aún no hay técnicos calificados para mostrar promedios.';
+                                    barCtx.parentElement.appendChild(fallbackMsg);
+                                }
+                                return;
+                            } else {
+                                barCtx.style.display = 'block';
+                                const fallbackMsg = document.getElementById('chartFallbackMsg');
+                                if (fallbackMsg) fallbackMsg.remove();
+                            }
+
+                            const ctx = barCtx.getContext('2d');
+                            if (window._reportesBarChart) window._reportesBarChart.destroy();
+
+                            const plugins = [];
+                            if (window.ChartDataLabels) {
+                                plugins.push(window.ChartDataLabels);
+                            }
+
+                            window._reportesBarChart = new Chart(ctx, {
+                                type: 'bar',
+                                plugins: plugins,
+                                data: {
+                                    labels: [t('reports.punctuality') || 'Puntualidad', t('reports.quality') || 'Calidad', t('reports.cleaning') || 'Limpieza', t('reports.communication') || 'Comunicación'],
+                                    datasets: [{
+                                        label: 'Promedio (%)',
+                                        data: [
+                                            metricas.puntualidad || 0,
+                                            metricas.calidad_trabajo || 0,
+                                            metricas.limpieza || 0,
+                                            metricas.comunicacion || 0
+                                        ],
+                                        backgroundColor: [
+                                            '#10b981', '#f59e0b', '#06b6d4', '#8b5cf6'
+                                        ],
+                                        borderColor: [
+                                            '#059669', '#d97706', '#0891b2', '#7c3aed'
+                                        ],
+                                        borderWidth: 2,
+                                        borderRadius: 6
+                                    }]
+                                },
+                                options: {
+                                    responsive: true,
+                                    maintainAspectRatio: false,
+                                    scales: {
+                                        y: {
+                                            beginAtZero: true,
+                                            max: 100,
+                                            ticks: {
+                                                callback: function (value) { return value + '%'; },
+                                                stepSize: 20
+                                            },
+                                            title: {
+                                                display: true,
+                                                text: t('reports.percentage') || 'Porcentaje (%)',
+                                                color: '#94a3b8',
+                                                font: { size: 10 }
+                                            }
+                                        }
+                                    },
+                                    plugins: {
+                                        legend: { display: false },
+                                        tooltip: {
+                                            callbacks: {
+                                                label: function (context) { return context.parsed.y + '%'; }
+                                            }
+                                        },
+                                        datalabels: {
+                                            anchor: 'end',
+                                            align: 'top',
+                                            display: function (context) {
+                                                return context.dataset.data[context.dataIndex] > 0;
+                                            },
+                                            formatter: function (value) { return value + '%'; },
+                                            font: { weight: 'bold', size: 12 },
+                                            color: '#475569'
+                                        }
+                                    }
+                                }
+                            });
+                        } else {
+                            console.warn('[H3] Estructura de datos no válida o sin métricas:', m);
+                            barCtx.parentElement.innerHTML = `<p class="text-red-500 text-center py-10">Error: Estructura de datos incompleta (${!m ? 'sin data' : 'sin métricas'})</p>`;
+                        }
+                    } catch (chartErr) {
+                        console.error('Error renderizando gráfico de barras:', chartErr);
+                    }
+                } else {
+                    console.error('[H3] Fallo en la respuesta del servidor:', json);
+                }
+            } catch (error) {
+                console.error("Error al cargar métricas H3:", error);
+                const barContainer = document.querySelector('#barChart')?.parentElement;
+                if (barContainer) {
+                    barContainer.innerHTML = '<p class="text-red-500 text-center py-10">Error de conexión con el servidor</p>';
+                }
+            }
+        };
+
+        // Función restaurada para cargar la tabla de usuarios reportados
+        async function cargarTablaReportes() {
+            const rcTbody = document.getElementById('reportCountsTbody');
+            if (!rcTbody) return;
+
+            // Solo poner "Cargando..." si está vacío o tiene mensaje de error, para no parpadear en polling
+            if (!rcTbody.hasChildNodes() || rcTbody.textContent.includes('Error') || rcTbody.textContent.includes('Cargando') || rcTbody.textContent.includes('Loading')) {
+                rcTbody.innerHTML = `<tr><td colspan="7" class="p-4 text-sm text-gray-500">${t('table.loading')}</td></tr>`;
+            }
+
+            const API_BASE = `${window.APP_CONFIG.BACKEND_URL}`;
+            try {
+                const rv = await fetch(API_BASE + '/api/reportes/all');
+                let reporteList = [];
+                if (rv.ok) {
+                    const jrv = await rv.json();
+                    if (Array.isArray(jrv)) reporteList = jrv;
+                }
+
+                // Agrupar reportes por usuario reportado
+                const counts = {};
+                reporteList.forEach(r => {
+                    const uid = r.reported_user_id || r.reported_user || r.id_usuario_reportado || 'sin_usuario';
+                    const key = String(uid || 'sin_usuario');
+
+                    if (!counts[key]) counts[key] = {
+                        name: null,
+                        email: r.reported_correo || null,
+                        perfilId: r.id_perfil_persona || r.id_Perfil_Persona || null,
+                        count: 0,
+                        lastDate: null,
+                        lastMotivo: null
+                    };
+
+                    // Nombre preferido
+                    const nombreFull = (r.reported_nombre || r.reported_apellido) ? `${r.reported_nombre || ''} ${r.reported_apellido || ''}`.trim() : (r.reported_correo || r.reported_user || null);
+                    if (nombreFull) counts[key].name = nombreFull;
+
+                    counts[key].count++;
+
+                    // Fecha más reciente
+                    const fecha = r.fecha_reporte || r.fecha || r.created_at || r.fecha_reporte_raw || null;
+                    if (fecha) {
+                        const d = new Date(fecha);
+                        if (!isNaN(d.getTime())) {
+                            if (!counts[key].lastDate || new Date(counts[key].lastDate) < d) {
+                                counts[key].lastDate = d.toISOString();
+                                counts[key].lastMotivo = r.motivo_descripcion || r.motivo || r.descripcion || null;
+                            }
+                        }
+                    }
+                });
+
+                const entries = Object.entries(counts).sort((a, b) => b[1].count - a[1].count);
+
+                if (entries.length === 0) {
+                    rcTbody.innerHTML = `<tr><td colspan="5" class="py-10 text-center text-gray-300 italic">${t('table.noRecords')}</td></tr>`;
+                } else {
+                    rcTbody.innerHTML = entries.map(([uid, obj]) => {
+                        return `
+                            <tr class="border-b border-black/10 hover:bg-gray-50 transition-colors">
+                                <td class="py-4 px-4 text-sm font-bold text-gray-700">${escapeHtml(obj.name || uid)}</td>
+                                <td class="py-4 px-4 text-xs text-gray-500">${escapeHtml(obj.email || '-')}</td>
+                                <td class="py-4 px-4 text-[10px] text-gray-400 font-mono">#${escapeHtml(obj.perfilId || '-')}</td>
+                                <td class="py-4 px-4 text-center">
+                                    <span class="text-sm font-black text-red-600">${obj.count}</span>
+                                </td>
+                                <td class="py-4 px-4 text-center">
+                                    <button onclick="openReportDetails('${uid}')" class="text-gray-400 hover:text-black transition-all">
+                                        <span class="iconify" data-icon="mdi:eye" style="font-size: 20px;"></span>
+                                    </button>
+                                </td>
+                            </tr>`;
+                    }).join('');
+                }
+
+            } catch (e) {
+                console.warn('Error cargando tabla reportes:', e);
+                rcTbody.innerHTML = '<tr><td colspan="7" class="p-4 text-sm text-red-600">Error al cargar tabla de reportes</td></tr>';
+            }
+        }
+
+        // Variables globales para técnicos
+        let todosLosTecnicos = [];
+
+
+        async function cargarTecnicosDirectorio() {
+            const tbody = document.getElementById('tablaTecnicosH3');
+            if (!tbody) return;
+            tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-sm text-gray-500">${t('table.loading')}</td></tr>`;
+
+            console.log('[H3] Iniciando carga de técnicos usando lógica de Descubrir...');
+            // Definir API_BASE asegurando que apunte a /api
+            const API_BASE = `${window.APP_CONFIG.BACKEND_URL}/api`;
+
+            try {
+                // 1. Obtener lista base de personas
+                const resPersonas = await fetch(`${API_BASE}/personas`);
+                if (!resPersonas.ok) throw new Error('Error al obtener personas');
+                const dataPersonas = await resPersonas.json();
+
+                if (!dataPersonas.success) throw new Error('Respuesta no exitosa de personas');
+
+                let personas = dataPersonas.data;
+                const usuarioActualId = localStorage.getItem("usuarioId");
+
+                // Filtrar usuario actual
+                personas = personas.filter(p => !usuarioActualId || p.id_Usuario !== parseInt(usuarioActualId));
+
+                // 2. Enriquecer datos en paralelo (Lógica replicada de descubrir.js)
+                const promesas = personas.map(async (p) => {
+                    try {
+                        // a) Habilidades
+                        const resHab = await fetch(`${API_BASE}/habilidades/persona/${p.id_Perfil_Persona}`).catch(() => null);
+                        let skillsStr = '-';
+                        let skills = []; // Definir en el scope correcto
+
+                        if (resHab && resHab.ok) {
+                            const dHab = await resHab.json();
+                            if (dHab.success && dHab.data) {
+                                // Filtrar "Ofrece" y tomar nombres
+                                skills = dHab.data
+                                    .filter(h => h.tipoEstado_Habilidad === 'Ofrece')
+                                    .map(h => h.nombre_Habilidad);
+                                if (skills.length > 0) skillsStr = skills.slice(0, 3).join(', ') + (skills.length > 3 ? '...' : '');
+                            }
+                        }
+
+                        // b) Dirección
+                        const resDir = await fetch(`${API_BASE}/direcciones/persona/${p.id_Perfil_Persona}`).catch(() => null);
+                        let ubicacion = t('card.noLocation');
+                        if (resDir && resDir.ok) {
+                            const dDir = await resDir.json();
+                            if (dDir.success && dDir.data) {
+                                const dir = Array.isArray(dDir.data) ? dDir.data[0] : dDir.data;
+                                if (dir) {
+                                    ubicacion = [dir.ciudad_Direccion || dir.ciudad, dir.pais_Direccion || dir.pais].filter(Boolean).join(', ');
+                                }
+                            }
+                        }
+
+                        // c) Estado (disponibilidad)
+                        let estadoKey = 'status.atWork';
+                        const disp = p.disponibilidad;
+                        if (disp === 1 || disp === true || String(disp).toLowerCase() === 'disponible' || String(disp) === '1' || String(disp).toLowerCase() === 'available') {
+                            estadoKey = 'status.available';
+                        } else if (String(disp).toLowerCase() === 'ocupado' || String(disp).toLowerCase() === 'busy') {
+                            estadoKey = 'status.busy';
+                        }
+
+                        const estado = t(estadoKey);
+
+                        return {
+                            id_Perfil_Persona: p.id_Perfil_Persona,
+                            nombre_Persona: p.nombre_Persona,
+                            apellido_Persona: p.apellido_Persona,
+                            imagenUrl_Persona: p.imagenUrl_Persona,
+                            especialidades: skillsStr,
+                            skillList: skills, // Lista completa sin truncar para el filtro
+                            ubicacion: ubicacion || t('card.noLocation'),
+                            estado: estado,
+                            estadoKey: estadoKey
+                        };
+
+                    } catch (errInner) {
+                        console.warn('Error procesando técnico individual:', p.id_Perfil_Persona, errInner);
+                        return null; // Ignorar errores individuales
+                    }
+                });
+
+                const resultados = await Promise.all(promesas);
+                todosLosTecnicos = resultados.filter(t => t !== null);
+
+                // 3. Población dinámica de Filtros (Ubicación y Especialidad)
+                // Esto asegura que el filtro coincida exactamente con lo que hay en la tabla
+                const especialidadesUnicas = new Set();
+                const ubicacionesUnicas = new Set();
+
+                todosLosTecnicos.forEach(t => {
+                    if (t.skillList) t.skillList.forEach(s => especialidadesUnicas.add(s));
+                    if (t.ubicacion && t.ubicacion !== 'Sin ubicación') ubicacionesUnicas.add(t.ubicacion);
+                });
+
+                const selEsp = document.getElementById('filtroEspecialidad');
+                if (selEsp) {
+                    selEsp.innerHTML = `<option value="">${t('reports.specialty')}</option>`;
+                    [...especialidadesUnicas].sort().forEach(s => {
+                        selEsp.innerHTML += `<option value="${escapeHtml(s)}">${escapeHtml(s)}</option>`;
+                    });
+                }
+
+                const selUbi = document.getElementById('filtroUbicacion');
+                if (selUbi) {
+                    selUbi.innerHTML = `<option value="">${t('reports.location')}</option>`;
+                    [...ubicacionesUnicas].sort().forEach(u => {
+                        selUbi.innerHTML += `<option value="${escapeHtml(u)}">${escapeHtml(u)}</option>`;
+                    });
+                }
+
+                // 4. Actualizar UI de la tabla
+                actualizarTablaTecnicos(todosLosTecnicos);
+
+            } catch (e) {
+                console.error('Error cargando técnicos (lógica frontend):', e);
+                tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-sm text-gray-500">Error cargando listado de técnicos. Por favor intente más tarde.</td></tr>';
+            }
+        }
+
+        function actualizarTablaTecnicos(lista) {
+            const tbody = document.getElementById('tablaTecnicosH3');
+            if (!tbody) return;
+            if (!lista.length) {
+                tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-sm text-gray-500">${t('table.noRecords')}</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = lista.map(tData => {
+                const estado = tData.estado || 'No disp.';
+                let estadoColor = 'text-gray-400 bg-gray-50';
+                if (String(tData.estadoKey).includes('available')) estadoColor = 'text-green-600 bg-green-50/50';
+                if (String(tData.estadoKey).includes('Work') || String(tData.estadoKey).includes('busy')) estadoColor = 'text-orange-600 bg-orange-50/50';
+
+                const avatar = tData.imagenUrl_Persona ? tData.imagenUrl_Persona : `https://ui-avatars.com/api/?name=${encodeURIComponent(tData.nombre_Persona || 'U')}&background=random`;
+
+                return `
+                    <tr class="border-b border-black/5 hover:bg-gray-50 transition-colors">
+                        <td class="py-5 px-4">
+                            <img src="${avatar}" class="w-10 h-10 rounded-full object-cover shadow-sm border border-gray-100" alt="Avatar">
+                        </td>
+                        <td class="py-5 px-4">
+                            <div class="text-sm font-bold text-gray-700">${escapeHtml(tData.nombre_Persona)} ${escapeHtml(tData.apellido_Persona || '')}</div>
+                            <div class="text-[10px] text-gray-400">ID: #${tData.id_Perfil_Persona}</div>
+                        </td>
+                        <td class="py-5 px-4 text-xs text-gray-500 max-w-[200px] truncate leading-relaxed">
+                            ${escapeHtml(tData.especialidades || '-')}
+                        </td>
+                        <td class="py-5 px-4 text-xs text-gray-400 flex items-center gap-1">
+                            <span class="iconify" data-icon="mdi:map-marker"></span>
+                            ${escapeHtml(tData.ubicacion)}
+                        </td>
+                        <td class="py-5 px-4 text-center">
+                            <span class="px-3 py-1 rounded-md text-[10px] font-black uppercase tracking-widest ${estadoColor}">
+                                ${escapeHtml(t(tData.estadoKey || 'status.atWork'))}
+                            </span>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function filtrarTecnicos() {
+            const nombre = document.getElementById('busquedaNombre').value.toLowerCase();
+            const esp = document.getElementById('filtroEspecialidad').value.toLowerCase();
+            const ubi = document.getElementById('filtroUbicacion').value.toLowerCase();
+
+            const filtrados = todosLosTecnicos.filter(t => {
+                const fullNombre = `${t.nombre_Persona} ${t.apellido_Persona || ''}`.toLowerCase();
+                const espValue = esp.toLowerCase();
+                const ubiValue = ubi.toLowerCase();
+
+                const matchNombre = !nombre || fullNombre.includes(nombre);
+                const matchEsp = !esp || (t.skillList && t.skillList.some(s => s.toLowerCase().includes(espValue)));
+                const matchUbi = !ubi || (t.ubicacion && t.ubicacion.toLowerCase().includes(ubiValue));
+
+                return matchNombre && matchEsp && matchUbi;
+            });
+
+            actualizarTablaTecnicos(filtrados);
+        }
+
+        // Inicializar componentes H3
+        document.addEventListener('DOMContentLoaded', () => {
+            // Inicializar traducciones
+            applyTranslations();
+
+            // Escuchar cambios de idioma del padre
+            window.addEventListener('message', (event) => {
+                if (event.data && event.data.type === 'languageChange') {
+                    changeLanguage(event.data.language);
+                    // Re-renderizar todo lo que necesite traducción dinámica
+                    cargarEstadisticasReportes();
+                    cargarTecnicosDirectorio();
+                    cargarSolicitudesVerificacion();
+                }
+            });
+
+            const isAdmin = localStorage.getItem('usuarioRolId') === '1';
+            cargarEstadisticasReportes();
+            cargarSolicitudesVerificacion();
+            if (isAdmin) {
+                console.log('[H3] Inicializando directorio administrador...');
+                cargarTecnicosDirectorio();
+            }
+        });
+    </script>
 </body>
 
 </html>

@@ -1,5 +1,5 @@
-﻿            // Diccionario de traducciones
-            const translations = {
+﻿// Diccionario de traducciones
+const translations = {
                 es: {
                     // Hero section
                     'hero.title': 'Descubre Talentos Increíbles',
@@ -188,7 +188,104 @@
                     'common.send': 'Enviar',
                     'common.loading': 'Cargando...',
                     'common.error': 'Error',
-                    'common.success': 'Éxito'
+                    'common.success': 'Éxito',
+
+                    // Sección de Administración / Reportes
+                    'reports.title': 'Panel de Administración',
+                    'reports.subtitle': 'Reportes, métricas y gestión de técnicos en un solo lugar.',
+                    'reports.reportedUsers': 'Usuarios reportados',
+                    'reports.reportedUsersDesc': 'Usuarios con mayor índice de incidencias.',
+                    'reports.globalPerformance': 'Desempeño Global',
+                    'reports.performanceDesc': 'Promedios generales de satisfacción.',
+                    'reports.verificationRequests': 'Solicitudes de Verificación',
+                    'reports.verificationDesc': 'Cola de validadores para identidad y certificaciones.',
+                    'reports.directory': 'Directorio General',
+                    'reports.directoryDesc': 'Listado íntegro de profesionales registrados.',
+                    'reports.search': 'Buscar...',
+                    'reports.specialty': 'Especialidad',
+                    'reports.location': 'Ubicación',
+                    
+                    // Tablas
+                    'table.user': 'Usuario',
+                    'table.email': 'Email',
+                    'table.id': 'ID',
+                    'table.reports': 'Reps',
+                    'table.action': 'Acción',
+                    'table.technician': 'Técnico',
+                    'table.status': 'Estado',
+                    'table.dateTime': 'Fecha / Hora',
+                    'table.actions': 'Acciones',
+                    'table.photo': 'Foto',
+                    'table.fullName': 'Nombre Completo',
+                    'table.expertise': 'Expertise',
+                    'table.availability': 'Disponibilidad',
+                    'table.loading': 'Cargando datos...',
+                    'table.syncing': 'Sincronizando...',
+                    'table.noRecords': 'Sin registros',
+
+                    // Estados
+                    'status.available': 'Disponible',
+                    'status.atWork': 'En obra',
+                    'status.busy': 'Ocupado',
+                    'status.approved': 'Aprobada',
+                    'status.rejected': 'Rechazada',
+                    'status.pending': 'Pendiente',
+
+                    // Métricas
+                    'reports.punctuality': 'Puntualidad',
+                    'reports.quality': 'Calidad',
+                    'reports.cleaning': 'Limpieza',
+                    'reports.communication': 'Comunicación',
+                    'reports.percentage': 'Porcentaje (%)',
+
+                    // Perfil Nuevo
+                    'profile.sendRequest': 'Enviar Solicitud',
+                    'profile.reporting': 'Reportar',
+                    'profile.yearsExperience': 'Años de experiencia',
+                    'profile.works': 'Obras',
+                    'profile.completed': 'completadas',
+                    'profile.average': 'Promedio',
+                    'profile.status': 'Estado',
+                    'profile.specialties': 'Especialidades Técnicas',
+                    'profile.descriptionAvailable': 'Sin descripción disponible.',
+                    'profile.profileInfo': 'Información del Perfil',
+                    'profile.birthDate': 'Fecha de nacimiento',
+                    'profile.gender': 'Género',
+                    'profile.email': 'Correo electrónico',
+                    'profile.phone': 'Teléfono',
+                    'profile.professionalInfo': 'Información Profesional',
+                    'profile.certifications': 'Certificaciones',
+                    'profile.noCertifications': 'Sin certificaciones registradas',
+                    'profile.portfolio': 'Portafolio',
+                    'profile.workDone': 'Trabajo realizado',
+                    'profile.reviews': 'Reseñas de Clientes',
+                    'profile.noReviews': 'Aún no hay reseñas para este usuario.',
+                    'profile.verifying': 'Verificando...',
+                    'profile.verified': 'VERIFICADO',
+                    'profile.pendingVerification': 'Verificación Pendiente',
+                    'profile.notVerified': 'No Verificado',
+                    'profile.loadingSession': 'Inicia sesión para enviar solicitudes',
+                    'profile.requestAccepted': 'Solicitud aceptada',
+                    'profile.requestPending': 'Tu solicitud está pendiente',
+                    'profile.requestReceived': 'Este usuario te envió una solicitud',
+                    'profile.unspecified': 'No especificado',
+                    'profile.years': 'años',
+                    'profile.workHistory': 'Historial de Órdenes de Trabajo',
+                    'status.finished': 'Finalizada',
+                    'status.inProgress': 'En progreso',
+                    'status.ongoing': 'En curso',
+                    'profile.technicalEvaluation': 'Evaluación Técnica',
+                    'profile.averageRating': 'Calificación Promedio',
+                    'profile.qualityOfWork': 'Calidad de trabajo',
+                    'profile.location': 'Ubicación',
+                    'profile.noPerformanceEvaluations': 'Aún no hay evaluaciones de desempeño',
+                    'profile.technicianResponse': 'Respuesta del técnico:',
+                    'profile.backToDiscover': 'Volver a Descubrir',
+                    'profile.errorLoading': 'Error al cargar el perfil',
+                    'profile.updateError': 'Error de conexión al actualizar el estado',
+                    'profile.serverError': 'Error del servidor',
+                    'profile.portfolioImage': 'Imagen del portafolio',
+                    'profile.enlargedImage': 'Imagen ampliada'
                 },
                 en: {
                     // Hero section
@@ -378,17 +475,116 @@
                     'common.send': 'Send',
                     'common.loading': 'Loading...',
                     'common.error': 'Error',
-                    'common.success': 'Success'
+                    'common.success': 'Success',
+
+                    // Administration / Reports Section
+                    'reports.title': 'Administration Panel',
+                    'reports.subtitle': 'Reports, metrics, and technician management in one place.',
+                    'reports.reportedUsers': 'Reported Users',
+                    'reports.reportedUsersDesc': 'Users with core high incident rates.',
+                    'reports.globalPerformance': 'Global Performance',
+                    'reports.performanceDesc': 'Overall satisfaction averages.',
+                    'reports.verificationRequests': 'Verification Requests',
+                    'reports.verificationDesc': 'Validator queue for identity and certifications.',
+                    'reports.directory': 'General Directory',
+                    'reports.directoryDesc': 'Complete list of registered professionals.',
+                    'reports.search': 'Search...',
+                    'reports.specialty': 'Specialty',
+                    'reports.location': 'Location',
+                    
+                    // Tables
+                    'table.user': 'User',
+                    'table.email': 'Email',
+                    'table.id': 'ID',
+                    'table.reports': 'Reps',
+                    'table.action': 'Action',
+                    'table.technician': 'Technician',
+                    'table.status': 'Status',
+                    'table.dateTime': 'Date / Time',
+                    'table.actions': 'Actions',
+                    'table.photo': 'Photo',
+                    'table.fullName': 'Full Name',
+                    'table.expertise': 'Expertise',
+                    'table.availability': 'Availability',
+                    'table.loading': 'Loading data...',
+                    'table.syncing': 'Syncing...',
+                    'table.noRecords': 'No records',
+
+                    // States
+                    'status.available': 'Available',
+                    'status.atWork': 'At Work',
+                    'status.busy': 'Busy',
+                    'status.approved': 'Approved',
+                    'status.rejected': 'Rejected',
+                    'status.pending': 'Pending',
+
+                    // Metrics
+                    'reports.punctuality': 'Punctuality',
+                    'reports.quality': 'Quality',
+                    'reports.cleaning': 'Cleaning',
+                    'reports.communication': 'Communication',
+                    'reports.percentage': 'Percentage (%)',
+
+                    // New Profile
+                    'profile.sendRequest': 'Send Request',
+                    'profile.reporting': 'Report',
+                    'profile.yearsExperience': 'Years of experience',
+                    'profile.works': 'Works',
+                    'profile.completed': 'completed',
+                    'profile.average': 'Average',
+                    'profile.status': 'Status',
+                    'profile.specialties': 'Technical Specialties',
+                    'profile.descriptionAvailable': 'No description available.',
+                    'profile.profileInfo': 'Profile Information',
+                    'profile.birthDate': 'Birth Date',
+                    'profile.gender': 'Gender',
+                    'profile.email': 'Email',
+                    'profile.phone': 'Phone',
+                    'profile.professionalInfo': 'Professional Information',
+                    'profile.certifications': 'Certifications',
+                    'profile.noCertifications': 'No certifications registered',
+                    'profile.portfolio': 'Portfolio',
+                    'profile.workDone': 'Work done',
+                    'profile.reviews': 'Client Reviews',
+                    'profile.noReviews': 'No reviews for this user yet.',
+                    'profile.verifying': 'Verifying...',
+                    'profile.verified': 'VERIFIED',
+                    'profile.pendingVerification': 'Pending Verification',
+                    'profile.notVerified': 'Not Verified',
+                    'profile.loadingSession': 'Log in to send requests',
+                    'profile.requestAccepted': 'Request accepted',
+                    'profile.requestPending': 'Your request is pending',
+                    'profile.requestReceived': 'This user sent you a request',
+                    'profile.unspecified': 'Unspecified',
+                    'profile.years': 'years',
+                    'profile.workHistory': 'Work History',
+                    'status.finished': 'Finished',
+                    'status.inProgress': 'In progress',
+                    'status.ongoing': 'Ongoing',
+                    'profile.technicalEvaluation': 'Technical Evaluation',
+                    'profile.averageRating': 'Average Rating',
+                    'profile.qualityOfWork': 'Quality of Work',
+                    'profile.location': 'Location',
+                    'profile.noPerformanceEvaluations': 'No performance evaluations yet',
+                    'profile.technicianResponse': 'Technician response:',
+                    'profile.backToDiscover': 'Back to Discover',
+                    'profile.errorLoading': 'Error loading profile',
+                    'profile.updateError': 'Connection error while updating status',
+                    'profile.serverError': 'Server error',
+                    'profile.portfolioImage': 'Portfolio image',
+                    'profile.enlargedImage': 'Enlarged image'
                 }
             };
 
             // Idioma actual (por defecto español)
             let currentLanguage = localStorage.getItem('preferred_language') || 'es';
 
-            // Función para cambiar idioma
-            function changeLanguage(lang) {
-                currentLanguage = lang;
+// Función para cambiar idioma
+function changeLanguage(lang) {
+    currentLanguage = lang;
+    window.currentLanguage = lang;
                 localStorage.setItem('preferred_language', lang);
+                window.dispatchEvent(new CustomEvent('languageChanged', { detail: { language: lang } }));
 
                 // Actualizar texto del idioma en el botón
                 const langSpan = document.getElementById('currentLang');
@@ -406,18 +602,27 @@
                 retranslateCurrentView();
 
                 // Notificar al iframe del perfil si está cargado
-                const iframe = document.getElementById('perfilIframe');
-                if (iframe && iframe.contentWindow) {
-                    iframe.contentWindow.postMessage({
+                const profileIframe = document.getElementById('perfilIframe');
+                if (profileIframe && profileIframe.contentWindow) {
+                    profileIframe.contentWindow.postMessage({
+                        type: 'languageChange',
+                        language: lang
+                    }, window.location.origin);
+                }
+
+                // Notificar al iframe de reportes si está cargado
+                const reportesIframe = document.getElementById('reportesIframe');
+                if (reportesIframe && reportesIframe.contentWindow) {
+                    reportesIframe.contentWindow.postMessage({
                         type: 'languageChange',
                         language: lang
                     }, window.location.origin);
                 }
             }
 
-            // Función para aplicar traducciones
-            function applyTranslations() {
-                const trans = translations[currentLanguage];
+// Función para aplicar traducciones
+function applyTranslations() {
+    const trans = translations[currentLanguage];
 
                 // Traducir elementos con data-i18n
                 document.querySelectorAll('[data-i18n]').forEach(element => {
@@ -458,14 +663,22 @@
                 });
             }
 
-            // Función auxiliar para obtener traducción (útil para JavaScript dinámico)
-            function t(key) {
-                return translations[currentLanguage][key] || key;
-            }
+// Función auxiliar para obtener traducción (útil para JavaScript dinámico)
+function t(key) {
+    const lang = (currentLanguage || 'es').toLowerCase();
+    const trans = translations[lang] || translations['es'] || {};
+    return trans[key] || key;
+}
+t._isReal = true;
+window.t = t;
+window.t_real = t;
+window.changeLanguage = changeLanguage;
+window.applyTranslations = applyTranslations;
+window.retranslateCurrentView = retranslateCurrentView;
 
-            // Función para re-traducir elementos dinámicos después de cambiar idioma
-            function retranslateCurrentView() {
-                applyTranslations();
+// Función para re-traducir elementos dinámicos después de cambiar idioma
+function retranslateCurrentView() {
+    applyTranslations();
 
                 // Re-renderizar elementos dinámicos si existen
                 if (typeof updateResultsCount === 'function') updateResultsCount();
@@ -509,9 +722,9 @@
                 }
             }
 
-            // Toggle dropdown de idiomas
-            document.addEventListener('DOMContentLoaded', function () {
-                const languageBtn = document.getElementById('languageBtn');
+// Toggle dropdown de idiomas
+document.addEventListener('DOMContentLoaded', function () {
+    const languageBtn = document.getElementById('languageBtn');
                 const languageDropdown = document.getElementById('languageDropdown');
 
                 if (languageBtn && languageDropdown) {
@@ -532,5 +745,5 @@
                 const langSpan = document.getElementById('currentLang');
                 if (langSpan) {
                     langSpan.textContent = currentLanguage === 'en' ? 'EN' : 'ES';
-                }
-            });
+    }
+});

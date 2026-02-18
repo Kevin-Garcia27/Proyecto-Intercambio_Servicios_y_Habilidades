@@ -1192,7 +1192,7 @@
                                         await new Promise(r => setTimeout(r, 1000 * attempt)); // Backoff incremental
                                     }
                                 } catch (err) {
-                                    console.error(`[ANSWER] ❌ Attempt ${attempt} failed:`, err);
+                                    console.error(`[ANSWER]   Attempt ${attempt} failed:`, err);
                                     if (attempt === 3) {
                                         console.error('[ANSWER] 🚨 CRITICAL: Failed to send answer after 3 attempts');
                                         throw new Error('Answer sending failed after maximum retries');

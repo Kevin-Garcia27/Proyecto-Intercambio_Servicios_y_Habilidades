@@ -2,13 +2,114 @@
  * ========================================
  * RUTAS DE MÉTRICAS DE DESEMPEÑO
  * Endpoints para gestionar métricas (puntualidad, calidad, limpieza, comunicación)
- * para los progress bars del perfil de usuario
+ * y estadísticas globales del dashboard
  * ========================================
  */
 
 const express = require('express');
 const router = express.Router();
 const db = require('../db');
+
+// ============================================
+// GET /metricas-desempeno/ (Estadísticas Globales)
+// Devuelve contadores para el dashboard
+// ============================================
+router.get('/', async (req, res) => {
+    try {
+        const [registrados] = await db.execute('SELECT COUNT(*) as count FROM Personas');
+        const [disponibles] = await db.execute("SELECT COUNT(*) as count FROM Personas WHERE disponibilidad = 'Disponible'");
+        const [en_obra] = await db.execute("SELECT COUNT(*) as count FROM Personas WHERE disponibilidad = 'En Obra'");
+        
+        // Obtener promedio global de métricas de desempeño
+        const [metricas] = await db.execute(`
+            SELECT 
+                IFNULL(AVG(puntualidad), 0) as promedio_puntualidad,
+                IFNULL(AVG(calidad_trabajo), 0) as promedio_calidad,
+                IFNULL(AVG(limpieza), 0) as promedio_limpieza,
+                IFNULL(AVG(comunicacion), 0) as promedio_comunicacion,
+                COUNT(*) as total_registros
+            FROM Metricas_Desempeno
+            WHERE cantidad_calificaciones > 0
+        `);
+        
+        // Simular o calcular reportes pendientes
+        // En una implementación real vendría de una tabla de reportes
+        const tecnicos_registrados = registrados[0].count;
+        const tecnicos_disponibles = disponibles[0].count;
+        const tecnicos_en_obra = en_obra[0].count; // Usamos esto para reportes pendientes según solicitud, o corregimos la semántica
+
+        res.json({
+            success: true,
+            data: {
+                tecnicos_registrados,
+                tecnicos_disponibles,
+                tecnicos_en_obra,
+                metricas_promedio: {
+                    puntualidad: Math.round(metricas[0].promedio_puntualidad),
+                    calidad_trabajo: Math.round(metricas[0].promedio_calidad),
+                    limpieza: Math.round(metricas[0].promedio_limpieza),
+                    comunicacion: Math.round(metricas[0].promedio_comunicacion),
+                    total_tecnicos_calificados: metricas[0].total_registros
+                }
+            }
+        });
+    } catch (error) {
+        console.error('Error al obtener estadísticas globales:', error.message);
+        res.status(500).json({ success: false, error: 'Error del servidor' });
+    }
+});
+
+// ============================================
+// GET /metricas-desempeno/listado-tecnicos
+// Obtener listado de técnicos con foto, especialidad y ubicación
+// ============================================
+router.get('/listado-tecnicos', async (req, res) => {
+    try {
+        const query = `
+            SELECT 
+                p.id_Perfil_Persona,
+                p.nombre_Persona,
+                p.apellido_Persona,
+                p.imagenUrl_Persona,
+                p.disponibilidad as estado,
+                IFNULL(d.ciudad_Direccion, 'Sin ubicación') as ubicacion,
+                (
+                    SELECT GROUP_CONCAT(cat.nombre_Categoria SEPARATOR ', ')
+                    FROM Habilidades_Servicios_Persona hs
+                    JOIN Habilidades_Servicios h ON hs.id_Habilidad = h.id_Habilidad
+                    JOIN Categorias_Generales_Habilidades cat ON h.id_Categoria = cat.id_Categoria
+                    WHERE hs.id_Perfil_Persona = p.id_Perfil_Persona
+                ) as especialidades,
+                 -- Alternativa si solo queremos la categoría principal o habilidades directas
+                (
+                    SELECT GROUP_CONCAT(h.nombre_Habilidad SEPARATOR ', ')
+                    FROM Habilidades_Servicios_Persona hs
+                    JOIN Habilidades_Servicios h ON hs.id_Habilidad = h.id_Habilidad
+                    WHERE hs.id_Perfil_Persona = p.id_Perfil_Persona
+                ) as habilidades_nombres,
+                (
+                     SELECT CAST(GROUP_CONCAT(DISTINCT h.id_Categoria) AS CHAR)
+                     FROM Habilidades_Servicios_Persona hs
+                     JOIN Habilidades_Servicios h ON hs.id_Habilidad = h.id_Habilidad
+                     WHERE hs.id_Perfil_Persona = p.id_Perfil_Persona
+                ) as categorias_ids
+            FROM Personas p
+            LEFT JOIN Direcciones d ON p.id_Perfil_Persona = d.id_Perfil_Persona
+            GROUP BY p.id_Perfil_Persona
+        `;
+        
+        const [rows] = await db.execute(query);
+        
+        res.json({
+            success: true,
+            data: rows
+        });
+        
+    } catch (error) {
+        console.error('Error al obtener listado de técnicos:', error.message);
+        res.status(500).json({ success: false, error: 'Error del servidor: ' + error.message });
+    }
+});
 
 // ============================================
 // GET /metricas/persona/:id

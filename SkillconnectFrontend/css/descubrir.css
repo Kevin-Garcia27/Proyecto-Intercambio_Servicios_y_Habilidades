@@ -88,12 +88,16 @@
 
         body {
             font-family: 'Inter', sans-serif;
-            background-image: url('../113435-OOM6G9-66.jpg'); /* Note the relative path */
+            background-image: url('../113435-OOM6G9-66.jpg'); 
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
             min-height: 100vh;
+            margin: 0;
+            padding: 0;
         }
+
+
 
         /* Tarjetas de perfil de usuario */
         .user-card {

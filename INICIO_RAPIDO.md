@@ -115,7 +115,7 @@ node serve-frontend.js
 
 ## 🔧 Solución de Problemas Comunes
 
-### ❌ Error: "Cannot find module"
+###   Error: "Cannot find module"
 
 **Solución**: Instala las dependencias del backend
 ```powershell
@@ -123,14 +123,14 @@ cd "SkillconnectBackend"
 npm install
 ```
 
-### ❌ Error: "ECONNREFUSED" o "Cannot connect to MySQL"
+###   Error: "ECONNREFUSED" o "Cannot connect to MySQL"
 
 **Solución**: 
 1. Verifica que MySQL esté corriendo
 2. Verifica las credenciales en `SkillconnectBackend/.env`
 3. Asegúrate de que la base de datos `SkillConnect2025` existe
 
-### ❌ Error: "Port 3001 is already in use"
+###   Error: "Port 3001 is already in use"
 
 **Solución**: Otro proceso está usando el puerto 3001
 ```powershell
@@ -140,7 +140,7 @@ netstat -ano | findstr :3001
 taskkill /PID <PID> /F
 ```
 
-### ❌ Error: "nodemon: command not found"
+###   Error: "nodemon: command not found"
 
 **Solución**: Nodemon está instalado localmente, usa npm start
 ```powershell
@@ -148,7 +148,7 @@ cd "SkillconnectBackend"
 npm start
 ```
 
-### ❌ Error: Scripts deshabilitados en PowerShell
+###   Error: Scripts deshabilitados en PowerShell
 
 **Solución**: Habilita la ejecución de scripts
 ```powershell

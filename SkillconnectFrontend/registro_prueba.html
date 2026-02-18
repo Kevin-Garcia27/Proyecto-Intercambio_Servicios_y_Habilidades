@@ -116,7 +116,7 @@
                 }
 
             } catch (error) {
-                console.error('❌ Error en registro Firebase:', error);
+                console.error('  Error en registro Firebase:', error);
                 const mensajeDiv = document.getElementById('mensaje');
                 mensajeDiv.textContent = 'Error: ' + error.message;
                 mensajeDiv.className = 'bg-red-100 text-red-700 border border-red-400';
@@ -137,7 +137,7 @@
                 const provider = new GoogleAuthProvider();
                 signInWithRedirect(auth, provider);
             } catch (error) {
-                console.error('❌ Error al registrar con Google:', error);
+                console.error('  Error al registrar con Google:', error);
                 sessionStorage.removeItem('firebaseRedirect');
                 const mensajeDiv = document.getElementById('mensaje');
                 mensajeDiv.textContent = 'Error con Google: ' + error.message;
@@ -158,7 +158,7 @@
                 const provider = new FacebookAuthProvider();
                 signInWithRedirect(auth, provider);
             } catch (error) {
-                console.error('❌ Error al registrar con Facebook:', error);
+                console.error('  Error al registrar con Facebook:', error);
                 sessionStorage.removeItem('firebaseRedirect');
                 const mensajeDiv = document.getElementById('mensaje');
                 mensajeDiv.textContent = 'Error con Facebook: ' + error.message;

@@ -9,7 +9,19 @@
 
     <!-- Configuración de entorno -->
     <script src="config.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
     <script>
+        // Helper para traducciones
+        var t = (key) => {
+            if (window.t_real && typeof window.t_real === 'function') return window.t_real(key);
+            if (window.t && typeof window.t === 'function' && window.t !== t) return window.t(key);
+            // Fallback manual para el historial si no ha cargado translations.js
+            const fallbacks = {
+                'history.completed': 'Completado'
+            };
+            return fallbacks[key] || key;
+        };
+
         // Escapa texto para prevenir inyección de HTML
         function escapeHtml(str) {
             if (!str && str !== 0) return '';
@@ -645,7 +657,7 @@
         <!-- Vista: Mi Perfil -->
         <div id="perfilView" class="view-section">
             <iframe src="./Perfil_Usuario/perfil.html" id="perfilIframe"
-                style="width: 100%; height: calc(100vh - 80px); border: none; display: block;"
+                style="width: 100%; height: calc(100vh - 50px); border: none; display: block;"
                 title="Perfil de Usuario">
             </iframe>
         </div>
@@ -754,7 +766,8 @@
         <!-- Vista: Reportes (carga Reportes.html dentro del layout) -->
         <div id="reportesView" class="view-section" style="display: none;">
             <iframe src="./Reportes.html" id="reportesIframe"
-                style="width: 100%; height: calc(100vh - 80px); border: none; display: block;" title="Reportes">
+                style="width: 100%; height: calc(100vh - 50px); border: none; display: block; background-color: #f3f4f6;"
+                title="Reportes">
             </iframe>
         </div>
 

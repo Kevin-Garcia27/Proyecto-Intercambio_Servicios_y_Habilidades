@@ -1331,683 +1331,675 @@
         </div>
     </div>
 
-        <!-- Main Content -->
-        <div id="mainContent" class="max-w-5xl">
-            <!-- Profile Header -->
-            <div class="profile-header glass-card">
-                <div class="action-buttons action-buttons-desktop">
-                    <button class="logout-button" onclick="showLogoutModal()" title="Cerrar Sesión">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="icon-sm" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd"
-                                d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z"
-                                clip-rule="evenodd" />
-                        </svg>
-                        <span data-i18n="logout">Cerrar Sesión</span>
-                    </button>
-                </div>
+    <!-- Main Content -->
+    <div id="mainContent" class="max-w-5xl">
+        <!-- Profile Header -->
+        <div class="profile-header glass-card">
+            <div class="action-buttons action-buttons-desktop">
+                <button class="logout-button" onclick="showLogoutModal()" title="Cerrar Sesión">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon-sm" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd"
+                            d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z"
+                            clip-rule="evenodd" />
+                    </svg>
+                    <span data-i18n="logout">Cerrar Sesión</span>
+                </button>
+            </div>
 
-                <div class="profile-content">
-                    <div class="profile-pic-container" id="profilePicContainer">
-                        <img class="profile-pic" id="profilePic" src="" alt="Perfil">
-                        <div class="camera-icon">
+            <div class="profile-content">
+                <div class="profile-pic-container" id="profilePicContainer">
+                    <img class="profile-pic" id="profilePic" src="" alt="Perfil">
+                    <div class="camera-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon-sm" viewBox="0 0 20 20" fill="currentColor">
+                            <path
+                                d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 4-3v2z" />
+                        </svg>
+                    </div>
+                </div>
+                <input type="file" id="profileUpload" accept="image/jpeg, image/png, image/gif" style="display: none;">
+
+                <div class="profile-info">
+                    <h1 class="profile-name">
+                        <span class="editable" id="nombreCompleto" data-field="nombre_Usuario"></span>
+                    </h1>
+                    <p class="profile-username" id="username">@usuario</p>
+                    <div class="profile-bio">
+                        <div class="editable" id="descripcion" data-field="descripcion_Usuario"></div>
+                    </div>
+                    <div id="header-badges-row"
+                        style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 10px;">
+                        <div class="verified-badge">
                             <svg xmlns="http://www.w3.org/2000/svg" class="icon-sm" viewBox="0 0 20 20"
                                 fill="currentColor">
-                                <path
-                                    d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 4-3v2z" />
+                                <path fill-rule="evenodd"
+                                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                                    clip-rule="evenodd" />
                             </svg>
+                            <span data-i18n="verifiedUser">Usuario Verificado</span>
+                        </div>
+
+                        <div class="status-toggle-group"
+                            style="display: flex; align-items: center; gap: 8px; height: 40px;">
+                            <span id="statusChip" class="perfil-chip-status perfil-chip-unavailable">
+                                <span class="status-dot"
+                                    style="width: 8px; height: 8px; background-color: currentColor; border-radius: 50%;"></span>
+                                <span id="statusChipText">En obra</span>
+                            </span>
+                            <label class="switch" style="margin: 0;">
+                                <input type="checkbox" id="availabilityToggle">
+                                <span class="slider round"></span>
+                            </label>
                         </div>
                     </div>
-                    <input type="file" id="profileUpload" accept="image/jpeg, image/png, image/gif"
-                        style="display: none;">
 
-                    <div class="profile-info">
-                        <h1 class="profile-name">
-                            <span class="editable" id="nombreCompleto" data-field="nombre_Usuario"></span>
-                        </h1>
-                        <p class="profile-username" id="username">@usuario</p>
-                        <div class="profile-bio">
-                            <div class="editable" id="descripcion" data-field="descripcion_Usuario"></div>
-                        </div>
-                        <div id="header-badges-row"
-                            style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 10px;">
-                            <div class="verified-badge">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="icon-sm" viewBox="0 0 20 20"
-                                    fill="currentColor">
-                                    <path fill-rule="evenodd"
-                                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                                        clip-rule="evenodd" />
-                                </svg>
-                                <span data-i18n="verifiedUser">Usuario Verificado</span>
-                            </div>
-
-                            <div class="status-toggle-group"
-                                style="display: flex; align-items: center; gap: 8px; height: 40px;">
-                                <span id="statusChip" class="perfil-chip-status perfil-chip-unavailable">
-                                    <span class="status-dot"
-                                        style="width: 8px; height: 8px; background-color: currentColor; border-radius: 50%;"></span>
-                                    <span id="statusChipText">En obra</span>
-                                </span>
-                                <label class="switch" style="margin: 0;">
-                                    <input type="checkbox" id="availabilityToggle">
-                                    <span class="slider round"></span>
-                                </label>
-                            </div>
-                        </div>
-
-                        <div class="action-buttons action-buttons-mobile">
-                            <button class="logout-button" onclick="showLogoutModal()" title="Cerrar Sesión">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="icon-sm" viewBox="0 0 20 20"
-                                    fill="currentColor">
-                                    <path fill-rule="evenodd"
-                                        d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z"
-                                        clip-rule="evenodd" />
-                                </svg>
-                                <span data-i18n="logout">Cerrar Sesión</span>
-                            </button>
-                        </div>
+                    <div class="action-buttons action-buttons-mobile">
+                        <button class="logout-button" onclick="showLogoutModal()" title="Cerrar Sesión">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon-sm" viewBox="0 0 20 20"
+                                fill="currentColor">
+                                <path fill-rule="evenodd"
+                                    d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                            <span data-i18n="logout">Cerrar Sesión</span>
+                        </button>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <!-- Main Grid -->
-            <div class="main-grid-redesigned">
-                <!-- Top Row -->
-                <div class="top-row">
-                    <!-- Personal Data -->
-                    <div class="glass-card location-section">
-                        <h2 class="section-title-primary">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="icon-md" viewBox="0 0 20 20"
+        <!-- Main Grid -->
+        <div class="main-grid-redesigned">
+            <!-- Top Row -->
+            <div class="top-row">
+                <!-- Personal Data -->
+                <div class="glass-card location-section">
+                    <h2 class="section-title-primary">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon-md" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd"
+                                d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
+                                clip-rule="evenodd" />
+                        </svg>
+                        <span data-i18n="personalData">Datos Personales</span>
+                    </h2>
+                    <ul class="data-list" id="datosPersonales">
+                        <!-- Se llenará dinámicamente -->
+                    </ul>
+
+                    <!-- Sección de Documento de Identidad -->
+                    <div class="id-card-section"
+                        style="margin-top: 24px; border-top: 1px solid #e5e7eb; padding-top: 20px;">
+                        <h3 class="section-title-primary" style="font-size: 16px; margin-bottom: 12px;">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon-md"
+                                style="width: 20px; height: 20px; color: #4b5563;" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                <line x1="16" y1="2" x2="16" y2="6"></line>
+                                <line x1="8" y1="2" x2="8" y2="6"></line>
+                                <line x1="3" y1="10" x2="21" y2="10"></line>
+                            </svg>
+                            <span>Tarjeta de Identidad</span>
+                        </h3>
+
+                        <div class="file-upload-area" id="idCardUploadArea"
+                            style="border: 2px dashed #d1d5db; border-radius: 12px; padding: 24px; text-align: center; background-color: #f9fafb; transition: all 0.3s; cursor: pointer;">
+                            <input type="file" id="idCardInput" accept="image/*" style="display: none;">
+                            <label for="idCardInput" style="cursor: pointer; width: 100%; display: block;">
+                                <div class="upload-placeholder" id="idCardPlaceholder">
+                                    <div
+                                        style="width: 48px; height: 48px; background: #e5e7eb; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px;">
+                                        <svg xmlns="http://www.w3.org/2000/svg"
+                                            style="width: 24px; height: 24px; color: #6b7280;" viewBox="0 0 24 24"
+                                            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                            stroke-linejoin="round">
+                                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                            <polyline points="17 8 12 3 7 8"></polyline>
+                                            <line x1="12" y1="3" x2="12" y2="15"></line>
+                                        </svg>
+                                    </div>
+                                    <p style="font-weight: 500; color: #374151; margin-bottom: 4px;">Sube una foto
+                                        de tu DNI</p>
+                                    <p style="font-size: 12px; color: #6b7280;">PNG, JPG hasta 5MB</p>
+                                </div>
+                                <div id="idCardPreview" style="display: none; position: relative;">
+                                    <img id="idCardImage" src="" alt="Vista previa"
+                                        style="max-width: 100%; max-height: 200px; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
+                                    <button type="button" id="removeIdCard"
+                                        style="position: absolute; top: -10px; right: -10px; background: #ef4444; color: white; border: none; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14"
+                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                            stroke-linecap="round" stroke-linejoin="round">
+                                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function () {
+                            const idCardInput = document.getElementById('idCardInput');
+                            const idCardUploadArea = document.getElementById('idCardUploadArea');
+                            const idCardPlaceholder = document.getElementById('idCardPlaceholder');
+                            const idCardPreview = document.getElementById('idCardPreview');
+                            const idCardImage = document.getElementById('idCardImage');
+                            const removeIdCard = document.getElementById('removeIdCard');
+
+                            // Highlight drop area on drag
+                            ['dragenter', 'dragover'].forEach(eventName => {
+                                idCardUploadArea.addEventListener(eventName, (e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    idCardUploadArea.style.borderColor = '#2563eb';
+                                    idCardUploadArea.style.backgroundColor = '#eff6ff';
+                                }, false);
+                            });
+
+                            ['dragleave', 'drop'].forEach(eventName => {
+                                idCardUploadArea.addEventListener(eventName, (e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    idCardUploadArea.style.borderColor = '#d1d5db';
+                                    idCardUploadArea.style.backgroundColor = '#f9fafb';
+                                }, false);
+                            });
+
+                            // Handle file input change
+                            idCardInput.addEventListener('change', function (e) {
+                                handleFiles(this.files);
+                            });
+
+                            // Handle file drop
+                            idCardUploadArea.addEventListener('drop', function (e) {
+                                const dt = e.dataTransfer;
+                                const files = dt.files;
+                                handleFiles(files);
+
+                                // Update input files (optional/hacky but good for consistency)
+                                if (files.length > 0) {
+                                    idCardInput.files = files;
+                                }
+                            });
+
+                            function handleFiles(files) {
+                                if (files && files[0]) {
+                                    const file = files[0];
+                                    if (!file.type.startsWith('image/')) {
+                                        alert('Por favor selecciona un archivo de imagen válido.');
+                                        return;
+                                    }
+
+                                    // Mostrar estado de carga
+                                    idCardPlaceholder.style.display = 'none';
+                                    idCardPreview.style.display = 'none';
+
+                                    // Crear elemento de carga si no existe
+                                    let loadingEl = idCardUploadArea.querySelector('.upload-loading');
+                                    if (!loadingEl) {
+                                        loadingEl = document.createElement('div');
+                                        loadingEl.className = 'upload-loading';
+                                        loadingEl.innerHTML = `
+                                                <div class="spinner" style="border: 4px solid rgba(0, 0, 0, 0.1); width: 36px; height: 36px; border-radius: 50%; border-left-color: #2563eb; animation: spin 1s linear infinite; margin: 0 auto 12px;"></div>
+                                                <p style="font-size: 14px; color: #4b5563;">Subiendo a Cloudflare...</p>
+                                                <style>@keyframes spin { to { transform: rotate(360deg); } }</style>
+                                            `;
+                                        idCardUploadArea.appendChild(loadingEl);
+                                    } else {
+                                        loadingEl.style.display = 'block';
+                                    }
+
+                                    const formData = new FormData();
+                                    formData.append('image', file);
+
+                                    // Subir a Cloudflare
+                                    fetch(`${API_BASE}/upload`, {
+                                        method: 'POST',
+                                        body: formData
+                                    })
+                                        .then(res => res.json())
+                                        .then(result => {
+                                            loadingEl.style.display = 'none';
+                                            if (result.success) {
+                                                console.log('ID Card subida a Cloudflare:', result.url);
+                                                idCardImage.src = result.url;
+                                                idCardPreview.style.display = 'block';
+                                                // Guardar la URL en un atributo para uso posterior
+                                                idCardUploadArea.setAttribute('data-cloudflare-url', result.url);
+
+                                                // Persistir en la base de datos automáticamente
+                                                if (typeof updateUsuario === 'function') {
+                                                    updateUsuario('url_Dni', result.url);
+                                                }
+
+                                                // Mostrar mensaje de éxito temporal
+                                                const successMsg = document.createElement('p');
+                                                successMsg.style.color = '#059669';
+                                                successMsg.style.fontSize = '12px';
+                                                successMsg.style.marginTop = '8px';
+                                                successMsg.textContent = '¡Subido correctamente!';
+                                                idCardPreview.appendChild(successMsg);
+                                                setTimeout(() => successMsg.remove(), 3000);
+                                            } else {
+                                                throw new Error(result.error || 'Error al subir');
+                                            }
+                                        })
+                                        .catch(err => {
+                                            console.error('Error subiendo ID Card:', err);
+                                            loadingEl.style.display = 'none';
+                                            idCardPlaceholder.style.display = 'block';
+                                            alert('Error al subir la imagen a Cloudflare. Por favor intenta de nuevo.');
+                                        });
+                                }
+                            }
+
+                            // Remove image
+                            removeIdCard.addEventListener('click', function (e) {
+                                e.preventDefault();
+                                e.stopPropagation();
+
+                                const currentUrl = idCardUploadArea.getAttribute('data-cloudflare-url');
+                                if (currentUrl && currentUrl.includes('r2.dev')) {
+                                    // Opcional: Eliminar de Cloudflare también
+                                    fetch(`${API_BASE}/upload`, {
+                                        method: 'DELETE',
+                                        headers: { 'Content-Type': 'application/json' },
+                                        body: JSON.stringify({ imageUrl: currentUrl })
+                                    }).catch(err => console.error('Error al eliminar de R2:', err));
+                                }
+
+                                idCardInput.value = '';
+                                idCardImage.src = '';
+                                idCardPreview.style.display = 'none';
+                                idCardPlaceholder.style.display = 'block';
+                                idCardUploadArea.removeAttribute('data-cloudflare-url');
+                            });
+                        });
+                    </script>
+                </div>
+
+                <!-- Stats Section -->
+                <div class="glass-card stats-section">
+                    <h2 class="section-title-secondary">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon-md" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd"
+                                d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a6 6 0 015.917 5h-2.09a4.001 4.001 0 00-3.827-3V5zM4.173 10A6.002 6.002 0 0110 4v2a4.002 4.002 0 00-3.827 3H4.173zm5.827 6a6.002 6.002 0 01-5.827-5h2.09A4.001 4.001 0 0010 14v2zm0 0v-2a4.002 4.002 0 003.827-3h2.09A6.002 6.002 0 0110 16z"
+                                clip-rule="evenodd" />
+                        </svg>
+                        <span data-i18n="statistics">Estadísticas</span>
+                    </h2>
+                    <div class="stats-grid">
+                        <div class="stat">
+                            <p class="stat-number-primary" id="statIntercambios">0</p>
+                            <p class="stat-label" data-i18n="exchanges">Intercambios (HU 13)</p>
+                        </div>
+                        <div class="stat">
+                            <p class="stat-number-secondary" id="statFavoritos">0</p>
+                            <p class="stat-label" data-i18n="favorites">Favoritos (HU 10)</p>
+                        </div>
+                        <div class="stat">
+                            <p class="stat-number-primary" id="statOfferedSkills">0</p>
+                            <p class="stat-label" data-i18n="offeredSkills">Habilidades Ofrecidas</p>
+                        </div>
+                    </div>
+
+
+                    <!-- Pixel Bar Chart -->
+                    <div class="pixel-chart">
+                        <div class="pixel-chart-title">Resumen</div>
+
+
+                    </div>
+
+                    <!-- Map -->
+                    <div class="map-container">
+                        <h3
+                            style="color: #e5e7eb; font-size: 14px; font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 20 20"
                                 fill="currentColor">
                                 <path fill-rule="evenodd"
                                     d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
                                     clip-rule="evenodd" />
                             </svg>
-                            <span data-i18n="personalData">Datos Personales</span>
-                        </h2>
-                        <ul class="data-list" id="datosPersonales">
-                            <!-- Se llenará dinámicamente -->
-                        </ul>
+                            <span data-i18n="location">Ubicación</span>
+                        </h3>
 
-                        <!-- Sección de Documento de Identidad -->
-                        <div class="id-card-section"
-                            style="margin-top: 24px; border-top: 1px solid #e5e7eb; padding-top: 20px;">
-                            <h3 class="section-title-primary" style="font-size: 16px; margin-bottom: 12px;">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="icon-md"
-                                    style="width: 20px; height: 20px; color: #4b5563;" viewBox="0 0 24 24" fill="none"
-                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                    stroke-linejoin="round">
-                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                                    <line x1="16" y1="2" x2="16" y2="6"></line>
-                                    <line x1="8" y1="2" x2="8" y2="6"></line>
-                                    <line x1="3" y1="10" x2="21" y2="10"></line>
-                                </svg>
-                                <span>Tarjeta de Identidad</span>
-                            </h3>
-
-                            <div class="file-upload-area" id="idCardUploadArea"
-                                style="border: 2px dashed #d1d5db; border-radius: 12px; padding: 24px; text-align: center; background-color: #f9fafb; transition: all 0.3s; cursor: pointer;">
-                                <input type="file" id="idCardInput" accept="image/*" style="display: none;">
-                                <label for="idCardInput" style="cursor: pointer; width: 100%; display: block;">
-                                    <div class="upload-placeholder" id="idCardPlaceholder">
-                                        <div
-                                            style="width: 48px; height: 48px; background: #e5e7eb; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px;">
-                                            <svg xmlns="http://www.w3.org/2000/svg"
-                                                style="width: 24px; height: 24px; color: #6b7280;" viewBox="0 0 24 24"
-                                                fill="none" stroke="currentColor" stroke-width="2"
-                                                stroke-linecap="round" stroke-linejoin="round">
-                                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                                                <polyline points="17 8 12 3 7 8"></polyline>
-                                                <line x1="12" y1="3" x2="12" y2="15"></line>
-                                            </svg>
-                                        </div>
-                                        <p style="font-weight: 500; color: #374151; margin-bottom: 4px;">Sube una foto
-                                            de tu DNI</p>
-                                        <p style="font-size: 12px; color: #6b7280;">PNG, JPG hasta 5MB</p>
-                                    </div>
-                                    <div id="idCardPreview" style="display: none; position: relative;">
-                                        <img id="idCardImage" src="" alt="Vista previa"
-                                            style="max-width: 100%; max-height: 200px; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
-                                        <button type="button" id="removeIdCard"
-                                            style="position: absolute; top: -10px; right: -10px; background: #ef4444; color: white; border: none; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14"
-                                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                                stroke-linecap="round" stroke-linejoin="round">
-                                                <line x1="18" y1="6" x2="6" y2="18"></line>
-                                                <line x1="6" y1="6" x2="18" y2="18"></line>
-                                            </svg>
-                                        </button>
-                                    </div>
-                                </label>
-                            </div>
-                        </div>
-
-                        <script>
-                            document.addEventListener('DOMContentLoaded', function () {
-                                const idCardInput = document.getElementById('idCardInput');
-                                const idCardUploadArea = document.getElementById('idCardUploadArea');
-                                const idCardPlaceholder = document.getElementById('idCardPlaceholder');
-                                const idCardPreview = document.getElementById('idCardPreview');
-                                const idCardImage = document.getElementById('idCardImage');
-                                const removeIdCard = document.getElementById('removeIdCard');
-
-                                // Highlight drop area on drag
-                                ['dragenter', 'dragover'].forEach(eventName => {
-                                    idCardUploadArea.addEventListener(eventName, (e) => {
-                                        e.preventDefault();
-                                        e.stopPropagation();
-                                        idCardUploadArea.style.borderColor = '#2563eb';
-                                        idCardUploadArea.style.backgroundColor = '#eff6ff';
-                                    }, false);
-                                });
-
-                                ['dragleave', 'drop'].forEach(eventName => {
-                                    idCardUploadArea.addEventListener(eventName, (e) => {
-                                        e.preventDefault();
-                                        e.stopPropagation();
-                                        idCardUploadArea.style.borderColor = '#d1d5db';
-                                        idCardUploadArea.style.backgroundColor = '#f9fafb';
-                                    }, false);
-                                });
-
-                                // Handle file input change
-                                idCardInput.addEventListener('change', function (e) {
-                                    handleFiles(this.files);
-                                });
-
-                                // Handle file drop
-                                idCardUploadArea.addEventListener('drop', function (e) {
-                                    const dt = e.dataTransfer;
-                                    const files = dt.files;
-                                    handleFiles(files);
-
-                                    // Update input files (optional/hacky but good for consistency)
-                                    if (files.length > 0) {
-                                        idCardInput.files = files;
-                                    }
-                                });
-
-                                function handleFiles(files) {
-                                    if (files && files[0]) {
-                                        const file = files[0];
-                                        if (!file.type.startsWith('image/')) {
-                                            alert('Por favor selecciona un archivo de imagen válido.');
-                                            return;
-                                        }
-
-                                        // Mostrar estado de carga
-                                        idCardPlaceholder.style.display = 'none';
-                                        idCardPreview.style.display = 'none';
-
-                                        // Crear elemento de carga si no existe
-                                        let loadingEl = idCardUploadArea.querySelector('.upload-loading');
-                                        if (!loadingEl) {
-                                            loadingEl = document.createElement('div');
-                                            loadingEl.className = 'upload-loading';
-                                            loadingEl.innerHTML = `
-                                                <div class="spinner" style="border: 4px solid rgba(0, 0, 0, 0.1); width: 36px; height: 36px; border-radius: 50%; border-left-color: #2563eb; animation: spin 1s linear infinite; margin: 0 auto 12px;"></div>
-                                                <p style="font-size: 14px; color: #4b5563;">Subiendo a Cloudflare...</p>
-                                                <style>@keyframes spin { to { transform: rotate(360deg); } }</style>
-                                            `;
-                                            idCardUploadArea.appendChild(loadingEl);
-                                        } else {
-                                            loadingEl.style.display = 'block';
-                                        }
-
-                                        const formData = new FormData();
-                                        formData.append('image', file);
-
-                                        // Subir a Cloudflare
-                                        fetch(`${API_BASE}/upload`, {
-                                            method: 'POST',
-                                            body: formData
-                                        })
-                                            .then(res => res.json())
-                                            .then(result => {
-                                                loadingEl.style.display = 'none';
-                                                if (result.success) {
-                                                    console.log('ID Card subida a Cloudflare:', result.url);
-                                                    idCardImage.src = result.url;
-                                                    idCardPreview.style.display = 'block';
-                                                    // Guardar la URL en un atributo para uso posterior
-                                                    idCardUploadArea.setAttribute('data-cloudflare-url', result.url);
-
-                                                    // Persistir en la base de datos automáticamente
-                                                    if (typeof updateUsuario === 'function') {
-                                                        updateUsuario('url_Dni', result.url);
-                                                    }
-
-                                                    // Mostrar mensaje de éxito temporal
-                                                    const successMsg = document.createElement('p');
-                                                    successMsg.style.color = '#059669';
-                                                    successMsg.style.fontSize = '12px';
-                                                    successMsg.style.marginTop = '8px';
-                                                    successMsg.textContent = '¡Subido correctamente!';
-                                                    idCardPreview.appendChild(successMsg);
-                                                    setTimeout(() => successMsg.remove(), 3000);
-                                                } else {
-                                                    throw new Error(result.error || 'Error al subir');
-                                                }
-                                            })
-                                            .catch(err => {
-                                                console.error('Error subiendo ID Card:', err);
-                                                loadingEl.style.display = 'none';
-                                                idCardPlaceholder.style.display = 'block';
-                                                alert('Error al subir la imagen a Cloudflare. Por favor intenta de nuevo.');
-                                            });
-                                    }
-                                }
-
-                                // Remove image
-                                removeIdCard.addEventListener('click', function (e) {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-
-                                    const currentUrl = idCardUploadArea.getAttribute('data-cloudflare-url');
-                                    if (currentUrl && currentUrl.includes('r2.dev')) {
-                                        // Opcional: Eliminar de Cloudflare también
-                                        fetch(`${API_BASE}/upload`, {
-                                            method: 'DELETE',
-                                            headers: { 'Content-Type': 'application/json' },
-                                            body: JSON.stringify({ imageUrl: currentUrl })
-                                        }).catch(err => console.error('Error al eliminar de R2:', err));
-                                    }
-
-                                    idCardInput.value = '';
-                                    idCardImage.src = '';
-                                    idCardPreview.style.display = 'none';
-                                    idCardPlaceholder.style.display = 'block';
-                                    idCardUploadArea.removeAttribute('data-cloudflare-url');
-                                });
-                            });
-                        </script>
-                    </div>
-
-                    <!-- Stats Section -->
-                    <div class="glass-card stats-section">
-                        <h2 class="section-title-secondary">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="icon-md" viewBox="0 0 20 20"
+                        <button id="locationBtn" class="location-button">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 20 20"
                                 fill="currentColor">
                                 <path fill-rule="evenodd"
-                                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a6 6 0 015.917 5h-2.09a4.001 4.001 0 00-3.827-3V5zM4.173 10A6.002 6.002 0 0110 4v2a4.002 4.002 0 00-3.827 3H4.173zm5.827 6a6.002 6.002 0 01-5.827-5h2.09A4.001 4.001 0 0010 14v2zm0 0v-2a4.002 4.002 0 003.827-3h2.09A6.002 6.002 0 0110 16z"
+                                    d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
                                     clip-rule="evenodd" />
                             </svg>
-                            <span data-i18n="statistics">Estadísticas</span>
-                        </h2>
-                        <div class="stats-grid">
-                            <div class="stat">
-                                <p class="stat-number-primary" id="statIntercambios">0</p>
-                                <p class="stat-label" data-i18n="exchanges">Intercambios (HU 13)</p>
-                            </div>
-                            <div class="stat">
-                                <p class="stat-number-secondary" id="statFavoritos">0</p>
-                                <p class="stat-label" data-i18n="favorites">Favoritos (HU 10)</p>
-                            </div>
-                            <div class="stat">
-                                <p class="stat-number-primary" id="statOfferedSkills">0</p>
-                                <p class="stat-label" data-i18n="offeredSkills">Habilidades Ofrecidas</p>
-                            </div>
+                            <span data-i18n="getMyLocation">Obtener mi ubicación</span>
+                        </button>
+
+                        <div id="locationMessage"
+                            style="display: none; padding: 10px 12px; border-radius: 6px; font-size: 13px; margin-bottom: 12px;">
                         </div>
 
-
-                        <!-- Pixel Bar Chart -->
-                        <div class="pixel-chart">
-                            <div class="pixel-chart-title">Resumen</div>
-
-
-                        </div>
-
-                        <!-- Map -->
-                        <div class="map-container">
-                            <h3
-                                style="color: #e5e7eb; font-size: 14px; font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 20 20"
-                                    fill="currentColor">
-                                    <path fill-rule="evenodd"
-                                        d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
-                                        clip-rule="evenodd" />
-                                </svg>
-                                <span data-i18n="location">Ubicación</span>
-                            </h3>
-
-                            <button id="locationBtn" class="location-button">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 20 20"
-                                    fill="currentColor">
-                                    <path fill-rule="evenodd"
-                                        d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
-                                        clip-rule="evenodd" />
-                                </svg>
-                                <span data-i18n="getMyLocation">Obtener mi ubicación</span>
-                            </button>
-
-                            <div id="locationMessage"
-                                style="display: none; padding: 10px 12px; border-radius: 6px; font-size: 13px; margin-bottom: 12px;">
-                            </div>
-
-                            <div id="map"></div>
-                        </div>
+                        <div id="map"></div>
                     </div>
                 </div>
+            </div>
 
-                <!-- Especialidades Técnicas (antes Habilidades que Ofrezco) -->
-                <div class="glass-card skills-offered-section">
-                    <h2 class="section-title-secondary" data-i18n="technicalSpecialties">Especialidades Técnicas</h2>
-                    <p class="section-description" data-i18n="technicalSpecialtiesDesc">Estas son las especialidades
-                        técnicas que domino.</p>
-                    <div class="skills-container" id="offeredSkillsContainer">
-                        <!-- Se llenará dinámicamente -->
-                    </div>
-                    <div id="selectedOfferedDetail" style="display: none;"></div>
+            <!-- Especialidades Técnicas (antes Habilidades que Ofrezco) -->
+            <div class="glass-card skills-offered-section">
+                <h2 class="section-title-secondary" data-i18n="technicalSpecialties">Especialidades Técnicas</h2>
+                <p class="section-description" data-i18n="technicalSpecialtiesDesc">Estas son las especialidades
+                    técnicas que domino.</p>
+                <div class="skills-container" id="offeredSkillsContainer">
+                    <!-- Se llenará dinámicamente -->
+                </div>
+                <div id="selectedOfferedDetail" style="display: none;"></div>
+            </div>
+
+            <!-- Sección de Certificaciones -->
+            <div class="glass-card" id="certificacionesSection">
+                <h2 class="section-title-primary">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon-md" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd"
+                            d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                            clip-rule="evenodd" />
+                    </svg>
+                    <span data-i18n="certifications">Certificaciones</span>
+                </h2>
+
+                <!-- Lista de certificaciones existentes -->
+                <div id="certificacionesList" style="margin-bottom: 16px;">
+                    <!-- Se llenará dinámicamente -->
                 </div>
 
-                <!-- Sección de Certificaciones -->
-                <div class="glass-card" id="certificacionesSection">
-                    <h2 class="section-title-primary">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="icon-md" viewBox="0 0 20 20" fill="currentColor">
+                <!-- Formulario para agregar certificación -->
+                <div class="certificacion-form"
+                    style="background: rgba(37, 99, 235, 0.1); border-radius: 12px; padding: 16px; border: 1px dashed #2563eb;">
+                    <h4 style="color: #2563eb; margin-bottom: 12px; font-size: 14px; font-weight: 600;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 20 20"
+                            fill="currentColor" style="vertical-align: middle; margin-right: 6px;">
                             <path fill-rule="evenodd"
-                                d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                                d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
                                 clip-rule="evenodd" />
                         </svg>
-                        <span data-i18n="certifications">Certificaciones</span>
-                    </h2>
+                        Agregar Nueva Certificación
+                    </h4>
 
-                    <!-- Lista de certificaciones existentes -->
-                    <div id="certificacionesList" style="margin-bottom: 16px;">
-                        <!-- Se llenará dinámicamente -->
-                    </div>
+                    <div style="display: grid; gap: 12px;">
+                        <div>
+                            <label style="display: block; font-size: 12px; color: #6b7280; margin-bottom: 4px;">Título
+                                de la Certificación *</label>
+                            <input type="text" id="tituloCertificacion"
+                                placeholder="Ej: Electricista Industrial Certificado"
+                                style="width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid #d1d5db; font-size: 14px;">
+                        </div>
 
-                    <!-- Formulario para agregar certificación -->
-                    <div class="certificacion-form"
-                        style="background: rgba(37, 99, 235, 0.1); border-radius: 12px; padding: 16px; border: 1px dashed #2563eb;">
-                        <h4 style="color: #2563eb; margin-bottom: 12px; font-size: 14px; font-weight: 600;">
+                        <div>
+                            <label
+                                style="display: block; font-size: 12px; color: #6b7280; margin-bottom: 4px;">Institución</label>
+                            <input type="text" id="institucionCertificacion"
+                                placeholder="Ej: SENA, Universidad Nacional, etc."
+                                style="width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid #d1d5db; font-size: 14px;">
+                        </div>
+
+                        <div>
+                            <label
+                                style="display: block; font-size: 12px; color: #6b7280; margin-bottom: 4px;">Documento
+                                (PDF o Imagen)</label>
+                            <input type="file" id="documentoCertificacion" accept=".pdf,image/jpeg,image/png,image/gif"
+                                style="width: 100%; padding: 8px; border-radius: 8px; border: 1px solid #d1d5db; font-size: 13px; background: white;">
+                        </div>
+
+                        <button type="button" id="btnAgregarCertificacion"
+                            style="background: linear-gradient(135deg, #2563eb, #1d4ed8); color: white; padding: 12px 20px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s;">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 20 20"
-                                fill="currentColor" style="vertical-align: middle; margin-right: 6px;">
+                                fill="currentColor">
                                 <path fill-rule="evenodd"
                                     d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
                                     clip-rule="evenodd" />
                             </svg>
-                            Agregar Nueva Certificación
-                        </h4>
+                            Guardar Certificación
+                        </button>
+                    </div>
 
-                        <div style="display: grid; gap: 12px;">
-                            <div>
-                                <label
-                                    style="display: block; font-size: 12px; color: #6b7280; margin-bottom: 4px;">Título
-                                    de la Certificación *</label>
-                                <input type="text" id="tituloCertificacion"
-                                    placeholder="Ej: Electricista Industrial Certificado"
-                                    style="width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid #d1d5db; font-size: 14px;">
-                            </div>
+                    <div id="mensajeCertificacion" style="margin-top: 10px; font-size: 13px; display: none;"></div>
+                </div>
+            </div>
 
-                            <div>
-                                <label
-                                    style="display: block; font-size: 12px; color: #6b7280; margin-bottom: 4px;">Institución</label>
-                                <input type="text" id="institucionCertificacion"
-                                    placeholder="Ej: SENA, Universidad Nacional, etc."
-                                    style="width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid #d1d5db; font-size: 14px;">
-                            </div>
+            <!-- Gallery -->
+            <div class="glass-card">
+                <h2 class="section-title-primary">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon-md" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd"
+                            d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"
+                            clip-rule="evenodd" />
+                    </svg>
+                    <span data-i18n="imageGallery">Galería de Imágenes</span>
+                </h2>
+                <div class="gallery-grid" id="galleryGrid">
+                    <!-- Se llenará dinámicamente -->
+                </div>
+                <input type="file" id="galleryUpload" accept="image/jpeg, image/png, image/gif" style="display: none;">
+            </div>
 
-                            <div>
-                                <label
-                                    style="display: block; font-size: 12px; color: #6b7280; margin-bottom: 4px;">Documento
-                                    (PDF o Imagen)</label>
-                                <input type="file" id="documentoCertificacion"
-                                    accept=".pdf,image/jpeg,image/png,image/gif"
-                                    style="width: 100%; padding: 8px; border-radius: 8px; border: 1px solid #d1d5db; font-size: 13px; background: white;">
-                            </div>
+            <!-- Reviews -->
+            <div class="glass-card reviews-section">
+                <h2 class="section-title-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon-md" viewBox="0 0 20 20" fill="currentColor">
+                        <path
+                            d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.91 8.724c-.783-.57-.381-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                    </svg>
+                    <span data-i18n="ratingsReviews">Calificaciones y Reseñas</span>
+                </h2>
 
-                            <button type="button" id="btnAgregarCertificacion"
-                                style="background: linear-gradient(135deg, #2563eb, #1d4ed8); color: white; padding: 12px 20px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s;">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 20 20"
-                                    fill="currentColor">
-                                    <path fill-rule="evenodd"
-                                        d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
-                                        clip-rule="evenodd" />
-                                </svg>
-                                Guardar Certificación
-                            </button>
+                <div class="rating-summary">
+                    <div class="rating-score">4.7</div>
+                    <div>
+                        <div class="stars-container">
+                            <svg class="star-filled" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                                fill="currentColor">
+                                <path
+                                    d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.91 8.724c-.783-.57-.381-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                            </svg>
+                            <svg class="star-filled" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                                fill="currentColor">
+                                <path
+                                    d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.91 8.724c-.783-.57-.381-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                            </svg>
+                            <svg class="star-filled" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                                fill="currentColor">
+                                <path
+                                    d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.91 8.724c-.783-.57-.381-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                            </svg>
+                            <svg class="star-filled" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                                fill="currentColor">
+                                <path
+                                    d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.91 8.724c-.783-.57-.381-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                            </svg>
+                            <svg class="star-empty" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                                fill="currentColor">
+                                <path
+                                    d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.91 8.724c-.783-.57-.381-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                            </svg>
                         </div>
-
-                        <div id="mensajeCertificacion" style="margin-top: 10px; font-size: 13px; display: none;"></div>
+                        <p class="rating-text">Basado en 12 intercambios.</p>
                     </div>
                 </div>
 
-                <!-- Gallery -->
-                <div class="glass-card">
-                    <h2 class="section-title-primary">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="icon-md" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd"
-                                d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"
-                                clip-rule="evenodd" />
-                        </svg>
-                        <span data-i18n="imageGallery">Galería de Imágenes</span>
-                    </h2>
-                    <div class="gallery-grid" id="galleryGrid">
-                        <!-- Se llenará dinámicamente -->
+                <div class="reviews-container">
+                    <div class="review-card">
+                        <div class="review-header">
+                            <img class="review-avatar"
+                                src="https://ui-avatars.com/api/?name=JP&background=10B981&color=ffffff&size=40&bold=true&rounded=true"
+                                alt="Usuario">
+                            <div>
+                                <p class="review-name">JuanPerez</p>
+                                <div class="review-rating">
+                                    <span>5.0</span>
+                                    <svg class="star-small" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                                        fill="currentColor">
+                                        <path
+                                            d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.91 8.724c-.783-.57-.381-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="review-text">"Ana me dio una tutoría de inglés excelente. Muy paciente y con
+                            material de apoyo
+                            de calidad. ¡Definitivamente la recomiendo!"</p>
+                        <p class="review-date">Hace 2 días - Intercambio por Clases de Guitarra</p>
                     </div>
-                    <input type="file" id="galleryUpload" accept="image/jpeg, image/png, image/gif"
-                        style="display: none;">
+
+                    <div class="review-card">
+                        <div class="review-header">
+                            <img class="review-avatar"
+                                src="https://ui-avatars.com/api/?name=MC&background=4F46E5&color=ffffff&size=40&bold=true&rounded=true"
+                                alt="Usuario">
+                            <div>
+                                <p class="review-name">Manuel_C</p>
+                                <div class="review-rating">
+                                    <span>4.0</span>
+                                    <svg class="star-small" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                                        fill="currentColor">
+                                        <path
+                                            d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.91 8.724c-.783-.57-.381-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="review-text">"La sesión de diseño gráfico fue útil, aunque tardó un poco en
+                            responder al inicio.
+                            El resultado final fue bueno."</p>
+                        <p class="review-date">Hace 1 semana - Intercambio por Reparación de Scooter</p>
+                    </div>
+
+                    <div class="review-card">
+                        <div class="review-header">
+                            <img class="review-avatar"
+                                src="https://ui-avatars.com/api/?name=DR&background=14B8A6&color=ffffff&size=40&bold=true&rounded=true"
+                                alt="Usuario">
+                            <div>
+                                <p class="review-name">DianaR</p>
+                                <div class="review-rating">
+                                    <span>5.0</span>
+                                    <svg class="star-small" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                                        fill="currentColor">
+                                        <path
+                                            d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.91 8.724c-.783-.57-.381-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="review-text">"¡Un trabajo de SEO excelente! Me ayudó a posicionar mi pequeño
+                            negocio en tiempo
+                            récord. La mejor opción."</p>
+                        <p class="review-date">Hace 3 semanas - Intercambio por Tutoría de Álgebra</p>
+                    </div>
                 </div>
 
-                <!-- Reviews -->
-                <div class="glass-card reviews-section">
-                    <h2 class="section-title-white">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="icon-md" viewBox="0 0 20 20" fill="currentColor">
-                            <path
-                                d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.91 8.724c-.783-.57-.381-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                        </svg>
-                        <span data-i18n="ratingsReviews">Calificaciones y Reseñas</span>
-                    </h2>
-
-                    <div class="rating-summary">
-                        <div class="rating-score">4.7</div>
-                        <div>
-                            <div class="stars-container">
-                                <svg class="star-filled" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
-                                    fill="currentColor">
-                                    <path
-                                        d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.91 8.724c-.783-.57-.381-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                </svg>
-                                <svg class="star-filled" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
-                                    fill="currentColor">
-                                    <path
-                                        d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.91 8.724c-.783-.57-.381-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                </svg>
-                                <svg class="star-filled" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
-                                    fill="currentColor">
-                                    <path
-                                        d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.91 8.724c-.783-.57-.381-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                </svg>
-                                <svg class="star-filled" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
-                                    fill="currentColor">
-                                    <path
-                                        d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.91 8.724c-.783-.57-.381-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                </svg>
-                                <svg class="star-empty" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
-                                    fill="currentColor">
-                                    <path
-                                        d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.91 8.724c-.783-.57-.381-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                </svg>
-                            </div>
-                            <p class="rating-text">Basado en 12 intercambios.</p>
-                        </div>
-                    </div>
-
-                    <div class="reviews-container">
-                        <div class="review-card">
-                            <div class="review-header">
-                                <img class="review-avatar"
-                                    src="https://ui-avatars.com/api/?name=JP&background=10B981&color=ffffff&size=40&bold=true&rounded=true"
-                                    alt="Usuario">
-                                <div>
-                                    <p class="review-name">JuanPerez</p>
-                                    <div class="review-rating">
-                                        <span>5.0</span>
-                                        <svg class="star-small" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
-                                            fill="currentColor">
-                                            <path
-                                                d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.91 8.724c-.783-.57-.381-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                        </svg>
-                                    </div>
-                                </div>
-                            </div>
-                            <p class="review-text">"Ana me dio una tutoría de inglés excelente. Muy paciente y con
-                                material de apoyo
-                                de calidad. ¡Definitivamente la recomiendo!"</p>
-                            <p class="review-date">Hace 2 días - Intercambio por Clases de Guitarra</p>
-                        </div>
-
-                        <div class="review-card">
-                            <div class="review-header">
-                                <img class="review-avatar"
-                                    src="https://ui-avatars.com/api/?name=MC&background=4F46E5&color=ffffff&size=40&bold=true&rounded=true"
-                                    alt="Usuario">
-                                <div>
-                                    <p class="review-name">Manuel_C</p>
-                                    <div class="review-rating">
-                                        <span>4.0</span>
-                                        <svg class="star-small" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
-                                            fill="currentColor">
-                                            <path
-                                                d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.91 8.724c-.783-.57-.381-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                        </svg>
-                                    </div>
-                                </div>
-                            </div>
-                            <p class="review-text">"La sesión de diseño gráfico fue útil, aunque tardó un poco en
-                                responder al inicio.
-                                El resultado final fue bueno."</p>
-                            <p class="review-date">Hace 1 semana - Intercambio por Reparación de Scooter</p>
-                        </div>
-
-                        <div class="review-card">
-                            <div class="review-header">
-                                <img class="review-avatar"
-                                    src="https://ui-avatars.com/api/?name=DR&background=14B8A6&color=ffffff&size=40&bold=true&rounded=true"
-                                    alt="Usuario">
-                                <div>
-                                    <p class="review-name">DianaR</p>
-                                    <div class="review-rating">
-                                        <span>5.0</span>
-                                        <svg class="star-small" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
-                                            fill="currentColor">
-                                            <path
-                                                d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.91 8.724c-.783-.57-.381-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                        </svg>
-                                    </div>
-                                </div>
-                            </div>
-                            <p class="review-text">"¡Un trabajo de SEO excelente! Me ayudó a posicionar mi pequeño
-                                negocio en tiempo
-                                récord. La mejor opción."</p>
-                            <p class="review-date">Hace 3 semanas - Intercambio por Tutoría de Álgebra</p>
-                        </div>
-                    </div>
-
-                    <div class="view-all-button">
-                        <button id="btnViewAllReviews" onclick="viewAllReviews()" style="display: none;">Ver todas las
-                            reseñas</button>
-                    </div>
+                <div class="view-all-button">
+                    <button id="btnViewAllReviews" onclick="viewAllReviews()" style="display: none;">Ver todas las
+                        reseñas</button>
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Modal for Skills -->
-        <div id="skillModal" class="modal-overlay" style="display: none;">
-            <div class="modal-content glass-card">
-                <h3 class="modal-title" id="modalTitle" data-i18n="addSkillTitle">Añadir Habilidad</h3>
-                <select id="skillCategory" class="modal-input">
-                    <option value="" data-i18n="selectCategory">Seleccione una categoría (opcional)</option>
-                </select>
-                <input type="text" id="skillInput" class="modal-input" data-i18n-placeholder="skillExample"
-                    placeholder="Ej: Programación en Python">
+    <!-- Modal for Skills -->
+    <div id="skillModal" class="modal-overlay" style="display: none;">
+        <div class="modal-content glass-card">
+            <h3 class="modal-title" id="modalTitle" data-i18n="addSkillTitle">Añadir Habilidad</h3>
+            <select id="skillCategory" class="modal-input">
+                <option value="" data-i18n="selectCategory">Seleccione una categoría (opcional)</option>
+            </select>
+            <input type="text" id="skillInput" class="modal-input" data-i18n-placeholder="skillExample"
+                placeholder="Ej: Programación en Python">
 
-                <!-- Descripción con botón de generar -->
-                <div class="skill-description-wrapper">
-                    <textarea id="skillDescription" class="modal-input modal-textarea"
-                        data-i18n-placeholder="shortDescription" placeholder="Descripción corta (opcional)"
-                        rows="3"></textarea>
-                    <button type="button" id="generateDescriptionBtn" class="generate-description-btn"
-                        onclick="generateSkillDescription()" title="Generar descripción automáticamente">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path
-                                d="M12 3v4m0 14v-4M5.636 5.636l2.828 2.828M15.536 15.536l2.828 2.828M3 12h4m14 0h-4M5.636 18.364l2.828-2.828M15.536 8.464l2.828-2.828" />
-                            <circle cx="12" cy="12" r="3" />
-                        </svg>
-                        <span>Generar</span>
-                    </button>
-                </div>
+            <!-- Descripción con botón de generar -->
+            <div class="skill-description-wrapper">
+                <textarea id="skillDescription" class="modal-input modal-textarea"
+                    data-i18n-placeholder="shortDescription" placeholder="Descripción corta (opcional)"
+                    rows="3"></textarea>
+                <button type="button" id="generateDescriptionBtn" class="generate-description-btn"
+                    onclick="generateSkillDescription()" title="Generar descripción automáticamente">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path
+                            d="M12 3v4m0 14v-4M5.636 5.636l2.828 2.828M15.536 15.536l2.828 2.828M3 12h4m14 0h-4M5.636 18.364l2.828-2.828M15.536 8.464l2.828-2.828" />
+                        <circle cx="12" cy="12" r="3" />
+                    </svg>
+                    <span>Generar</span>
+                </button>
+            </div>
 
-                <div class="modal-buttons">
-                    <button class="modal-button-cancel" onclick="hideSkillModal()" data-i18n="cancel">Cancelar</button>
-                    <button class="modal-button-submit" onclick="addSkill()" data-i18n="add">Agregar</button>
-                </div>
+            <div class="modal-buttons">
+                <button class="modal-button-cancel" onclick="hideSkillModal()" data-i18n="cancel">Cancelar</button>
+                <button class="modal-button-submit" onclick="addSkill()" data-i18n="add">Agregar</button>
             </div>
         </div>
+    </div>
 
-        <!-- Context Menu -->
-        <div id="contextMenuBackdrop" class="context-menu-backdrop" style="display: none;"></div>
-        <div id="contextMenu" class="context-menu" style="display: none;">
-            <button class="context-menu-item" onclick="handleEditSkill()">
-                <svg xmlns="http://www.w3.org/2000/svg" class="icon-xs" viewBox="0 0 20 20" fill="currentColor"
-                    style="margin-right: 8px;">
-                    <path
-                        d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-                </svg>
-                <span data-i18n="edit">Editar</span>
-            </button>
-            <button class="context-menu-item danger" onclick="handleDeleteSkill()">
-                <svg xmlns="http://www.w3.org/2000/svg" class="icon-xs" viewBox="0 0 20 20" fill="currentColor"
-                    style="margin-right: 8px;">
-                    <path fill-rule="evenodd"
-                        d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
-                        clip-rule="evenodd" />
-                </svg>
-                <span data-i18n="delete">Eliminar</span>
-            </button>
-        </div>
+    <!-- Context Menu -->
+    <div id="contextMenuBackdrop" class="context-menu-backdrop" style="display: none;"></div>
+    <div id="contextMenu" class="context-menu" style="display: none;">
+        <button class="context-menu-item" onclick="handleEditSkill()">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon-xs" viewBox="0 0 20 20" fill="currentColor"
+                style="margin-right: 8px;">
+                <path
+                    d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+            </svg>
+            <span data-i18n="edit">Editar</span>
+        </button>
+        <button class="context-menu-item danger" onclick="handleDeleteSkill()">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon-xs" viewBox="0 0 20 20" fill="currentColor"
+                style="margin-right: 8px;">
+                <path fill-rule="evenodd"
+                    d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+                    clip-rule="evenodd" />
+            </svg>
+            <span data-i18n="delete">Eliminar</span>
+        </button>
+    </div>
 
-        <!-- Image Context Menu -->
-        <div id="imageContextMenu" class="context-menu" style="display: none;">
-            <button class="context-menu-item" onclick="handleChangeImage()">
-                <svg xmlns="http://www.w3.org/2000/svg" class="icon-xs" viewBox="0 0 20 20" fill="currentColor"
-                    style="margin-right: 8px;">
-                    <path
-                        d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-                </svg>
-                <span data-i18n="change">Cambiar</span>
-            </button>
-            <button class="context-menu-item danger" onclick="handleDeleteImage()">
-                <svg xmlns="http://www.w3.org/2000/svg" class="icon-xs" viewBox="0 0 20 20" fill="currentColor"
-                    style="margin-right: 8px;">
-                    <path fill-rule="evenodd"
-                        d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
-                        clip-rule="evenodd" />
-                </svg>
-                <span data-i18n="delete">Eliminar</span>
-            </button>
-        </div>
+    <!-- Image Context Menu -->
+    <div id="imageContextMenu" class="context-menu" style="display: none;">
+        <button class="context-menu-item" onclick="handleChangeImage()">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon-xs" viewBox="0 0 20 20" fill="currentColor"
+                style="margin-right: 8px;">
+                <path
+                    d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+            </svg>
+            <span data-i18n="change">Cambiar</span>
+        </button>
+        <button class="context-menu-item danger" onclick="handleDeleteImage()">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon-xs" viewBox="0 0 20 20" fill="currentColor"
+                style="margin-right: 8px;">
+                <path fill-rule="evenodd"
+                    d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+                    clip-rule="evenodd" />
+            </svg>
+            <span data-i18n="delete">Eliminar</span>
+        </button>
+    </div>
 
-        <!-- Profile Context Menu -->
-        <div id="profileContextMenu" class="context-menu" style="display: none;">
-            <button class="context-menu-item" onclick="handleEditProfileImage()">
-                <svg xmlns="http://www.w3.org/2000/svg" class="icon-xs" viewBox="0 0 20 20" fill="currentColor"
-                    style="margin-right: 8px;">
-                    <path
-                        d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-                </svg>
-                <span data-i18n="edit">Editar</span>
-            </button>
-            <button class="context-menu-item danger" onclick="handleDeleteProfileImage()">
-                <svg xmlns="http://www.w3.org/2000/svg" class="icon-xs" viewBox="0 0 20 20" fill="currentColor"
-                    style="margin-right: 8px;">
-                    <path fill-rule="evenodd"
-                        d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
-                        clip-rule="evenodd" />
-                </svg>
-                <span data-i18n="delete">Eliminar</span>
-            </button>
-        </div>
+    <!-- Profile Context Menu -->
+    <div id="profileContextMenu" class="context-menu" style="display: none;">
+        <button class="context-menu-item" onclick="handleEditProfileImage()">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon-xs" viewBox="0 0 20 20" fill="currentColor"
+                style="margin-right: 8px;">
+                <path
+                    d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+            </svg>
+            <span data-i18n="edit">Editar</span>
+        </button>
+        <button class="context-menu-item danger" onclick="handleDeleteProfileImage()">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon-xs" viewBox="0 0 20 20" fill="currentColor"
+                style="margin-right: 8px;">
+                <path fill-rule="evenodd"
+                    d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+                    clip-rule="evenodd" />
+            </svg>
+            <span data-i18n="delete">Eliminar</span>
+        </button>
+    </div>
     </div>
 
     <!-- Leaflet JS -->
@@ -2227,7 +2219,8 @@
                     identificacion_usuario: personaDB.identificacion_Persona || '',
                     fechaNacimiento: personaDB.fechaNac_Persona || '',
                     anios_experiencia: personaDB.anios_experiencia || 0,
-                    url_Dni: personaDB.url_Dni || ''
+                    url_Dni: personaDB.url_Dni || '',
+                    disponibilidad_Usuario: personaDB.disponibilidad_Persona || personaDB.disponibilidad || 'Disponible'
                 };
 
                 // 4. Cargar imágenes de galería
@@ -5905,11 +5898,12 @@
 
             // 1. Establecer estado inicial basado en usuario cargado
             // Aseguramos compatibilidad con 1/0, true/false, "Disponible"/"No disponible"
+            // Nota: El objeto usuario tiene propiedades con sufijo _Usuario (ej: disponibilidad_Usuario)
             const isAvailable = (
-                usuario.disponibilidad === 1 ||
-                usuario.disponibilidad === true ||
-                usuario.disponibilidad === '1' ||
-                usuario.disponibilidad === 'Disponible' ||
+                usuario.disponibilidad_Usuario === 'Disponible' ||
+                usuario.disponibilidad_Usuario === true ||
+                usuario.disponibilidad === 'Disponible' || // fallback
+                usuario.disponibilidad === true ||         // fallback
                 usuario.estado === 'Disponible'
             );
 
@@ -5949,6 +5943,7 @@
 
                     console.log('Estado actualizado con éxito');
                     // Actualizar objeto usuario local
+                    usuario.disponibilidad_Usuario = statusString;
                     usuario.disponibilidad = statusString;
 
                 } catch (error) {

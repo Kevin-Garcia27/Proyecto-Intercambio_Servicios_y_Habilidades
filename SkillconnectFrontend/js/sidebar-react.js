@@ -5,6 +5,14 @@ const { useState, useEffect } = React;
  * SidebarReact V9: 100% CSS - Sin Framer Motion
  * Elimina completamente la dependencia de Motion para evitar conflictos de keys
  */
+
+// Helper para traducciones
+var t = (key) => {
+    if (window.t_real && typeof window.t_real === 'function') return window.t_real(key);
+    if (window.t && typeof window.t === 'function' && window.t !== t) return window.t(key);
+    return key;
+};
+
 const SidebarReact = () => {
     const [conversations, setConversations] = useState([]);
     const [isHovered, setIsHovered] = useState(false);

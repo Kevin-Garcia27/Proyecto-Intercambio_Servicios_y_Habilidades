@@ -62,7 +62,7 @@ passport.use(new GoogleStrategy({
       });
       
     } catch (error) {
-      console.error('❌ Error en autenticación de Google:', error);
+      console.error('  Error en autenticación de Google:', error);
       return done(error, null);
     }
   }

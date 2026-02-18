@@ -6,7 +6,14 @@
  */
 
 // Destructuring de React
-const { useState, useEffect, useCallback } = React;
+const { useState, useEffect, useCallback, useMemo } = React;
+
+// Helper para traducciones
+var t = (key) => {
+    if (window.t_real && typeof window.t_real === 'function') return window.t_real(key);
+    if (window.t && window.t !== t) return window.t(key);
+    return key;
+};
 
 // ========================================
 // ICONOS SVG (para no depender de librerías externas)
@@ -312,28 +319,28 @@ function ProfileHeader({ persona, ubicacion, onSolicitar, onReportar, perfilId, 
                 return (
                     <div className="perfil-solicitud-mensaje warning">
                         <Icons.User size={18} />
-                        <span>Inicia sesión para enviar solicitudes</span>
+                        <span>{t('profile.loadingSession')}</span>
                     </div>
                 );
             case 'aceptada':
                 return (
                     <div className="perfil-solicitud-mensaje success">
                         <Icons.CheckCircle size={18} />
-                        <span>{mensajeSolicitud || 'Solicitud aceptada'}</span>
+                        <span>{mensajeSolicitud || t('profile.requestAccepted')}</span>
                     </div>
                 );
             case 'pendiente':
                 return (
                     <div className="perfil-solicitud-mensaje info">
                         <Icons.Clock size={18} />
-                        <span>{mensajeSolicitud || 'Tu solicitud está pendiente'}</span>
+                        <span>{mensajeSolicitud || t('profile.requestPending')}</span>
                     </div>
                 );
             case 'enviada_por_otro':
                 return (
                     <div className="perfil-solicitud-mensaje purple">
                         <Icons.Send size={18} />
-                        <span>{mensajeSolicitud || 'Este usuario te envió una solicitud'}</span>
+                        <span>{mensajeSolicitud || t('profile.requestReceived')}</span>
                     </div>
                 );
             case 'none':
@@ -344,7 +351,7 @@ function ProfileHeader({ persona, ubicacion, onSolicitar, onReportar, perfilId, 
                         onClick={handleEnviarSolicitud}
                     >
                         <Icons.Send />
-                        Enviar Solicitud
+                        {t('profile.sendRequest')}
                     </button>
                 );
         }
@@ -367,8 +374,8 @@ function ProfileHeader({ persona, ubicacion, onSolicitar, onReportar, perfilId, 
     );
     
     const statusConfig = {
-        disponible: { className: 'perfil-chip-available', text: 'Disponible' },
-        noDisponible: { className: 'perfil-chip-unavailable', text: 'En obra' }
+        disponible: { className: 'perfil-chip-available', text: t('status.available') },
+        noDisponible: { className: 'perfil-chip-unavailable', text: t('status.atWork') }
     };
     const status = esDisponible ? statusConfig.disponible : statusConfig.noDisponible;
 
@@ -411,30 +418,30 @@ function ProfileHeader({ persona, ubicacion, onSolicitar, onReportar, perfilId, 
                         
                         <div className="perfil-header-ubicacion">
                             <Icons.MapPin />
-                            <span>{ubicacion || 'Sin ubicación'}</span>
+                            <span>{ubicacion || t('card.noLocation')}</span>
                         </div>
 
                         <div className="perfil-header-badges">
                             {/* Chip de verificación dinámico */}
-                            {estadoVerificacion === 'loading' ? (
+                             {estadoVerificacion === 'loading' ? (
                                 <span className="perfil-chip perfil-chip-pending">
                                     <Icons.ShieldAlert color="#6b7280" />
-                                    Verificando...
+                                    {t('profile.verifying')}
                                 </span>
                             ) : estadoVerificacion === 'aprobada' ? (
                                 <span className="perfil-chip perfil-chip-verified">
                                     <Icons.ShieldCheck color="#22c55e" />
-                                    VERIFICADO
+                                    {t('profile.verified')}
                                 </span>
                             ) : estadoVerificacion === 'pendiente' ? (
                                 <span className="perfil-chip perfil-chip-pending">
                                     <Icons.ShieldAlert color="#eab308" />
-                                    Verificación Pendiente
+                                    {t('profile.pendingVerification')}
                                 </span>
                             ) : (
                                 <span className="perfil-chip perfil-chip-not-verified">
                                     <Icons.ShieldOff color="#ef4444" />
-                                    No Verificado
+                                    {t('profile.notVerified')}
                                 </span>
                             )}
                             
@@ -455,7 +462,7 @@ function ProfileHeader({ persona, ubicacion, onSolicitar, onReportar, perfilId, 
                                 onClick={onReportar}
                             >
                                 <Icons.Flag />
-                                Reportar
+                                {t('profile.reporting')}
                             </button>
                         </div>
                     </div>
@@ -506,28 +513,28 @@ function QuickStats({ aniosExperiencia, intercambiosCount, promedioCalificacion,
     const stats = [
         { 
             icon: <Icons.Wrench size={32} />, 
-            label: 'Años de experiencia', 
+            label: t('profile.yearsExperience'), 
             value: aniosExperiencia || 0, 
             color: 'primary' 
         },
         { 
             icon: <Icons.ClipboardList size={32} />, 
-            label: 'Obras', 
+            label: t('profile.works'), 
             value: intercambiosCount || 0, 
-            sublabel: 'completadas', 
+            sublabel: t('profile.completed'), 
             color: 'primary' 
         },
         { 
             icon: <Icons.Star size={32} color="#2563eb" />, 
-            label: 'Promedio', 
+            label: t('profile.average'), 
             value: promedioCalificacion ? promedioCalificacion.toFixed(1) : '0.0', 
             sublabel: '/ 5', 
             color: 'primary' 
         },
         { 
             icon: <Icons.Clock size={32} disponible={esDisponible} />, 
-            label: 'Estado', 
-            value: esDisponible ? 'Disponible' : 'En obra', 
+            label: t('profile.status'), 
+            value: esDisponible ? t('status.available') : t('status.atWork'), 
             color: esDisponible ? 'success' : 'primary' 
         }
     ];
@@ -574,7 +581,7 @@ function Specialties({ habilidades, tipo = 'Ofrece' }) {
     };
 
     // Solo mostrar Especialidades Técnicas (antes "Habilidades que Ofrece")
-    const titulo = 'Especialidades Técnicas';
+    const titulo = t('profile.specialties');
     const iconColor = '#2563eb';
 
     if (!habilidades || habilidades.length === 0) {
@@ -611,7 +618,7 @@ function Specialties({ habilidades, tipo = 'Ofrece' }) {
             {selectedIndex !== null && habilidades[selectedIndex] && (
                 <div className="perfil-specialty-detail" style={{ borderColor: iconColor }}>
                     <h4 style={{ color: iconColor }}>{habilidades[selectedIndex].nombre_Habilidad}</h4>
-                    <p>{habilidades[selectedIndex].descripcion_Habilidad || 'Sin descripción disponible.'}</p>
+                    <p>{habilidades[selectedIndex].descripcion_Habilidad || t('profile.descriptionAvailable')}</p>
                 </div>
             )}
         </div>
@@ -628,7 +635,7 @@ function ProfessionalInfo({ persona, certificaciones }) {
             <div className="perfil-section">
                 <div className="perfil-section-title">
                     <Icons.User />
-                    <h3>Información del Perfil</h3>
+                    <h3>{t('profile.profileInfo')}</h3>
                 </div>
                 
                 {/* Fecha de nacimiento */}
@@ -638,9 +645,9 @@ function ProfessionalInfo({ persona, certificaciones }) {
                             <Icons.Calendar />
                         </div>
                         <div>
-                            <div className="perfil-info-label">Fecha de nacimiento</div>
+                            <div className="perfil-info-label">{t('profile.birthDate')}</div>
                             <div className="perfil-info-value">
-                                {new Date(persona.fechaNac_Persona).toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' })}
+                                {new Date(persona.fechaNac_Persona).toLocaleDateString(window.currentLanguage === 'en' ? 'en-US' : 'es-ES', { day: '2-digit', month: 'long', year: 'numeric' })}
                             </div>
                         </div>
                     </div>
@@ -653,7 +660,7 @@ function ProfessionalInfo({ persona, certificaciones }) {
                             <Icons.User />
                         </div>
                         <div>
-                            <div className="perfil-info-label">Género</div>
+                            <div className="perfil-info-label">{t('profile.gender')}</div>
                             <div className="perfil-info-value">{persona.genero_Persona}</div>
                         </div>
                     </div>
@@ -666,7 +673,7 @@ function ProfessionalInfo({ persona, certificaciones }) {
                             <Icons.Mail />
                         </div>
                         <div>
-                            <div className="perfil-info-label">Correo electrónico</div>
+                            <div className="perfil-info-label">{t('profile.email')}</div>
                             <div className="perfil-info-value">{persona.email_Persona}</div>
                         </div>
                     </div>
@@ -679,7 +686,7 @@ function ProfessionalInfo({ persona, certificaciones }) {
                             <Icons.Phone />
                         </div>
                         <div>
-                            <div className="perfil-info-label">Teléfono</div>
+                            <div className="perfil-info-label">{t('profile.phone')}</div>
                             <div className="perfil-info-value">{persona.telefono_Persona}</div>
                         </div>
                     </div>
@@ -699,7 +706,7 @@ function ProfessionalInfo({ persona, certificaciones }) {
             <div className="perfil-section">
                 <div className="perfil-section-title">
                     <Icons.Briefcase />
-                    <h3>Información Profesional</h3>
+                    <h3>{t('profile.professionalInfo')}</h3>
                 </div>
                 
                 {/* Años de experiencia */}
@@ -708,11 +715,11 @@ function ProfessionalInfo({ persona, certificaciones }) {
                         <Icons.Briefcase />
                     </div>
                     <div>
-                        <div className="perfil-info-label">Años de experiencia</div>
+                        <div className="perfil-info-label">{t('profile.yearsExperience')}</div>
                         <div className="perfil-info-value">
                             {persona.anios_experiencia 
-                                ? `${persona.anios_experiencia} años` 
-                                : 'No especificado'}
+                                ? `${persona.anios_experiencia} ${t('profile.years')}` 
+                                : t('profile.unspecified')}
                         </div>
                     </div>
                 </div>
@@ -723,7 +730,7 @@ function ProfessionalInfo({ persona, certificaciones }) {
                         <Icons.Award />
                     </div>
                     <div className="perfil-certifications-container">
-                        <div className="perfil-info-label">Certificaciones</div>
+                        <div className="perfil-info-label">{t('profile.certifications')}</div>
                         {certificaciones && certificaciones.length > 0 ? (
                             <div className="perfil-certifications-list">
                                 {certificaciones.map((cert, index) => (
@@ -750,7 +757,7 @@ function ProfessionalInfo({ persona, certificaciones }) {
                             </div>
                         ) : (
                             <div className="perfil-info-value perfil-info-muted">
-                                Sin certificaciones registradas
+                                {t('profile.noCertifications')}
                             </div>
                         )}
                     </div>
@@ -770,14 +777,14 @@ function Portfolio({ imagenes, onImageClick }) {
 
     const portfolioItems = imagenes.map((url, index) => ({
         url,
-        description: `Trabajo realizado #${index + 1}`
+        description: `${t('profile.workDone')} #${index + 1}`
     }));
 
     return (
         <div className="perfil-portfolio-sticky">
             <div className="perfil-section-title" style={{ marginBottom: '16px' }}>
                 <Icons.Images />
-                <h3>Portafolio</h3>
+                <h3>{t('profile.portfolio')}</h3>
             </div>
             
             <div className="perfil-portfolio-grid">
@@ -808,11 +815,11 @@ function Portfolio({ imagenes, onImageClick }) {
 function WorkHistory({ intercambios }) {
     // Configuración de estados como en el diseño original
     const statusConfig = {
-        'Completado': { icon: Icons.CheckCircle, text: 'Finalizada', color: '#22c55e', bgcolor: '#f0fdf4' },
-        'Finalizado': { icon: Icons.CheckCircle, text: 'Finalizada', color: '#22c55e', bgcolor: '#f0fdf4' },
-        'En progreso': { icon: Icons.Clock, text: 'En progreso', color: '#2563eb', bgcolor: '#eff6ff' },
-        'Pendiente': { icon: Icons.Clock, text: 'Pendiente', color: '#2563eb', bgcolor: '#eff6ff' },
-        'default': { icon: Icons.Clock, text: 'En curso', color: '#2563eb', bgcolor: '#eff6ff' }
+        'Completado': { icon: Icons.CheckCircle, text: t('status.finished'), color: '#22c55e', bgcolor: '#f0fdf4' },
+        'Finalizado': { icon: Icons.CheckCircle, text: t('status.finished'), color: '#22c55e', bgcolor: '#f0fdf4' },
+        'En progreso': { icon: Icons.Clock, text: t('status.inProgress'), color: '#2563eb', bgcolor: '#eff6ff' },
+        'Pendiente': { icon: Icons.Clock, text: t('status.pending'), color: '#2563eb', bgcolor: '#eff6ff' },
+        'default': { icon: Icons.Clock, text: t('status.ongoing'), color: '#2563eb', bgcolor: '#eff6ff' }
     };
 
     const getStatusConfig = (estado) => {
@@ -830,7 +837,7 @@ function WorkHistory({ intercambios }) {
         <div className="perfil-section">
             <div className="perfil-section-title">
                 <Icons.ClipboardCheck />
-                <h3>Historial de Órdenes de Trabajo</h3>
+                <h3>{t('profile.workHistory')}</h3>
                 {intercambios.length > 5 && (
                     <span className="perfil-section-count">({intercambios.length} total)</span>
                 )}
@@ -944,7 +951,7 @@ function LocationMap({ coordenadas, ubicacion }) {
         <div className="perfil-location-map-container">
             <div className="perfil-location-map-header">
                 <Icons.MapPin />
-                <span>Ubicación</span>
+                <span>{t('profile.location')}</span>
             </div>
             <div 
                 ref={mapRef} 
@@ -972,25 +979,25 @@ function TechnicalEvaluation({ estadisticas, calificaciones, coordenadas, ubicac
     // Si no hay métricas, usar valores por defecto basados en la calificación promedio
     const criteria = [
         { 
-            name: 'Puntualidad', 
+            name: t('reports.punctuality'), 
             percentage: metricas?.puntualidad ?? 0,
             IconComponent: Icons.ClockCheck,
             color: '#10b981'
         },
         { 
-            name: 'Calidad de trabajo', 
+            name: t('profile.qualityOfWork'), 
             percentage: metricas?.calidad_trabajo ?? 0,
             IconComponent: Icons.StarCheck,
             color: '#f59e0b'
         },
         { 
-            name: 'Limpieza', 
+            name: t('reports.cleaning'), 
             percentage: metricas?.limpieza ?? 0,
             IconComponent: Icons.Sparkles,
             color: '#06b6d4'
         },
         { 
-            name: 'Comunicación', 
+            name: t('reports.communication'), 
             percentage: metricas?.comunicacion ?? 0,
             IconComponent: Icons.MessageCircle,
             color: '#8b5cf6'
@@ -1042,7 +1049,7 @@ function TechnicalEvaluation({ estadisticas, calificaciones, coordenadas, ubicac
         <div className="perfil-section">
             <div className="perfil-section-title">
                 <Icons.StarYellow filled={true} size={20} />
-                <h3>Evaluación Técnica</h3>
+                <h3>{t('profile.technicalEvaluation')}</h3>
             </div>
             
             <div className="perfil-eval-grid">
@@ -1053,7 +1060,7 @@ function TechnicalEvaluation({ estadisticas, calificaciones, coordenadas, ubicac
                         {renderStars(overallRating)}
                     </div>
                     <div className="perfil-eval-label">
-                        Calificación Promedio
+                        {t('profile.averageRating')}
                     </div>
                 </div>
 
@@ -1103,7 +1110,7 @@ function TechnicalEvaluation({ estadisticas, calificaciones, coordenadas, ubicac
                             color: '#94a3b8',
                             fontSize: '13px'
                         }}>
-                            Aún no hay evaluaciones de desempeño
+                            {t('profile.noPerformanceEvaluations')}
                         </div>
                     )}
                 </div>
@@ -1117,18 +1124,18 @@ function TechnicalEvaluation({ estadisticas, calificaciones, coordenadas, ubicac
             {/* Comentarios de Clientes - Grid de 2 columnas como en el diseño */}
             {calificaciones && calificaciones.length > 0 && (
                 <>
-                    <h4 className="perfil-reviews-title">Comentarios de Clientes</h4>
+                    <h4 className="perfil-reviews-title">{t('profile.reviews')}</h4>
                     <div className="perfil-reviews-grid">
                         {calificaciones.map((review, index) => (
                             <div key={index} className="perfil-review-item">
                                 <div className="perfil-review-header">
                                     <div>
                                         <div className="perfil-review-author">
-                                            {review.nombre_calificador || 'Usuario'} {review.apellido_calificador || ''}
+                                            {review.nombre_calificador || t('table.user')} {review.apellido_calificador || ''}
                                         </div>
                                         <div className="perfil-review-date">
                                             {(review.fecha_calificacion || review.fecha_creacion)
-                                                ? new Date(review.fecha_calificacion || review.fecha_creacion).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' })
+                                                ? new Date(review.fecha_calificacion || review.fecha_creacion).toLocaleDateString(window.currentLanguage === 'en' ? 'en-US' : 'es-ES', { day: '2-digit', month: 'short', year: 'numeric' })
                                                 : ''}
                                         </div>
                                     </div>
@@ -1145,7 +1152,7 @@ function TechnicalEvaluation({ estadisticas, calificaciones, coordenadas, ubicac
                                 {review.respuesta_del_dueno && (
                                     <div className="perfil-review-response">
                                         <div className="perfil-review-response-label">
-                                            Respuesta del técnico:
+                                            {t('profile.technicianResponse')}
                                         </div>
                                         <p className="perfil-review-response-text">{review.respuesta_del_dueno}</p>
                                     </div>
@@ -1167,7 +1174,7 @@ function ImageModal({ imageData, onClose }) {
 
     // Si es string, convertir a objeto
     const image = typeof imageData === 'string' 
-        ? { url: imageData, description: 'Imagen del portafolio' }
+        ? { url: imageData, description: t('profile.portfolioImage') }
         : imageData;
 
     return (
@@ -1176,7 +1183,7 @@ function ImageModal({ imageData, onClose }) {
                 <Icons.X />
             </button>
             <div className="perfil-image-modal-content" onClick={(e) => e.stopPropagation()}>
-                <img src={image.url} alt={image.description || 'Imagen ampliada'} />
+                <img src={image.url} alt={image.description || t('profile.enlargedImage')} />
                 {image.description && (
                     <div className="perfil-image-modal-caption">
                         {image.description}
@@ -1205,6 +1212,14 @@ function NuevoPerfilUsuario({ perfilId, onVolver, onSolicitar, onReportar }) {
     const [metricas, setMetricas] = useState(null); // Estado para métricas de desempeño (progress bars)
     const [selectedImage, setSelectedImage] = useState(null);
     const [error, setError] = useState(null);
+    const [, setTick] = useState(0); // Para forzar re-render al cambiar idioma
+
+    // Escuchar cambios de idioma
+    useEffect(() => {
+        const handleLangChange = () => setTick(t => t + 1);
+        window.addEventListener('languageChanged', handleLangChange);
+        return () => window.removeEventListener('languageChanged', handleLangChange);
+    }, []);
 
     // Cargar datos del perfil
     useEffect(() => {
@@ -1434,14 +1449,14 @@ function NuevoPerfilUsuario({ perfilId, onVolver, onSolicitar, onReportar }) {
             
             const data = await res.json();
             if (!res.ok || !data.success) {
-                throw new Error(data.message || 'Error del servidor');
+                throw new Error(data.message || t('profile.serverError'));
             }
             console.log('Estado actualizado exitosamente en backend');
         } catch (e) {
             console.error('Error de red al actualizar estado:', e);
             // 4. Revertir cambios en caso de error
             setPersona(previousPersona);
-            alert('Error de conexión al actualizar el estado');
+            alert(t('profile.updateError'));
         }
     };
 
@@ -1465,7 +1480,7 @@ function NuevoPerfilUsuario({ perfilId, onVolver, onSolicitar, onReportar }) {
                 <div className="nuevo-perfil-wrapper">
                     <button className="perfil-back-btn" onClick={onVolver}>
                         <Icons.ArrowLeft />
-                        Volver
+                        {t('messages.back')}
                     </button>
                     <div className="perfil-section" style={{ textAlign: 'center', padding: '48px' }}>
                         <div style={{ color: '#ef4444', marginBottom: '16px' }}>
@@ -1475,7 +1490,7 @@ function NuevoPerfilUsuario({ perfilId, onVolver, onSolicitar, onReportar }) {
                                 <line x1="12" y1="16" x2="12.01" y2="16"></line>
                             </svg>
                         </div>
-                        <h3 style={{ fontSize: '20px', fontWeight: '600', marginBottom: '8px' }}>Error al cargar el perfil</h3>
+                        <h3 style={{ fontSize: '20px', fontWeight: '600', marginBottom: '8px' }}>{t('profile.errorLoading')}</h3>
                         <p style={{ color: '#6b7280' }}>{error}</p>
                     </div>
                 </div>
@@ -1489,7 +1504,7 @@ function NuevoPerfilUsuario({ perfilId, onVolver, onSolicitar, onReportar }) {
                 {/* Botón volver */}
                 <button className="perfil-back-btn" onClick={onVolver}>
                     <Icons.ArrowLeft />
-                    Volver a Descubrir
+                    {t('profile.backToDiscover')}
                 </button>
 
                 {/* Header del perfil */}
