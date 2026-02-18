@@ -19,7 +19,7 @@ const enviarCorreoRecuperacion = async (destinatario, token) => {
     const mailOptions = {
         from: `"SkillConnect" <${process.env.EMAIL_USER}>`,
         to: destinatario,
-        subject: 'Recuperación de Contraseña - SkillConnect',
+        subject: 'Recuperación de contraseña - SkillConnect',
         html: `
             <!DOCTYPE html>
             <html>
