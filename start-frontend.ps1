@@ -2,13 +2,13 @@
 # Uso: .\start-frontend.ps1
 
 Write-Host "╔═══════════════════════════════════════════════════╗" -ForegroundColor Cyan
-Write-Host "║       SkillConnect - Frontend Server              ║" -ForegroundColor Cyan
+Write-Host "║       SEMACKRO - Frontend Server              ║" -ForegroundColor Cyan
 Write-Host "╚═══════════════════════════════════════════════════╝" -ForegroundColor Cyan
 Write-Host ""
 
 # Ruta base del proyecto
 $projectRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
-$frontendPath = Join-Path $projectRoot "SkillconnectFrontend"
+$frontendPath = Join-Path $projectRoot "SEMACKROFrontend"
 
 # Cambiar al directorio del frontend
 Set-Location $frontendPath

@@ -2,13 +2,13 @@
 # Uso: .\start-backend.ps1
 
 Write-Host "╔═══════════════════════════════════════════════════╗" -ForegroundColor Cyan
-Write-Host "║        SkillConnect - Backend Server              ║" -ForegroundColor Cyan
+Write-Host "║        SEMACKRO - Backend Server              ║" -ForegroundColor Cyan
 Write-Host "╚═══════════════════════════════════════════════════╝" -ForegroundColor Cyan
 Write-Host ""
 
 # Ruta base del proyecto
 $projectRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
-$backendPath = Join-Path $projectRoot "SkillconnectBackend"
+$backendPath = Join-Path $projectRoot "SEMACKROBackend"
 
 # Cambiar al directorio del backend
 Set-Location $backendPath

@@ -398,10 +398,8 @@
 </head>
 
 <body>
-    <script>
-        // URL del servidor backend que sirve socket.io y la API de señalización
-        window.BACKEND_URL = window.BACKEND_URL || 'http://localhost:3001';
-    </script>
+    <!-- Configuración de entorno -->
+    <script src="config.js"></script>
     <!-- Cargar cliente Socket.io desde CDN HTTPS para cumplir CSP -->
     <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
     <div class="container">
@@ -463,7 +461,7 @@
 
     <script>
         // Backend URL y Socket.io cliente para señalización en tiempo real
-        const BACKEND_URL = window.BACKEND_URL || 'http://localhost:3001';
+        const BACKEND_URL = window.APP_CONFIG ? window.APP_CONFIG.BACKEND_URL : 'https://SEMACKRO.duckdns.org';
 
         // Control de throttling para ICE candidates
         let _candidateBuffer = [];
@@ -654,13 +652,149 @@
             // unir sala en socket.io
             try { if (socket && currentRoomId) socket.emit('join', currentRoomId); } catch (e) { }
 
-            try {
-                localStream = await navigator.mediaDevices.getUserMedia({
-                    video: { width: { ideal: 1280 }, height: { ideal: 720 } },
-                    audio: true
+            // IMPORTANTE: Detener cualquier stream previo que pueda estar activo
+            if (localStream) {
+                console.log('[CLEANUP] Deteniendo stream previo...');
+                localStream.getTracks().forEach(track => {
+                    track.stop();
+                    console.log('[CLEANUP] Track detenido:', track.kind, track.label);
                 });
+                localStream = null;
+            }
 
-                document.getElementById('localVideo').srcObject = localStream;
+            // Esperar un momento para que los dispositivos se liberen
+            await new Promise(resolve => setTimeout(resolve, 500));
+
+            // Listar dispositivos disponibles ANTES de solicitar permisos
+            let videoDevicesCount = 0;
+            let audioDevicesCount = 0;
+            try {
+                const devicesBeforePermission = await navigator.mediaDevices.enumerateDevices();
+                videoDevicesCount = devicesBeforePermission.filter(d => d.kind === 'videoinput').length;
+                audioDevicesCount = devicesBeforePermission.filter(d => d.kind === 'audioinput').length;
+                console.log('[DEVICES] ANTES de permisos - Camaras:', videoDevicesCount, 'Microfonos:', audioDevicesCount);
+            } catch (e) {
+                console.warn('[DEVICES] No se pudo enumerar dispositivos antes de permisos:', e);
+            }
+
+            // Si no hay dispositivos detectados, solicitar permisos primero
+            if (videoDevicesCount === 0 && audioDevicesCount === 0) {
+                console.log('[PERMISSION] No se detectaron dispositivos, solicitando permisos...');
+                try {
+                    // Solicitar permisos con un getUserMedia temporal
+                    const tempStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+                    console.log('[PERMISSION] Permisos concedidos, deteniendo stream temporal');
+                    tempStream.getTracks().forEach(track => track.stop());
+
+                    // Esperar un poco y volver a enumerar
+                    await new Promise(resolve => setTimeout(resolve, 500));
+
+                    const devicesAfterPermission = await navigator.mediaDevices.enumerateDevices();
+                    videoDevicesCount = devicesAfterPermission.filter(d => d.kind === 'videoinput').length;
+                    audioDevicesCount = devicesAfterPermission.filter(d => d.kind === 'audioinput').length;
+                    console.log('[DEVICES] DESPUES de permisos - Camaras:', videoDevicesCount, 'Microfonos:', audioDevicesCount);
+
+                    devicesAfterPermission.filter(d => d.kind === 'videoinput').forEach((d, i) =>
+                        console.log(`  Camara ${i + 1}:`, d.label || d.deviceId));
+                    devicesAfterPermission.filter(d => d.kind === 'audioinput').forEach((d, i) =>
+                        console.log(`  Microfono ${i + 1}:`, d.label || d.deviceId));
+                } catch (permError) {
+                    console.error('[PERMISSION] Error al solicitar permisos:', permError.name, permError.message);
+                }
+            } else {
+                // Ya hay dispositivos detectados, mostrarlos
+                const devices = await navigator.mediaDevices.enumerateDevices();
+                devices.filter(d => d.kind === 'videoinput').forEach((d, i) =>
+                    console.log(`  Camara ${i + 1}:`, d.label || d.deviceId));
+                devices.filter(d => d.kind === 'audioinput').forEach((d, i) =>
+                    console.log(`  Microfono ${i + 1}:`, d.label || d.deviceId));
+            }
+
+            try {
+                // Intentar con configuracion simple primero
+                try {
+                    console.log('[MEDIA] Intentando obtener video y audio...');
+                    localStream = await navigator.mediaDevices.getUserMedia({
+                        video: true,
+                        audio: true
+                    });
+                    console.log('[MEDIA] Exito! Video y audio obtenidos');
+                    console.log('[MEDIA] Video tracks:', localStream.getVideoTracks().length);
+                    console.log('[MEDIA] Audio tracks:', localStream.getAudioTracks().length);
+                } catch (firstError) {
+                    console.error('[MEDIA] Error en primer intento:', firstError.name, '-', firstError.message);
+
+                    // Si es error de permisos, informar al usuario
+                    if (firstError.name === 'NotAllowedError' || firstError.name === 'PermissionDeniedError') {
+                        alert('Debes permitir el acceso a la camara y microfono en tu navegador.\n\nHaz clic en el icono de candado en la barra de direcciones y permite el acceso.');
+                        throw firstError;
+                    }
+
+                    // Si es NotFoundError, puede ser que otra pestaña esté usando la cámara
+                    if (firstError.name === 'NotFoundError') {
+                        console.error('[MEDIA] NotFoundError detectado - Posibles causas:');
+                        console.error('  1. Otra pestaña o aplicacion esta usando la camara');
+                        console.error('  2. La camara esta desconectada fisicamente');
+                        console.error('  3. Problema con drivers del dispositivo');
+                        alert('No se pudo acceder a la camara.\n\n' +
+                            'CIERRA otras pestanas del navegador que puedan estar usando la camara\n' +
+                            '(incluyendo pestanas en modo incognito)\n\n' +
+                            'Luego intenta de nuevo.');
+                        throw firstError;
+                    }
+
+                    // Intentar solo video
+                    try {
+                        console.log('[MEDIA] Intentando solo video...');
+                        localStream = await navigator.mediaDevices.getUserMedia({ video: true });
+                        console.log('[MEDIA] Solo video obtenido correctamente');
+                        alert('No se pudo acceder al microfono. La llamada continuara solo con video.');
+                    } catch (secondError) {
+                        console.error('[MEDIA] Error obteniendo solo video:', secondError.name, '-', secondError.message);
+
+                        // Verificar NotFoundError en el segundo intento tambien
+                        if (secondError.name === 'NotFoundError') {
+                            alert('La camara no esta disponible.\n\n' +
+                                'Verifica que:\n' +
+                                '- No hay otras pestanas usandola\n' +
+                                '- Esta conectada correctamente\n' +
+                                '- No esta bloqueada por otra aplicacion');
+                            throw secondError;
+                        }
+
+                        // Intentar solo audio
+                        try {
+                            console.log('[MEDIA] Intentando solo audio...');
+                            localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                            console.log('[MEDIA] Solo audio obtenido correctamente');
+                            alert('No se pudo acceder a la camara. La llamada continuara solo con audio.');
+                        } catch (thirdError) {
+                            console.error('[MEDIA] Error obteniendo solo audio:', thirdError.name, '-', thirdError.message);
+
+                            // Crear stream vacio para permitir continuar
+                            localStream = new MediaStream();
+                            console.log('[MEDIA] Continuando sin dispositivos multimedia');
+
+                            if (thirdError.name === 'NotFoundError') {
+                                alert('No se encontro camara ni microfono conectado.\nPodras ver y escuchar a la otra persona.');
+                            } else if (thirdError.name === 'NotAllowedError' || thirdError.name === 'PermissionDeniedError') {
+                                alert('Permisos denegados.\nPodras ver y escuchar a la otra persona.');
+                            }
+                        }
+                    }
+                }
+
+                // Asignar video local si hay tracks de video
+                if (localStream && localStream.getVideoTracks().length > 0) {
+                    const localVideoEl = document.getElementById('localVideo');
+                    localVideoEl.srcObject = localStream;
+                    console.log('[MEDIA] Video local asignado correctamente');
+
+                    // Forzar reproduccion
+                    localVideoEl.play().catch(e => console.warn('[MEDIA] Error al reproducir video local:', e));
+                } else {
+                    console.log('[MEDIA] Sin video tracks disponibles');
+                }
                 const _pc = document.getElementById('phoneContainer');
                 if (_pc) _pc.style.display = 'none';
                 document.getElementById('videoCallInterface').classList.add('active');
@@ -671,8 +805,26 @@
 
                 peerConnection = new RTCPeerConnection(iceServers);
 
+                // Si no hay video tracks, agregar un track negro para poder reemplazarlo después
+                const hasVideo = localStream.getVideoTracks().length > 0;
+                if (!hasVideo) {
+                    console.log('[WEBRTC] No hay video tracks, agregando track negro para permitir activacion posterior');
+                    const canvas = document.createElement('canvas');
+                    canvas.width = 640;
+                    canvas.height = 480;
+                    const ctx = canvas.getContext('2d');
+                    ctx.fillStyle = '#000000';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    const blackStream = canvas.captureStream();
+                    const blackTrack = blackStream.getVideoTracks()[0];
+                    localStream.addTrack(blackTrack);
+                    cameraEnabled = false; // Marcar cámara como desactivada
+                    document.getElementById('videoBtn')?.classList.remove('active');
+                }
+
                 localStream.getTracks().forEach(track => {
                     peerConnection.addTrack(track, localStream);
+                    console.log('[WEBRTC] Track agregado:', track.kind, track.label || 'sin nombre');
                 });
 
                 peerConnection.ontrack = (event) => {
@@ -751,8 +903,8 @@
                 console.log('ID Usuario:', currentUserId);
 
             } catch (error) {
-                console.error('Error:', error);
-                alert('Error: ' + error.message);
+                console.error('[CALL] Error general en startCall:', error);
+                alert('Error al iniciar la llamada: ' + error.message);
                 const _pc_err = document.getElementById('phoneContainer');
                 if (_pc_err) _pc_err.style.display = 'flex';
             }
@@ -902,10 +1054,36 @@
 
                             if (videoSender && typeof videoSender.replaceTrack === 'function') {
                                 await videoSender.replaceTrack(newTrack);
-                                console.log('[CAMERA] Camera re-enabled and track replaced');
+                                console.log('[CAMERA] Camera re-enabled and track replaced successfully');
+
+                                // Forzar renegociación para asegurar que el receptor reciba el nuevo track
+                                try {
+                                    const offer = await peerConnection.createOffer();
+                                    await peerConnection.setLocalDescription(offer);
+                                    console.log('[CAMERA] Renegotiating connection to send new video track');
+
+                                    // Enviar nueva offer via polling
+                                    await sendSignalViaPolling('offer', {
+                                        offer: JSON.stringify(offer)
+                                    });
+                                } catch (renegErr) {
+                                    console.error('[CAMERA] Error during renegotiation:', renegErr);
+                                }
                             } else {
-                                console.log('[CAMERA] No video sender found, adding new track');
+                                console.log('[CAMERA] No video sender found, adding new track and renegotiating');
                                 peerConnection.addTrack(newTrack, localStream);
+
+                                // Renegociar después de agregar track
+                                try {
+                                    const offer = await peerConnection.createOffer();
+                                    await peerConnection.setLocalDescription(offer);
+                                    await sendSignalViaPolling('offer', {
+                                        offer: JSON.stringify(offer)
+                                    });
+                                    console.log('[CAMERA] New track added and connection renegotiated');
+                                } catch (renegErr) {
+                                    console.error('[CAMERA] Error during renegotiation:', renegErr);
+                                }
                             }
                         }
                     }
@@ -1060,7 +1238,7 @@
                         if (signal.signal_type === 'call_ended' && signal.sender_id != myUserId) {
                             console.log('[CALL] Remote user ended the call');
                             _addedCandidateIds.add(signal.id);
-                            // Cerrar la llamada en este lado también
+                            // Cerrar la llamada en este lado tambi�n
                             endCall();
                             return; // Salir del loop
                         }
@@ -1069,7 +1247,7 @@
                         if (signal.signal_type === 'call_rejected' && signal.sender_id != myUserId) {
                             console.log('[CALL] Remote user rejected the call');
                             _addedCandidateIds.add(signal.id);
-                            // Cerrar la llamada en este lado también
+                            // Cerrar la llamada en este lado tambi�n
                             endCall();
                             return; // Salir del loop
                         }
@@ -1125,10 +1303,58 @@
                             if (!currentUserId) currentUserId = generateUserId();
                             // obtener media local
                             if (!localStream) {
-                                try { localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true }); document.getElementById('localVideo').srcObject = localStream; } catch (err) { console.error('Error getUserMedia on accept', err); }
+                                try {
+                                    console.log('[ACCEPT] Solicitando camara y microfono...');
+                                    localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+                                    console.log('[ACCEPT] Exito! Video y audio obtenidos');
+                                    document.getElementById('localVideo').srcObject = localStream;
+                                } catch (err) {
+                                    console.error('[ACCEPT] Error getUserMedia:', err.name, '-', err.message);
+
+                                    // Si es NotFoundError, puede ser que otra pestaña esté usando la cámara
+                                    if (err.name === 'NotFoundError') {
+                                        alert('No se pudo acceder a tu camara.\n\nCIERRA otras pestanas del navegador que puedan estar usandola\n(incluyendo pestanas en modo incognito)\n\nLa llamada continuara pero no podras enviar video.');
+                                    } else if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+                                        alert('Permisos denegados.\nPermite el acceso a camara y microfono en la configuracion del navegador.');
+                                    }
+
+                                    // Intentar solo audio como fallback
+                                    try {
+                                        console.log('[ACCEPT] Intentando solo audio...');
+                                        localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                                        console.log('[ACCEPT] Solo audio obtenido');
+                                    } catch (audioErr) {
+                                        console.error('[ACCEPT] No se pudo obtener ni video ni audio:', audioErr.name);
+                                        // Crear stream vacío para permitir continuar
+                                        localStream = new MediaStream();
+                                    }
+                                }
                             }
+
+                            // Si no hay video tracks, agregar un track negro para poder reemplazarlo después
+                            const hasVideo = localStream.getVideoTracks().length > 0;
+                            if (!hasVideo) {
+                                console.log('[ACCEPT] No hay video tracks, agregando track negro');
+                                const canvas = document.createElement('canvas');
+                                canvas.width = 640;
+                                canvas.height = 480;
+                                const ctx = canvas.getContext('2d');
+                                ctx.fillStyle = '#000000';
+                                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                                const blackStream = canvas.captureStream();
+                                const blackTrack = blackStream.getVideoTracks()[0];
+                                localStream.addTrack(blackTrack);
+                                cameraEnabled = false;
+                                document.getElementById('videoBtn')?.classList.remove('active');
+                            }
+
                             peerConnection = new RTCPeerConnection(iceServers);
-                            if (localStream) localStream.getTracks().forEach(t => peerConnection.addTrack(t, localStream));
+                            if (localStream) {
+                                localStream.getTracks().forEach(t => {
+                                    peerConnection.addTrack(t, localStream);
+                                    console.log('[ACCEPT] Track agregado:', t.kind, t.label || 'sin nombre');
+                                });
+                            }
                             peerConnection.ontrack = (event) => {
                                 console.log('[VIDEO] REMOTE STREAM RECEIVED!', event.streams[0]);
                                 const remoteVid = document.getElementById('remoteVideo');

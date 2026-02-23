@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Términos de Servicio - SEMACKRO</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='none' stroke='%232563EB' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M13 10V3L4 14h7v7l9-11h-7z'/></svg>"
+        type="image/svg+xml">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-image: url('113435-OOM6G9-66.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+
+        /* Navbar Styles */
+        .navbar {
+            background-color: #ffffff !important;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            position: fixed !important;
+            top: 0;
+            z-index: 1050 !important;
+            width: 100%;
+        }
+
+        .navbar * {
+            opacity: 1 !important;
+            visibility: visible !important;
+        }
+
+        .navbar-brand {
+            color: #2563EB !important;
+            font-weight: 800 !important;
+            font-size: 1.5rem !important;
+            letter-spacing: -0.025em;
+            opacity: 1 !important;
+            visibility: visible !important;
+        }
+
+        .navbar-nav .nav-item {
+            opacity: 1 !important;
+            visibility: visible !important;
+        }
+
+        .navbar-nav .nav-link {
+            color: #000000 !important;
+            font-weight: 700 !important;
+            transition: color 0.15s ease;
+            margin-right: 1.5rem;
+            font-size: 1rem !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+            text-decoration: none !important;
+        }
+
+        .navbar-nav .nav-link:hover {
+            color: #2563EB !important;
+        }
+
+        .btn-register {
+            background-color: #2563EB !important;
+            color: #ffffff !important;
+            font-weight: 700 !important;
+            padding: 0.5rem 1.5rem;
+            border-radius: 9999px;
+            border: none;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            transition: all 0.15s ease;
+            opacity: 1 !important;
+            visibility: visible !important;
+            text-decoration: none !important;
+        }
+
+        .btn-register:hover {
+            background-color: #1d4ed8 !important;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        .btn-login {
+            color: #000000 !important;
+            font-weight: 700 !important;
+            background-color: transparent !important;
+            border: 2px solid #2563EB !important;
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            transition: all 0.15s ease;
+            opacity: 1 !important;
+            visibility: visible !important;
+            text-decoration: none !important;
+        }
+
+        .btn-login:hover {
+            color: #ffffff !important;
+            background-color: #2563EB !important;
+        }
+
+        .navbar-toggler {
+            border-color: rgba(75, 85, 99, 0.5);
+        }
+
+        .navbar-toggler-icon {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(75, 85, 99, 1)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+        }
+
+        main {
+            padding-top: 100px;
+        }
+    </style>
+</head>
+
+<body class="antialiased">
+
+    <!-- NAVBAR -->
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top">
+        <div class="container-fluid" style="max-width: 1400px; margin: 0 auto;">
+            <a class="navbar-brand" href="index.html">SEMACKRO</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html#como-funciona" data-i18n="nav.howItWorks">Cómo Funciona</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html#habilidades" data-i18n="nav.skills">Habilidades</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html#comunidad" data-i18n="nav.community">Comunidad</a>
+                    </li>
+                </ul>
+                <div class="d-flex gap-2 align-items-center">
+                    <!-- Selector de idioma -->
+                    <div class="position-relative">
+                        <button id="languageBtn"
+                            class="btn btn-sm border border-secondary rounded-pill d-flex align-items-center gap-2 px-3 py-2 bg-white"
+                            style="min-width: 80px;">
+                            <svg class="text-secondary" width="16" height="16" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129">
+                                </path>
+                            </svg>
+                            <span id="currentLang" class="fw-semibold small">ES</span>
+                            <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </button>
+
+                        <div id="languageDropdown" class="dropdown-menu shadow-lg border-0 rounded-3"
+                            style="display: none; position: absolute; right: 0; min-width: 180px; z-index: 1050;">
+                            <button onclick="changeLanguage('es')"
+                                class="dropdown-item d-flex align-items-center gap-3 px-3 py-2">
+                                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129">
+                                    </path>
+                                </svg>
+                                <span class="small fw-semibold text-secondary">ES</span>
+                                <span class="fw-medium">Español</span>
+                            </button>
+                            <button onclick="changeLanguage('en')"
+                                class="dropdown-item d-flex align-items-center gap-3 px-3 py-2 border-top">
+                                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129">
+                                    </path>
+                                </svg>
+                                <span class="small fw-semibold text-secondary">EN</span>
+                                <span class="fw-medium">English</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <a href="login.html" class="btn btn-login" data-i18n="nav.login">Iniciar Sesión</a>
+                    <a href="registro_prueba.html" class="btn btn-register" data-i18n="nav.register">Crear Cuenta</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container">
+        <div class="max-w-4xl mx-auto bg-white p-10 rounded-lg shadow-xl">
+            <h1 class="text-4xl font-bold text-blue-700 mb-6 border-b pb-3" data-i18n="terms.title">Términos de Servicio
+                de SEMACKRO</h1>
+            <p class="text-gray-500 mb-6" data-i18n="terms.lastUpdate">Última actualización: 20 de Noviembre de 2025</p>
+
+            <h2 class="text-2xl font-semibold text-gray-800 mb-4" data-i18n="terms.section1.title">1. Aceptación de los
+                Términos</h2>
+            <p class="text-gray-700 mb-4" data-i18n="terms.section1.content">Al acceder o utilizar el servicio SEMACKRO,
+                usted acepta estar sujeto a estos Términos de Servicio. Si no está de acuerdo con alguna parte de los
+                términos, no debe utilizar nuestro servicio.</p>
+
+            <h2 class="text-2xl font-semibold text-gray-800 mb-4" data-i18n="terms.section2.title">2. Intercambio de
+                Habilidades</h2>
+            <p class="text-gray-700 mb-4" data-i18n="terms.section2.content">SEMACKRO es una plataforma de intercambio.
+                Los usuarios se comprometen a ofrecer habilidades de buena fe y a respetar el tiempo de los demás.</p>
+
+            <h2 class="text-2xl font-semibold text-gray-800 mb-4" data-i18n="terms.section3.title">3. Conducta del
+                Usuario</h2>
+            <p class="text-gray-700" data-i18n="terms.section3.content">Se prohíbe el uso de lenguaje ofensivo,
+                discriminatorio o acosador. Nos reservamos el derecho de suspender o cancelar cuentas que violen esta
+                política.</p>
+        </div>
+    </main>
+
+    <footer class="bg-gray-800 text-white py-8" style="margin-top: 200px;">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-sm">
+            <p data-i18n="footer.rights">&copy; 2025 SEMACKRO. Todos los derechos reservados.</p>
+            <div class="mt-2 space-x-4">
+                <a href="terminos_de_servicio.html" class="hover:text-blue-400" data-i18n="footer.terms">Términos de
+                    Servicio</a>
+                <span class="text-gray-600">|</span>
+                <a href="politica_de_privacidad.html" class="hover:text-blue-400" data-i18n="footer.privacy">Política de
+                    Privacidad</a>
+            </div>
+        </div>
+    </footer>
+
+    <script> if (typeof lucide !== 'undefined') lucide.createIcons(); </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Sistema de Traducción -->
+    <script>
+        const translations = {
+            es: {
+                'nav.howItWorks': 'Cómo Funciona',
+                'nav.skills': 'Habilidades',
+                'nav.community': 'Comunidad',
+                'nav.login': 'Iniciar Sesión',
+                'nav.register': 'Crear Cuenta',
+                'terms.title': 'Términos de Servicio de SEMACKRO',
+                'terms.lastUpdate': 'Última actualización: 20 de Noviembre de 2025',
+                'terms.section1.title': '1. Aceptación de los Términos',
+                'terms.section1.content': 'Al acceder o utilizar el servicio SEMACKRO, usted acepta estar sujeto a estos Términos de Servicio. Si no está de acuerdo con alguna parte de los términos, no debe utilizar nuestro servicio.',
+                'terms.section2.title': '2. Intercambio de Habilidades',
+                'terms.section2.content': 'SEMACKRO es una plataforma de intercambio. Los usuarios se comprometen a ofrecer habilidades de buena fe y a respetar el tiempo de los demás.',
+                'terms.section3.title': '3. Conducta del Usuario',
+                'terms.section3.content': 'Se prohíbe el uso de lenguaje ofensivo, discriminatorio o acosador. Nos reservamos el derecho de suspender o cancelar cuentas que violen esta política.',
+                'footer.rights': '© 2025 SEMACKRO. Todos los derechos reservados.',
+                'footer.terms': 'Términos de Servicio',
+                'footer.privacy': 'Política de Privacidad'
+            },
+            en: {
+                'nav.howItWorks': 'How It Works',
+                'nav.skills': 'Skills',
+                'nav.community': 'Community',
+                'nav.login': 'Login',
+                'nav.register': 'Sign Up',
+                'terms.title': 'SEMACKRO Terms of Service',
+                'terms.lastUpdate': 'Last updated: November 20, 2025',
+                'terms.section1.title': '1. Acceptance of Terms',
+                'terms.section1.content': 'By accessing or using the SEMACKRO service, you agree to be bound by these Terms of Service. If you do not agree with any part of the terms, you should not use our service.',
+                'terms.section2.title': '2. Skill Exchange',
+                'terms.section2.content': 'SEMACKRO is an exchange platform. Users commit to offering skills in good faith and respecting others\' time.',
+                'terms.section3.title': '3. User Conduct',
+                'terms.section3.content': 'The use of offensive, discriminatory or harassing language is prohibited. We reserve the right to suspend or cancel accounts that violate this policy.',
+                'footer.rights': '© 2025 SEMACKRO. All rights reserved.',
+                'footer.terms': 'Terms of Service',
+                'footer.privacy': 'Privacy Policy'
+            }
+        };
+
+        let currentLanguage = localStorage.getItem('preferred_language') || 'es';
+
+        function changeLanguage(lang) {
+            currentLanguage = lang;
+            localStorage.setItem('preferred_language', lang);
+            document.getElementById('currentLang').textContent = lang.toUpperCase();
+            applyTranslations();
+
+            const dropdown = document.getElementById('languageDropdown');
+            if (dropdown) {
+                dropdown.style.display = 'none';
+            }
+        }
+
+        function applyTranslations() {
+            document.querySelectorAll('[data-i18n]').forEach(element => {
+                const key = element.getAttribute('data-i18n');
+                if (translations[currentLanguage][key]) {
+                    element.textContent = translations[currentLanguage][key];
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('currentLang').textContent = currentLanguage.toUpperCase();
+            applyTranslations();
+
+            const languageBtn = document.getElementById('languageBtn');
+            const languageDropdown = document.getElementById('languageDropdown');
+
+            if (languageBtn && languageDropdown) {
+                languageBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const isVisible = languageDropdown.style.display === 'block';
+                    languageDropdown.style.display = isVisible ? 'none' : 'block';
+                });
+
+                document.addEventListener('click', () => {
+                    languageDropdown.style.display = 'none';
+                });
+
+                languageDropdown.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                });
+            }
+        });
+    </script>
+</body>
+
+</html>

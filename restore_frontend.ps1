@@ -1,4 +1,4 @@
-$baseDir = "C:\Users\Dilmer\Desktop\Proyectos\Proyectos de HTML CSS JS\Proyecto-Intercambio_Servicios_y_Habilidades\SkillconnectFrontend"
+$baseDir = "C:\Users\Dilmer\Desktop\Proyectos\Proyectos de HTML CSS JS\Proyecto-Intercambio_Servicios_y_Habilidades\SEMACKROFrontend"
 $backupPath = "$baseDir\Descubrir_backup.html"
 $jsPath = "$baseDir\js\descubrir.js"
 $cssPath = "$baseDir\css\descubrir.css"

@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='none' stroke='%232563EB' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M13 10V3L4 14h7v7l9-11h-7z'/></svg>"
+        type="image/svg+xml">
+    <title>SEMACKRO - Registro de Usuario</title>
+    <script src="config.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, signInWithRedirect, getRedirectResult, GoogleAuthProvider, FacebookAuthProvider } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDHPaGaZIoa8fJA1Z4LTDdU7rTaYekNk1E",
+            authDomain: "mi-portafolio-main.firebaseapp.com",
+            projectId: "mi-portafolio-main",
+            storageBucket: "mi-portafolio-main.firebasestorage.app",
+            messagingSenderId: "630198308201",
+            appId: "1:630198308201:web:17f7bfa9ea93e1aec541f8",
+            measurementId: "G-Y4785PMVB2"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        console.log("🔥 Firebase inicializado correctamente");
+
+        let yaProcesoUsuario = false;
+
+        auth.onAuthStateChanged((user) => {
+            console.log("🔔 onAuthStateChanged disparado");
+            console.log("   - yaProcesoUsuario:", yaProcesoUsuario);
+
+            if (user && !yaProcesoUsuario) {
+                console.log("✅ Usuario autenticado detectado:");
+                console.log("   - Email:", user.email);
+                console.log("   - UID:", user.uid);
+                console.log("   - Display Name:", user.displayName);
+                console.log("   - Photo URL:", user.photoURL);
+
+                yaProcesoUsuario = true;
+
+                const urlParams = new URLSearchParams(window.location.search);
+                const fromFirebase = sessionStorage.getItem('firebaseRedirect');
+
+                console.log("   - URL tiene parámetros?:", window.location.search);
+                console.log("   - sessionStorage firebaseRedirect:", fromFirebase);
+
+                if (fromFirebase === 'true') {
+                    console.log("📱 Usuario viene de redirect de Firebase, procesando...");
+                    sessionStorage.removeItem('firebaseRedirect');
+                    registrarConFirebase(user);
+                } else {
+                    console.log("ℹ️ Usuario ya estaba autenticado (no es nuevo redirect)");
+                }
+            } else if (!user) {
+                console.log("👤 No hay usuario autenticado");
+                yaProcesoUsuario = false;
+            } else {
+                console.log("ℹ️ Usuario ya fue procesado anteriormente");
+            }
+        });
+
+        async function registrarConFirebase(user) {
+            try {
+                const email = user.email;
+                const displayName = user.displayName || 'Usuario de Firebase';
+
+                console.log("🔐 Iniciando registro Firebase para:", email);
+
+                const mensajeDiv = document.getElementById('mensaje');
+                mensajeDiv.textContent = `Registrando a ${displayName}...`;
+                mensajeDiv.className = '';
+
+                const url = `${window.APP_CONFIG.BACKEND_URL}/api/registro`;
+
+                console.log("📝 Enviando POST a /api/registro con:", { correo: email, contrasena: email });
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        correo: email,
+                        contrasena: email
+                    })
+                });
+
+                const data = await response.json();
+                console.log("📋 Respuesta del backend:", response.status, data);
+
+                if (response.status === 201) {
+                    console.log("✅ Usuario registrado correctamente");
+                    const successMessage = translations[currentLanguage]['register.successFirebase'] || '✓ Registro exitoso con Firebase. Redirigiendo...';
+                    mensajeDiv.textContent = successMessage;
+                    mensajeDiv.className = 'bg-green-100 text-green-700 border border-green-400';
+                    setTimeout(() => {
+                        window.location.href = 'login.html';
+                    }, 2000);
+                } else if (response.status === 409) {
+                    console.log("ℹ️ Usuario ya existe, redirigiendo a login");
+                    mensajeDiv.textContent = 'Ya tienes cuenta. Redirigiendo a login...';
+                    mensajeDiv.className = 'bg-green-100 text-green-700 border border-green-400';
+                    setTimeout(() => {
+                        window.location.href = 'login.html';
+                    }, 2000);
+                } else {
+                    throw new Error(data.mensaje || 'Error al registrar');
+                }
+
+            } catch (error) {
+                console.error('  Error en registro Firebase:', error);
+                const mensajeDiv = document.getElementById('mensaje');
+                mensajeDiv.textContent = 'Error: ' + error.message;
+                mensajeDiv.className = 'bg-red-100 text-red-700 border border-red-400';
+            }
+        }
+
+        window.registrarConGoogle = () => {
+            try {
+                console.log("🔵 Click en botón de Google");
+                const mensajeDiv = document.getElementById('mensaje');
+                const redirectMessage = translations[currentLanguage]['register.redirectingGoogle'] || 'Redirigiendo a Google...';
+                mensajeDiv.textContent = redirectMessage;
+                mensajeDiv.className = '';
+
+                sessionStorage.setItem('firebaseRedirect', 'true');
+                console.log("✅ Marcado firebaseRedirect en sessionStorage");
+
+                const provider = new GoogleAuthProvider();
+                signInWithRedirect(auth, provider);
+            } catch (error) {
+                console.error('  Error al registrar con Google:', error);
+                sessionStorage.removeItem('firebaseRedirect');
+                const mensajeDiv = document.getElementById('mensaje');
+                mensajeDiv.textContent = 'Error con Google: ' + error.message;
+                mensajeDiv.className = 'bg-red-100 text-red-700 border border-red-400';
+            }
+        };
+
+        window.registrarConFacebook = () => {
+            try {
+                console.log("🔵 Click en botón de Facebook");
+                const mensajeDiv = document.getElementById('mensaje');
+                mensajeDiv.textContent = 'Redirigiendo a Facebook...';
+                mensajeDiv.className = '';
+
+                sessionStorage.setItem('firebaseRedirect', 'true');
+                console.log("✅ Marcado firebaseRedirect en sessionStorage");
+
+                const provider = new FacebookAuthProvider();
+                signInWithRedirect(auth, provider);
+            } catch (error) {
+                console.error('  Error al registrar con Facebook:', error);
+                sessionStorage.removeItem('firebaseRedirect');
+                const mensajeDiv = document.getElementById('mensaje');
+                mensajeDiv.textContent = 'Error con Facebook: ' + error.message;
+                mensajeDiv.className = 'bg-red-100 text-red-700 border border-red-400';
+            }
+        };
+    </script>
+
+    <!-- Sistema de Traducción (Declaración Global) -->
+    <script>
+        const translations = {
+            es: {
+                'nav.howItWorks': 'Cómo Funciona',
+                'nav.skills': 'Habilidades',
+                'nav.community': 'Comunidad',
+                'nav.login': 'Iniciar Sesión',
+                'register.title': 'Crear Cuenta',
+                'register.subtitle': 'Únete a nuestra comunidad de aprendizaje colaborativo',
+                'register.email': 'Correo Electrónico',
+                'register.emailPlaceholder': 'tucorreo@ejemplo.com',
+                'register.password': 'Contraseña',
+                'register.passwordPlaceholder': '••••••••',
+                'register.submit': 'Registrarse',
+                'register.orContinue': 'o regístrate con',
+                'register.googleFull': 'Continuar con Google',
+                'register.googleShort': 'Google',
+                'register.successFirebase': 'Registro exitoso con Firebase. Redirigiendo...',
+                'register.alreadyExists': 'Ya tienes cuenta. Redirigiendo a login...',
+                'register.redirectingGoogle': 'Redirigiendo a Google...',
+                'register.successGoogle': 'Registro con Google exitoso. Redirigiendo...',
+                'register.hasAccount': '¿Ya tienes cuenta?',
+                'register.loginHere': 'Inicia sesión aquí',
+                'footer.rights': '© 2025 SEMACKRO. Todos los derechos reservados.',
+                'footer.terms': 'Términos de Servicio',
+                'footer.privacy': 'Política de Privacidad'
+            },
+            en: {
+                'nav.howItWorks': 'How It Works',
+                'nav.skills': 'Skills',
+                'nav.community': 'Community',
+                'nav.login': 'Login',
+                'register.title': 'Create Account',
+                'register.subtitle': 'Join our collaborative learning community',
+                'register.email': 'Email Address',
+                'register.emailPlaceholder': 'youremail@example.com',
+                'register.password': 'Password',
+                'register.passwordPlaceholder': '••••••••',
+                'register.submit': 'Sign Up',
+                'register.orContinue': 'or sign up with',
+                'register.googleFull': 'Continue with Google',
+                'register.googleShort': 'Google',
+                'register.successFirebase': '✓ Successful Firebase registration. Redirecting...',
+                'register.alreadyExists': 'You already have an account. Redirecting to login...',
+                'register.redirectingGoogle': 'Redirecting to Google...',
+                'register.successGoogle': 'Google registration successful. Redirecting...',
+                'register.hasAccount': 'Already have an account?',
+                'register.loginHere': 'Login here',
+                'footer.rights': '© 2025 SEMACKRO. All rights reserved.',
+                'footer.terms': 'Terms of Service',
+                'footer.privacy': 'Privacy Policy'
+            }
+        };
+
+        let currentLanguage = localStorage.getItem('preferred_language') || 'es';
+    </script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-image: url('113435-OOM6G9-66.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+        }
+
+        /* Navbar Styles */
+        .navbar {
+            background-color: #ffffff !important;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            position: fixed !important;
+            top: 0;
+            z-index: 1050 !important;
+            width: 100%;
+        }
+
+        .navbar * {
+            opacity: 1 !important;
+            visibility: visible !important;
+        }
+
+        .navbar-brand {
+            color: #2563EB !important;
+            font-weight: 800 !important;
+            font-size: 1.5rem !important;
+            letter-spacing: -0.025em;
+            opacity: 1 !important;
+            visibility: visible !important;
+        }
+
+        .navbar-nav .nav-item {
+            opacity: 1 !important;
+            visibility: visible !important;
+        }
+
+        .navbar-nav .nav-link {
+            color: #000000 !important;
+            font-weight: 700 !important;
+            transition: color 0.15s ease;
+            margin-right: 1.5rem;
+            font-size: 1rem !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+            text-decoration: none !important;
+        }
+
+        .navbar-nav .nav-link:hover {
+            color: #2563EB !important;
+        }
+
+        .btn-login {
+            color: #000000 !important;
+            font-weight: 700 !important;
+            background-color: transparent !important;
+            border: 2px solid #2563EB !important;
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            transition: all 0.15s ease;
+            opacity: 1 !important;
+            visibility: visible !important;
+            text-decoration: none !important;
+        }
+
+        .btn-login:hover {
+            color: #ffffff !important;
+            background-color: #2563EB !important;
+        }
+
+        .navbar-toggler {
+            border-color: rgba(75, 85, 99, 0.5);
+        }
+
+        .navbar-toggler-icon {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(75, 85, 99, 1)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+        }
+
+        /* Ajuste para contenido debajo del navbar fijo */
+        main {
+            padding-top: 100px;
+            padding-bottom: 40px;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Ajustes para la carta de registro */
+        .registro-card {
+            max-width: 480px;
+            width: 100%;
+        }
+
+        @media (max-width: 640px) {
+            main {
+                padding-top: 90px;
+                padding-bottom: 20px;
+            }
+
+            .registro-card {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100">
+
+    <!-- NAVBAR -->
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">SEMACKRO</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html#como-funciona" data-i18n="nav.howItWorks">Cómo Funciona</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html#habilidades" data-i18n="nav.skills">Habilidades</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html#comunidad" data-i18n="nav.community">Comunidad</a>
+                    </li>
+                </ul>
+                <div class="d-flex gap-2 align-items-center">
+                    <!-- Selector de idioma -->
+                    <div class="position-relative">
+                        <button id="languageBtn"
+                            class="btn btn-sm border border-secondary rounded-pill d-flex align-items-center gap-2 px-3 py-2 bg-white"
+                            style="min-width: 80px;">
+                            <svg class="text-secondary" width="16" height="16" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129">
+                                </path>
+                            </svg>
+                            <span id="currentLang" class="fw-semibold small">ES</span>
+                            <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </button>
+
+                        <div id="languageDropdown" class="dropdown-menu shadow-lg border-0 rounded-3"
+                            style="display: none; position: absolute; right: 0; min-width: 180px; z-index: 1050;">
+                            <button onclick="changeLanguage('es')"
+                                class="dropdown-item d-flex align-items-center gap-3 px-3 py-2">
+                                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129">
+                                    </path>
+                                </svg>
+                                <span class="small fw-semibold text-secondary">ES</span>
+                                <span class="fw-medium">Español</span>
+                            </button>
+                            <button onclick="changeLanguage('en')"
+                                class="dropdown-item d-flex align-items-center gap-3 px-3 py-2 border-top">
+                                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129">
+                                    </path>
+                                </svg>
+                                <span class="small fw-semibold text-secondary">EN</span>
+                                <span class="fw-medium">English</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <a href="login.html" class="btn btn-login" data-i18n="nav.login">Iniciar Sesión</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="px-4 sm:px-6 lg:px-8">
+        <div class="registro-card bg-white p-6 sm:p-8 rounded-xl shadow-2xl">
+
+            <!-- Header -->
+            <div class="text-center mb-6">
+                <div class="flex items-center justify-center gap-3 mb-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none"
+                        stroke="#2563EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                        <circle cx="9" cy="7" r="4" />
+                        <line x1="19" y1="8" x2="19" y2="14" />
+                        <line x1="22" y1="11" x2="16" y2="11" />
+                    </svg>
+                    <h1 class="text-2xl sm:text-3xl font-extrabold text-gray-900" data-i18n="register.title">
+                        Crear Cuenta
+                    </h1>
+                </div>
+                <p class="text-sm text-gray-600" data-i18n="register.subtitle">
+                    Únete a nuestra comunidad de aprendizaje colaborativo
+                </p>
+            </div>
+
+            <!-- Mensaje de Estado/Error -->
+            <div id="mensaje" class="p-3 text-sm font-medium rounded-lg mb-4 text-center hidden">
+            </div>
+
+            <!-- Formulario de Registro -->
+            <form id="registroForm" class="space-y-4">
+                <div>
+                    <label for="correo" class="block text-sm font-medium text-gray-700 mb-2" data-i18n="register.email">
+                        Correo Electrónico
+                    </label>
+                    <input type="email" id="correo" name="correo" required
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-150 ease-in-out text-base sm:text-sm"
+                        placeholder="tucorreo@ejemplo.com" data-i18n-placeholder="register.emailPlaceholder">
+                </div>
+
+                <div>
+                    <label for="contrasena" class="block text-sm font-medium text-gray-700 mb-2"
+                        data-i18n="register.password">
+                        Contraseña
+                    </label>
+                    <input type="password" id="contrasena" name="contrasena" required
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-150 ease-in-out text-base sm:text-sm"
+                        placeholder="••••••••" data-i18n-placeholder="register.passwordPlaceholder">
+                </div>
+
+                <button type="submit"
+                    class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm sm:text-base font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out active:scale-95"
+                    data-i18n="register.submit">
+                    Registrarse
+                </button>
+            </form>
+
+            <!-- Divider -->
+            <div class="relative my-4">
+                <div class="absolute inset-0 flex items-center">
+                    <div class="w-full border-t border-gray-300"></div>
+                </div>
+                <div class="relative flex justify-center text-sm">
+                    <span class="px-2 bg-white text-gray-500" data-i18n="register.orContinue">o regístrate con</span>
+                </div>
+            </div>
+
+            <!-- Botones de Redes Sociales -->
+            <div class="space-y-2">
+                <button id="google-registro-btn" type="button"
+                    class="w-full flex items-center justify-center gap-3 py-3 px-4 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out active:scale-95">
+                    <svg class="w-5 h-5" viewBox="0 0 24 24">
+                        <path fill="#4285F4"
+                            d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                        <path fill="#34A853"
+                            d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                        <path fill="#FBBC05"
+                            d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
+                        <path fill="#EA4335"
+                            d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+                    </svg>
+                    <span class="hidden sm:inline" data-i18n="register.googleFull">Continuar con Google</span>
+                    <span class="sm:hidden" data-i18n="register.googleShort">Google</span>
+                </button>
+            </div>
+
+            <!-- Link a Login -->
+            <div class="mt-6 text-center border-t border-gray-200 pt-4">
+                <p class="text-gray-600 text-sm">
+                    <span data-i18n="register.hasAccount">¿Ya tienes cuenta?</span>
+                    <a href="login.html" class="font-medium text-blue-600 hover:text-blue-500 transition duration-150"
+                        data-i18n="register.loginHere">
+                        Inicia sesión aquí
+                    </a>
+                </p>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-gray-800 text-white py-6 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-xs sm:text-sm">
+            <p data-i18n="footer.rights">&copy; 2025 SEMACKRO. Todos los derechos reservados.</p>
+            <div class="mt-2 space-x-2 sm:space-x-4 flex justify-center flex-wrap gap-2">
+                <a href="terminos_de_servicio.html" class="hover:text-blue-400 transition duration-150"
+                    data-i18n="footer.terms">Términos de Servicio</a>
+                <span class="text-gray-600 hidden sm:inline">|</span>
+                <a href="politica_de_privacidad.html" class="hover:text-blue-400 transition duration-150"
+                    data-i18n="footer.privacy">Política de Privacidad</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- SCRIPTS -->
+    <script>
+        // Verificar si viene de autenticación con Google
+        window.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const token = urlParams.get('token');
+            const userId = urlParams.get('userId');
+            const email = urlParams.get('email');
+            const source = urlParams.get('source');
+
+            const mensajeDiv = document.getElementById('mensaje');
+
+            if (token && userId && email && source === 'google') {
+                console.log("Autenticación con Google exitosa");
+                console.log("   - Email:", email);
+                console.log("   - User ID:", userId);
+
+                localStorage.setItem('authToken', token);
+                localStorage.setItem('usuarioId', userId);
+                localStorage.setItem('correoUsuario', email);
+                localStorage.setItem('firebaseUser', 'true');
+
+                mensajeDiv.classList.remove('hidden');
+                const successGoogleMessage = translations[currentLanguage]['register.successGoogle'] || "Registro con Google exitoso. Redirigiendo...";
+                mensajeDiv.textContent = successGoogleMessage;
+                mensajeDiv.className = 'p-3 text-sm font-medium rounded-lg mb-6 text-center bg-green-100 text-green-700 border border-green-400';
+
+                setTimeout(() => {
+                    window.location.href = "Descubrir.html";
+                }, 1500);
+
+                return;
+            }
+
+            const error = urlParams.get('error');
+            if (error) {
+                mensajeDiv.classList.remove('hidden');
+                if (error === 'auth_failed') {
+                    mensajeDiv.textContent = "Error: Autenticación fallida";
+                    mensajeDiv.className = 'p-3 text-sm font-medium rounded-lg mb-6 text-center bg-red-100 text-red-700 border border-red-400';
+                } else if (error === 'server_error') {
+                    mensajeDiv.textContent = "Error del servidor";
+                    mensajeDiv.className = 'p-3 text-sm font-medium rounded-lg mb-6 text-center bg-red-100 text-red-700 border border-red-400';
+                }
+            }
+        });
+
+        // REGISTRO TRADICIONAL
+        document.getElementById('registroForm').addEventListener('submit', async function (event) {
+            event.preventDefault();
+
+            const correo = document.getElementById('correo').value;
+            const contrasena = document.getElementById('contrasena').value;
+            const mensajeDiv = document.getElementById('mensaje');
+
+            mensajeDiv.classList.add('hidden');
+
+            try {
+                const url = `${window.APP_CONFIG.BACKEND_URL}/api/registro`;
+
+                console.log("Registro tradicional para:", correo);
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ correo, contrasena })
+                });
+
+                const data = await response.json();
+
+                mensajeDiv.classList.remove('hidden');
+
+                if (response.status === 201) {
+                    mensajeDiv.textContent = '✓ Registro Exitoso: ' + data.mensaje;
+                    mensajeDiv.className = 'p-3 text-sm font-medium rounded-lg mb-6 text-center bg-green-100 text-green-700 border border-green-400';
+                    document.getElementById('registroForm').reset();
+
+                    setTimeout(() => {
+                        window.location.href = 'login.html';
+                    }, 2000);
+
+                } else if (response.status === 409) {
+                    mensajeDiv.textContent = 'Error: Este correo ya está registrado.';
+                    mensajeDiv.className = 'p-3 text-sm font-medium rounded-lg mb-6 text-center bg-red-100 text-red-700 border border-red-400';
+
+                } else {
+                    mensajeDiv.textContent = 'Error del servidor: ' + (data.mensaje || 'Intente de nuevo.');
+                    mensajeDiv.className = 'p-3 text-sm font-medium rounded-lg mb-6 text-center bg-red-100 text-red-700 border border-red-400';
+                }
+
+            } catch (error) {
+                console.error('Error al conectar con el backend:', error);
+                mensajeDiv.classList.remove('hidden');
+                mensajeDiv.textContent = 'Error de conexión. Asegúrate que el Backend esté activo.';
+                mensajeDiv.className = 'p-3 text-sm font-medium rounded-lg mb-6 text-center bg-red-100 text-red-700 border border-red-400';
+            }
+        });
+
+        // REGISTRO CON GOOGLE
+        const googleBtn = document.getElementById("google-registro-btn");
+        if (googleBtn) {
+            googleBtn.addEventListener("click", () => {
+                console.log("Click en Continuar con Google");
+                const mensajeDiv = document.getElementById('mensaje');
+                mensajeDiv.classList.remove('hidden');
+                const redirectMessage = translations[currentLanguage]['register.redirectingGoogle'] || 'Redirigiendo a Google...';
+                mensajeDiv.textContent = redirectMessage;
+                mensajeDiv.className = 'p-3 text-sm font-medium rounded-lg mb-6 text-center bg-blue-100 text-blue-700';
+                window.location.href = `${window.APP_CONFIG.BACKEND_URL}/api/auth/google`;
+            });
+        }
+    </script>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Sistema de Traducción (Funciones) -->
+    <script>
+        function changeLanguage(lang) {
+            currentLanguage = lang;
+            localStorage.setItem('preferred_language', lang);
+            document.getElementById('currentLang').textContent = lang.toUpperCase();
+            applyTranslations();
+
+            const dropdown = document.getElementById('languageDropdown');
+            if (dropdown) {
+                dropdown.style.display = 'none';
+            }
+        }
+
+        function applyTranslations() {
+            document.querySelectorAll('[data-i18n]').forEach(element => {
+                const key = element.getAttribute('data-i18n');
+                if (translations[currentLanguage][key]) {
+                    element.textContent = translations[currentLanguage][key];
+                }
+            });
+
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(element => {
+                const key = element.getAttribute('data-i18n-placeholder');
+                if (translations[currentLanguage][key]) {
+                    element.placeholder = translations[currentLanguage][key];
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('currentLang').textContent = currentLanguage.toUpperCase();
+            applyTranslations();
+
+            const languageBtn = document.getElementById('languageBtn');
+            const languageDropdown = document.getElementById('languageDropdown');
+
+            if (languageBtn && languageDropdown) {
+                languageBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const isVisible = languageDropdown.style.display === 'block';
+                    languageDropdown.style.display = isVisible ? 'none' : 'block';
+                });
+
+                document.addEventListener('click', () => {
+                    languageDropdown.style.display = 'none';
+                });
+
+                languageDropdown.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                });
+            }
+        });
+    </script>
+
+</body>
+
+</html>

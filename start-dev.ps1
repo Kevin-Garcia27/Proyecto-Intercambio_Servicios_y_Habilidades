@@ -2,23 +2,23 @@
 # Uso: .\start-dev.ps1
 
 Write-Host "╔═══════════════════════════════════════════════════╗" -ForegroundColor Cyan
-Write-Host "║     SkillConnect - Iniciador de Desarrollo       ║" -ForegroundColor Cyan
+Write-Host "║     SEMACKRO - Iniciador de Desarrollo       ║" -ForegroundColor Cyan
 Write-Host "╚═══════════════════════════════════════════════════╝" -ForegroundColor Cyan
 Write-Host ""
 
 # Ruta base del proyecto
 $projectRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
-$backendPath = Join-Path $projectRoot "SkillconnectBackend"
-$frontendPath = Join-Path $projectRoot "SkillconnectFrontend"
+$backendPath = Join-Path $projectRoot "SEMACKROBackend"
+$frontendPath = Join-Path $projectRoot "SEMACKROFrontend"
 
 # Verificar que existen los directorios
 if (-not (Test-Path $backendPath)) {
-    Write-Host "✗ Error: No se encontró la carpeta 'SkillconnectBackend'" -ForegroundColor Red
+    Write-Host "✗ Error: No se encontró la carpeta 'SEMACKROBackend'" -ForegroundColor Red
     exit 1
 }
 
 if (-not (Test-Path $frontendPath)) {
-    Write-Host "✗ Error: No se encontró la carpeta 'SkillconnectFrontend'" -ForegroundColor Red
+    Write-Host "✗ Error: No se encontró la carpeta 'SEMACKROFrontend'" -ForegroundColor Red
     exit 1
 }
 

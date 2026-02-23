@@ -1,6 +1,6 @@
-# 🚀 Inicio Rápido - SkillConnect
+# 🚀 Inicio Rápido - SEMACKRO
 
-Guía rápida para iniciar el proyecto SkillConnect en desarrollo local.
+Guía rápida para iniciar el proyecto SEMACKRO en desarrollo local.
 
 ## 📋 Requisitos Previos
 
@@ -27,13 +27,13 @@ mysql --version   # Debe mostrar una versión de MySQL
 2. **Crea la base de datos** (si no existe):
 
 ```sql
-CREATE DATABASE IF NOT EXISTS SkillConnect2025;
+CREATE DATABASE IF NOT EXISTS SEMACKRO2025;
 ```
 
 3. **Importa el esquema** (si tienes un archivo .sql):
 
 ```powershell
-mysql -u usuario1 -p SkillConnect2025 < ruta/al/esquema.sql
+mysql -u usuario1 -p SEMACKRO2025 < ruta/al/esquema.sql
 ```
 
 ## ⚙️ Configuración Inicial
@@ -41,15 +41,15 @@ mysql -u usuario1 -p SkillConnect2025 < ruta/al/esquema.sql
 ### 1. Instalar Dependencias del Backend
 
 ```powershell
-cd "SkillconnectBackend"
+cd "SEMACKROBackend"
 npm install
 ```
 
 ### 2. Verificar Variables de Entorno
 
-El archivo `SkillconnectBackend/.env` ya está configurado con:
+El archivo `SEMACKROBackend/.env` ya está configurado con:
 
-- ✅ Base de datos: `SkillConnect2025`
+- ✅ Base de datos: `SEMACKRO2025`
 - ✅ Usuario: `usuario1`
 - ✅ Contraseña: `equipo2`
 - ✅ Puerto Backend: `3001`
@@ -82,7 +82,7 @@ Esto abrirá dos ventanas:
 O manualmente:
 
 ```powershell
-cd "SkillconnectBackend"
+cd "SEMACKROBackend"
 npm start
 ```
 
@@ -95,7 +95,7 @@ npm start
 O manualmente:
 
 ```powershell
-cd "SkillconnectFrontend"
+cd "SEMACKROFrontend"
 node serve-frontend.js
 ```
 
@@ -105,7 +105,7 @@ node serve-frontend.js
    - Deberías ver: "Servidor Skill Connect Activo!"
 
 2. **Frontend**: Abre http://localhost:5050 en tu navegador
-   - Deberías ver la página principal de SkillConnect
+   - Deberías ver la página principal de SEMACKRO
 
 3. **Consola del Navegador**: Presiona F12 y verifica que aparezca:
    ```
@@ -119,7 +119,7 @@ node serve-frontend.js
 
 **Solución**: Instala las dependencias del backend
 ```powershell
-cd "SkillconnectBackend"
+cd "SEMACKROBackend"
 npm install
 ```
 
@@ -127,8 +127,8 @@ npm install
 
 **Solución**: 
 1. Verifica que MySQL esté corriendo
-2. Verifica las credenciales en `SkillconnectBackend/.env`
-3. Asegúrate de que la base de datos `SkillConnect2025` existe
+2. Verifica las credenciales en `SEMACKROBackend/.env`
+3. Asegúrate de que la base de datos `SEMACKRO2025` existe
 
 ###   Error: "Port 3001 is already in use"
 
@@ -144,7 +144,7 @@ taskkill /PID <PID> /F
 
 **Solución**: Nodemon está instalado localmente, usa npm start
 ```powershell
-cd "SkillconnectBackend"
+cd "SEMACKROBackend"
 npm start
 ```
 
@@ -159,12 +159,12 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 
 ```
 Proyecto-Intercambio_Servicios_y_Habilidades/
-├── SkillconnectBackend/          # Servidor Node.js + Express
+├── SEMACKROBackend/          # Servidor Node.js + Express
 │   ├── server.js                 # Punto de entrada del backend
 │   ├── routes/                   # Rutas de la API
 │   ├── config/                   # Configuraciones
 │   └── .env                      # Variables de entorno
-├── SkillconnectFrontend/         # Aplicación web estática
+├── SEMACKROFrontend/         # Aplicación web estática
 │   ├── serve-frontend.js         # Servidor estático
 │   ├── config.js                 # Configuración de URLs
 │   ├── index.html                # Página principal
@@ -178,9 +178,9 @@ Proyecto-Intercambio_Servicios_y_Habilidades/
 
 | Servicio | URL Local | Producción |
 |----------|-----------|------------|
-| Frontend | http://localhost:5050 | https://skillconnect.duckdns.org |
-| Backend | http://localhost:3001 | https://skillconnect.duckdns.org/api |
-| API | http://localhost:3001/api | https://skillconnect.duckdns.org/api |
+| Frontend | http://localhost:5050 | https://SEMACKRO.duckdns.org |
+| Backend | http://localhost:3001 | https://SEMACKRO.duckdns.org/api |
+| API | http://localhost:3001/api | https://SEMACKRO.duckdns.org/api |
 
 ## 🎨 Flujo de Desarrollo
 
@@ -199,17 +199,17 @@ Proyecto-Intercambio_Servicios_y_Habilidades/
 
 ```powershell
 # Ver logs del backend
-cd "SkillconnectBackend"
+cd "SEMACKROBackend"
 npm start
 
 # Reinstalar dependencias
-cd "SkillconnectBackend"
+cd "SEMACKROBackend"
 Remove-Item -Recurse -Force node_modules
 npm install
 
 # Verificar conexión a MySQL
 mysql -u usuario1 -p
-# Luego escribe: USE SkillConnect2025; SHOW TABLES;
+# Luego escribe: USE SEMACKRO2025; SHOW TABLES;
 ```
 
 ## 🎯 Próximos Pasos
@@ -217,7 +217,7 @@ mysql -u usuario1 -p
 Una vez que todo esté funcionando:
 
 1. Explora la aplicación en http://localhost:5050
-2. Revisa los endpoints API en `SkillconnectBackend/routes/`
+2. Revisa los endpoints API en `SEMACKROBackend/routes/`
 3. Prueba el registro y login de usuarios
 4. Revisa la consola del navegador y del backend para debugging
 
