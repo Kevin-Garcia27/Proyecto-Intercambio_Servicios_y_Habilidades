@@ -55,7 +55,7 @@ const SidebarReact = () => {
 
     // En móvil siempre expandido (width 100%), en desktop usa hover
     const sidebarStyle = isMobile ? { width: '100%' } : {
-        width: isHovered ? '280px' : '88px',
+        width: isHovered ? '280px' : '88Px',
         transition: 'width 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
     };
     
@@ -113,9 +113,9 @@ const SidebarReact = () => {
             
             {/* Footer */}
             <div className="h-[70px] border-t border-gray-50 p-4 flex items-center shrink-0 bg-slate-50/50">
-                <div className="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center text-white font-bold text-xs shrink-0 shadow-sm">SC</div>
+                <div className="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center text-white font-bold text-xs shrink-0 shadow-sm">Sc</div>
                 <div className={`ml-3 truncate transition-all duration-300 ${showDetails ? 'opacity-100' : 'opacity-0 w-0'}`}>
-                    <p className="text-xs font-bold text-slate-800">SEMACKRO App</p>
+                    <p className="text-xs font-bold text-slate-800">Semackro app</p>
                     <p className="text-[10px] text-indigo-600 font-bold uppercase tracking-widest">Premium</p>
                 </div>
             </div>

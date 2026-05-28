@@ -1,12 +1,12 @@
-﻿// Helper para traducciones
+// Helper para traducciones
 var t = (key) => {
   if (window.t_real && typeof window.t_real === 'function') return window.t_real(key);
   if (window.t && typeof window.t === 'function' && window.t !== t) return window.t(key);
   const fallbacks = {
     'users.showing': 'Mostrando',
-    'users.of': 'de',
-    'users.user': 'usuario',
-    'users.users': 'usuarios'
+    'users.of': 'De',
+    'users.user': 'Usuario',
+    'users.users': 'Usuarios'
   };
   return fallbacks[key] || key;
 };
@@ -17,6 +17,224 @@ const hamburgerBtn = document.getElementById("hamburgerBtn");
 const closeSidebar = document.getElementById("closeSidebar");
 const usersGrid = document.getElementById("usersGrid");
 const mainContent = document.getElementById("mainContent");
+let cleanupMobileChatViewportHandlers = null;
+let chatMessagesAbortController = null;
+let chatMessagesRequestNonce = 0;
+
+function syncAppHeaderHeight() {
+  const header = document.querySelector("#mainContent > header");
+  document.documentElement.style.setProperty("--app-vh", `${window.innerHeight}px`);
+  if (!header) return;
+  document.documentElement.style.setProperty(
+    "--app-header-height",
+    `${header.offsetHeight}px`,
+  );
+}
+
+function syncVisualViewportHeight() {
+  const layoutViewportHeight = window.innerHeight;
+  document.documentElement.style.setProperty(
+    "--app-vh",
+    `${layoutViewportHeight}px`,
+  );
+
+  if (window.visualViewport) {
+    const vv = window.visualViewport;
+    const visualViewportHeight = Math.round(vv.height);
+    const keyboardOffset = Math.max(
+      0,
+      Math.round(layoutViewportHeight - (vv.height + vv.offsetTop)),
+    );
+
+    document.documentElement.style.setProperty(
+      "--visual-vh",
+      `${visualViewportHeight}px`,
+    );
+    document.documentElement.style.setProperty(
+      "--chat-keyboard-offset",
+      `${keyboardOffset}px`,
+    );
+    return;
+  }
+
+  document.documentElement.style.setProperty(
+    "--visual-vh",
+    `${layoutViewportHeight}px`,
+  );
+  document.documentElement.style.setProperty("--chat-keyboard-offset", "0px");
+}
+
+function setupMobileChatViewportFixes() {
+  if (cleanupMobileChatViewportHandlers) {
+    cleanupMobileChatViewportHandlers();
+    cleanupMobileChatViewportHandlers = null;
+  }
+
+  const mensajesView = document.getElementById("mensajesView");
+  const input = document.getElementById("message-input-dashboard");
+  const messagesContainer = document.getElementById("mensajes-container-dashboard");
+  const chatHeader = document.getElementById("chat-header-dashboard");
+
+  if (!mensajesView || !input) return;
+
+  let blurTimer = null;
+
+  const isMobile = () => window.innerWidth <= 767;
+  const isMensajesActive = () =>
+    document.body.classList.contains("mensajes-open") ||
+    mensajesView.classList.contains("active");
+
+  const setKeyboardOffset = (value) => {
+    const safeValue = Math.max(0, Math.round(Number(value) || 0));
+    document.documentElement.style.setProperty(
+      "--chat-keyboard-offset",
+      `${safeValue}px`,
+    );
+  };
+
+  const getKeyboardOffset = () => {
+    if (!isMobile() || !window.visualViewport) return 0;
+    const vv = window.visualViewport;
+    return Math.max(0, Math.round(window.innerHeight - (vv.height + vv.offsetTop)));
+  };
+
+  const scrollBottomIfChatOpen = () => {
+    const chatLayout = document.getElementById("chat-layout-dashboard");
+    if (!chatLayout || !chatLayout.classList.contains("mobile-show-chat")) return;
+    scrollToBottomDashboard();
+  };
+
+  const syncChatViewportState = () => {
+    if (!isMobile() || !isMensajesActive()) {
+      setKeyboardOffset(0);
+      document.documentElement.classList.remove("chat-typing");
+      document.body.classList.remove("chat-typing");
+      mensajesView.classList.remove("mobile-chat-keyboard-open");
+      syncVisualViewportHeight();
+      return;
+    }
+
+    const keyboardOffset = getKeyboardOffset();
+    const keyboardOpen = keyboardOffset > 80 || document.activeElement === input;
+    setKeyboardOffset(keyboardOffset);
+
+    if (keyboardOpen) {
+      document.documentElement.classList.add("chat-typing");
+      document.body.classList.add("chat-typing");
+      mensajesView.classList.add("mobile-chat-keyboard-open");
+    } else if (document.activeElement !== input) {
+      document.documentElement.classList.remove("chat-typing");
+      document.body.classList.remove("chat-typing");
+      mensajesView.classList.remove("mobile-chat-keyboard-open");
+    }
+
+    syncVisualViewportHeight();
+  };
+
+  const onViewportChange = () => {
+    syncChatViewportState();
+    setTimeout(() => {
+      scrollBottomIfChatOpen();
+    }, 70);
+  };
+
+  const onInputFocus = () => {
+    if (!isMobile()) return;
+    if (!isMensajesActive()) return;
+    clearTimeout(blurTimer);
+    document.documentElement.classList.add("mensajes-open");
+    document.body.classList.add("mensajes-open");
+    syncChatViewportState();
+    setTimeout(() => {
+      onViewportChange();
+    }, 90);
+    setTimeout(() => {
+      scrollBottomIfChatOpen();
+    }, 220);
+  };
+
+  const onInputBlur = () => {
+    if (!isMobile()) return;
+    blurTimer = setTimeout(() => {
+      if (document.activeElement === input) return;
+      document.documentElement.classList.remove("chat-typing");
+      document.body.classList.remove("chat-typing");
+      mensajesView.classList.remove("mobile-chat-keyboard-open");
+      setKeyboardOffset(0);
+      syncVisualViewportHeight();
+    }, 140);
+  };
+
+  const onInputType = () => {
+    if (!isMobile()) return;
+    if (!isMensajesActive()) return;
+    setTimeout(() => {
+      scrollBottomIfChatOpen();
+    }, 40);
+  };
+
+  const onPointerOutsideInput = (event) => {
+    if (!isMobile()) return;
+    if (document.activeElement !== input) return;
+
+    const target = event.target;
+    if (
+      target &&
+      (target.closest("#chat-input-dashboard") ||
+        target.closest("#attachments-preview-dashboard"))
+    ) {
+      return;
+    }
+
+    input.blur();
+  };
+
+  input.addEventListener("focus", onInputFocus);
+  input.addEventListener("blur", onInputBlur);
+  input.addEventListener("input", onInputType);
+  input.addEventListener("click", onInputType);
+  if (messagesContainer) {
+    messagesContainer.addEventListener("pointerdown", onPointerOutsideInput);
+  }
+  if (chatHeader) {
+    chatHeader.addEventListener("pointerdown", onPointerOutsideInput);
+  }
+  window.addEventListener("orientationchange", onViewportChange);
+
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener("resize", onViewportChange);
+    window.visualViewport.addEventListener("scroll", onViewportChange);
+  }
+
+  syncChatViewportState();
+  syncVisualViewportHeight();
+
+  cleanupMobileChatViewportHandlers = () => {
+    document.documentElement.classList.remove("chat-typing");
+    document.body.classList.remove("chat-typing");
+    mensajesView.classList.remove("mobile-chat-keyboard-open");
+    setKeyboardOffset(0);
+    syncVisualViewportHeight();
+    input.removeEventListener("focus", onInputFocus);
+    input.removeEventListener("blur", onInputBlur);
+    input.removeEventListener("input", onInputType);
+    input.removeEventListener("click", onInputType);
+    if (messagesContainer) {
+      messagesContainer.removeEventListener("pointerdown", onPointerOutsideInput);
+    }
+    if (chatHeader) {
+      chatHeader.removeEventListener("pointerdown", onPointerOutsideInput);
+    }
+    window.removeEventListener("orientationchange", onViewportChange);
+    if (window.visualViewport) {
+      window.visualViewport.removeEventListener("resize", onViewportChange);
+      window.visualViewport.removeEventListener("scroll", onViewportChange);
+    }
+  };
+}
+
+window.addEventListener("resize", syncAppHeaderHeight);
+window.addEventListener("load", syncAppHeaderHeight);
 
 // Comprobación de sesión: si no hay usuario o token en localStorage, redirigir al login
 try {
@@ -33,10 +251,454 @@ try {
   window.location.href = "login.html";
 }
 
+const POST_LOGIN_ONBOARDING_STORAGE_KEY = "semackro_post_login_onboarding";
+const POST_LOGIN_ONBOARDING_SEEN_PREFIX = "semackro_onboarding_seen_user_";
+const POST_LOGIN_ONBOARDING_DRIVER_KEY = "descubrir_post_login_onboarding_v1";
+let onboardingPostLoginEnCurso = false;
+let pendingProfileOnboardingTourStart = false;
+
+function enviarTriggerTourPerfilAlIframe() {
+  const iframe = document.getElementById("perfilIframe");
+  if (!iframe || !iframe.contentWindow) return false;
+  iframe.contentWindow.postMessage(
+    {
+      type: "startProfileOnboardingTour",
+      source: "descubrirOnboarding",
+    },
+    window.location.origin,
+  );
+  return true;
+}
+
+function abrirPerfilYDispararTour() {
+  pendingProfileOnboardingTourStart = true;
+  closeSidebarFn();
+  navigateTo("perfil");
+
+  // Intento inmediato por si el iframe ya está cargado.
+  setTimeout(() => {
+    if (enviarTriggerTourPerfilAlIframe()) {
+      pendingProfileOnboardingTourStart = false;
+    }
+  }, 220);
+}
+
+function onboardingForzadoPorQuery() {
+  try {
+    const url = new URL(window.location.href);
+    const value = (url.searchParams.get("onboarding") || "").toLowerCase();
+    return value === "1" || value === "true" || value === "yes";
+  } catch (error) {
+    return false;
+  }
+}
+
+function limpiarQueryOnboarding() {
+  try {
+    const url = new URL(window.location.href);
+    if (!url.searchParams.has("onboarding")) return;
+    url.searchParams.delete("onboarding");
+    const nextUrl = `${url.pathname}${url.search}${url.hash}`;
+    window.history.replaceState(window.history.state || {}, "", nextUrl);
+  } catch (error) {
+    console.warn("No se pudo limpiar query de onboarding:", error);
+  }
+}
+
+function obtenerUsuarioSesionOnboarding() {
+  return String(localStorage.getItem("usuarioId") || "");
+}
+
+function obtenerClaveOnboardingMostradoUsuario() {
+  const usuarioId = obtenerUsuarioSesionOnboarding();
+  return `${POST_LOGIN_ONBOARDING_SEEN_PREFIX}${usuarioId || "anon"}`;
+}
+
+function fueMostradoOnboardingUsuarioActual() {
+  try {
+    return localStorage.getItem(obtenerClaveOnboardingMostradoUsuario()) === "1";
+  } catch (error) {
+    console.warn("No se pudo leer estado de onboarding mostrado:", error);
+    return false;
+  }
+}
+
+function marcarOnboardingMostradoUsuarioActual() {
+  try {
+    localStorage.setItem(obtenerClaveOnboardingMostradoUsuario(), "1");
+  } catch (error) {
+    console.warn("No se pudo guardar estado de onboarding mostrado:", error);
+  }
+}
+
+async function obtenerEstadoOnboardingServidor() {
+  try {
+    const idPerfilPersona = await obtenerPersonaIdActual();
+    if (!idPerfilPersona || !window.API_BASE) return false;
+
+    const response = await fetch(
+      `${window.API_BASE}/onboarding-drivers/${encodeURIComponent(idPerfilPersona)}/${encodeURIComponent(POST_LOGIN_ONBOARDING_DRIVER_KEY)}`,
+    );
+
+    if (!response.ok) return false;
+    const data = await response.json();
+    return !!(data && data.success && data.data && data.data.ejecutado === true);
+  } catch (error) {
+    console.warn("No se pudo consultar onboarding en servidor:", error);
+    return false;
+  }
+}
+
+async function marcarOnboardingMostradoServidor() {
+  try {
+    const idPerfilPersona = await obtenerPersonaIdActual();
+    if (!idPerfilPersona || !window.API_BASE) return;
+
+    await fetch(
+      `${window.API_BASE}/onboarding-drivers/${encodeURIComponent(idPerfilPersona)}/${encodeURIComponent(POST_LOGIN_ONBOARDING_DRIVER_KEY)}`,
+      {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ejecutado: true }),
+      },
+    );
+  } catch (error) {
+    console.warn("No se pudo guardar onboarding en servidor:", error);
+  }
+}
+
+function leerBanderaOnboardingEn(storageRef) {
+  try {
+    if (!storageRef || typeof storageRef.getItem !== "function") return null;
+    const raw = storageRef.getItem(POST_LOGIN_ONBOARDING_STORAGE_KEY);
+    if (!raw) return null;
+
+    const data = JSON.parse(raw);
+    if (!data || data.pending !== true) return null;
+
+    const usuarioSesion = obtenerUsuarioSesionOnboarding();
+    const usuarioBandera = String(data.usuarioId || "");
+    if (usuarioBandera && usuarioSesion && usuarioBandera !== usuarioSesion) {
+      return null;
+    }
+
+    return data;
+  } catch (error) {
+    console.warn("No se pudo leer bandera de onboarding:", error);
+    return null;
+  }
+}
+
+function leerOnboardingPostLoginPendiente() {
+  try {
+    if (onboardingForzadoPorQuery()) return true;
+
+    const banderaSession = leerBanderaOnboardingEn(sessionStorage);
+    if (banderaSession) return true;
+
+    const banderaLocal = leerBanderaOnboardingEn(localStorage);
+    if (banderaLocal) return true;
+
+    return !fueMostradoOnboardingUsuarioActual();
+  } catch (error) {
+    console.warn("No se pudo leer onboarding post-login:", error);
+    return false;
+  }
+}
+
+function limpiarOnboardingPostLoginPendiente() {
+  try {
+    sessionStorage.removeItem(POST_LOGIN_ONBOARDING_STORAGE_KEY);
+    localStorage.removeItem(POST_LOGIN_ONBOARDING_STORAGE_KEY);
+  } catch (error) {
+    console.warn("No se pudo limpiar onboarding post-login:", error);
+  }
+}
+
+function obtenerDriverFactoryDescubrir() {
+  if (window.driver && typeof window.driver === "function") return window.driver;
+  if (window.driver && typeof window.driver.driver === "function") {
+    return window.driver.driver;
+  }
+  if (
+    window.driver &&
+    window.driver.js &&
+    typeof window.driver.js.driver === "function"
+  ) {
+    return window.driver.js.driver;
+  }
+  return null;
+}
+
+function iniciarTourOnboardingPerfil() {
+  const hamburger = document.getElementById("hamburgerBtn");
+  const perfilItem = document.querySelector('[data-view="perfil"]');
+
+  if (!hamburger || !perfilItem) {
+    abrirPerfilYDispararTour();
+    return;
+  }
+
+  const createDriver = obtenerDriverFactoryDescubrir();
+  if (!createDriver) {
+    console.warn("Driver.js no está disponible. Redirigiendo al perfil.");
+    openSidebar();
+    setTimeout(() => {
+      abrirPerfilYDispararTour();
+    }, 260);
+    return;
+  }
+
+  let activeStepIndex = 0;
+  let autoAdvanceLock = false;
+  let removeTourInteractionListeners = () => {};
+
+  const moveToNextFromInteraction = (driverInstance) => {
+    if (!driverInstance || autoAdvanceLock) return;
+    autoAdvanceLock = true;
+    setTimeout(() => {
+      try {
+        driverInstance.moveNext();
+      } catch (error) {
+        console.warn("No se pudo avanzar onboarding automaticamente:", error);
+      } finally {
+        autoAdvanceLock = false;
+      }
+    }, 180);
+  };
+
+  const tour = createDriver({
+    steps: [
+      {
+        element: "#hamburgerBtn",
+        popover: {
+          title: "Paso 1: abre el menu",
+          description:
+            "Toca este boton para abrir el menu lateral. Si prefieres, tambien puedes usar Siguiente.",
+          side: "bottom",
+          align: "start",
+        },
+      },
+      {
+        element: '[data-view="perfil"]',
+        popover: {
+          title: "Paso 2: entra a tu perfil",
+          description:
+            "Desde aqui completas tu informacion. Toca Mi perfil para abrir esta seccion.",
+          side: "right",
+          align: "start",
+        },
+      },
+    ],
+    showProgress: true,
+    allowClose: true,
+    overlayClickBehavior: "close",
+    overlayOpacity: 0.55,
+    stagePadding: 10,
+    popoverOffset: 14,
+    disableActiveInteraction: false,
+    nextBtnText: "Siguiente",
+    prevBtnText: "Atras",
+    doneBtnText: "Ir a perfil",
+    showButtons: ["previous", "next", "close"],
+    onHighlighted: (_, __, options) => {
+      activeStepIndex = options?.state?.activeIndex || 0;
+    },
+    onNextClick: (_, __, options) => {
+      const index = options?.state?.activeIndex || 0;
+      const total = (options?.config?.steps || []).length;
+
+      if (index === 0) {
+        openSidebar();
+        setTimeout(() => {
+          options.driver.moveNext();
+        }, 260);
+        return;
+      }
+
+      if (index >= total - 1) {
+        abrirPerfilYDispararTour();
+        options.driver.destroy();
+        return;
+      }
+
+      options.driver.moveNext();
+    },
+    onPrevClick: (_, __, options) => {
+      const index = options?.state?.activeIndex || 0;
+      if (index <= 0) return;
+      if (index === 1) {
+        closeSidebarFn();
+      }
+      setTimeout(() => {
+        options.driver.movePrevious();
+      }, 120);
+    },
+    onCloseClick: (_, __, options) => {
+      closeSidebarFn();
+      options.driver.destroy();
+    },
+    onDestroyed: () => {
+      removeTourInteractionListeners();
+      closeSidebarFn();
+    },
+  });
+
+  const onHamburgerClick = () => {
+    if (activeStepIndex !== 0) return;
+    openSidebar();
+    moveToNextFromInteraction(tour);
+  };
+
+  const onPerfilClick = () => {
+    if (activeStepIndex !== 1) return;
+    abrirPerfilYDispararTour();
+    try {
+      tour.destroy();
+    } catch (error) {
+      console.warn("No se pudo cerrar onboarding automaticamente:", error);
+    }
+  };
+
+  hamburger.addEventListener("click", onHamburgerClick, true);
+  perfilItem.addEventListener("click", onPerfilClick, true);
+  removeTourInteractionListeners = () => {
+    hamburger.removeEventListener("click", onHamburgerClick, true);
+    perfilItem.removeEventListener("click", onPerfilClick, true);
+  };
+
+  if (tour && typeof tour.drive === "function") {
+    setTimeout(() => {
+      tour.drive();
+    }, 180);
+    return;
+  }
+
+  abrirPerfilYDispararTour();
+}
+
+async function mostrarOnboardingPostLogin() {
+  if (onboardingPostLoginEnCurso) return;
+  if (!leerOnboardingPostLoginPendiente()) return;
+
+  onboardingPostLoginEnCurso = true;
+
+  try {
+    const onboardingVistoEnServidor = await obtenerEstadoOnboardingServidor();
+    if (onboardingVistoEnServidor) {
+      marcarOnboardingMostradoUsuarioActual();
+      limpiarOnboardingPostLoginPendiente();
+      limpiarQueryOnboarding();
+      return;
+    }
+
+    if (typeof Swal !== "undefined" && Swal && typeof Swal.fire === "function") {
+      const result = await Swal.fire({
+        title: "Completa tu perfil",
+        html: "Es importante para nosotros que llenes ahora tu perfil para poder verificar tus datos, habilidades y mas.",
+        imageUrl: "/MascotaDesicion.gif",
+        imageWidth: 90,
+        imageAlt: "Mascota de ayuda",
+        showDenyButton: true,
+        confirmButtonText: "Llenar informacion",
+        denyButtonText: "Omitir por ahora",
+        confirmButtonColor: "#2563eb",
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        showCloseButton: false,
+        reverseButtons: true,
+        didOpen: () => {
+          const confirmButton = Swal.getConfirmButton();
+          if (confirmButton) {
+            confirmButton.style.backgroundColor = "#2563eb";
+            confirmButton.style.borderColor = "#2563eb";
+          }
+        },
+      });
+
+      if (result.isConfirmed) {
+        await marcarOnboardingMostradoServidor();
+        marcarOnboardingMostradoUsuarioActual();
+        limpiarOnboardingPostLoginPendiente();
+        limpiarQueryOnboarding();
+        setTimeout(() => {
+          iniciarTourOnboardingPerfil();
+        }, 120);
+        return;
+      }
+
+      if (result.isDenied) {
+        await marcarOnboardingMostradoServidor();
+        marcarOnboardingMostradoUsuarioActual();
+        limpiarOnboardingPostLoginPendiente();
+        limpiarQueryOnboarding();
+        return;
+      }
+
+      return;
+    }
+
+    const quiereCompletar = window.confirm(
+      "Antes de usar Descubrir, quieres completar tu perfil ahora?",
+    );
+    await marcarOnboardingMostradoServidor();
+    marcarOnboardingMostradoUsuarioActual();
+    limpiarOnboardingPostLoginPendiente();
+    limpiarQueryOnboarding();
+    if (quiereCompletar) {
+      iniciarTourOnboardingPerfil();
+    }
+  } catch (error) {
+    console.warn("No se pudo mostrar onboarding post-login:", error);
+  } finally {
+    onboardingPostLoginEnCurso = false;
+  }
+}
+
+function intentarOnboardingPostLogin() {
+  if (!leerOnboardingPostLoginPendiente()) return;
+  window.requestAnimationFrame(() => {
+    setTimeout(() => {
+      mostrarOnboardingPostLogin();
+    }, 140);
+  });
+}
+
+setTimeout(() => {
+  intentarOnboardingPostLogin();
+}, 280);
+
+window.addEventListener("load", () => {
+  setTimeout(() => {
+    intentarOnboardingPostLogin();
+  }, 120);
+});
+
+window.addEventListener("focus", () => {
+  setTimeout(() => {
+    intentarOnboardingPostLogin();
+  }, 80);
+});
+
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState !== "visible") return;
+  setTimeout(() => {
+    intentarOnboardingPostLogin();
+  }, 80);
+});
+
 // Sistema de navegación SPA (Single Page Application)
 let currentView = "descubrir";
 
 async function navigateTo(viewName) {
+  syncAppHeaderHeight();
+  document.documentElement.classList.toggle("mensajes-open", viewName === "mensajes");
+  document.body.classList.toggle("mensajes-open", viewName === "mensajes");
+  if (viewName !== "mensajes") {
+    document.documentElement.classList.remove("chat-typing");
+    document.body.classList.remove("chat-typing");
+  }
+
   // Actualizar el estado activo del sidebar inmediatamente
   try {
     document.querySelectorAll(".sidebar-item").forEach((item) => {
@@ -126,6 +788,8 @@ async function navigateTo(viewName) {
     cargarOrdenesTrabajo();
   }
   if (viewName === "mensajes") {
+    setupMobileChatViewportFixes();
+
     // Cargar conversaciones
     cargarConversacionesDashboard();
 
@@ -150,6 +814,22 @@ async function navigateTo(viewName) {
       }
     }, 1000); // 1 segundo para mensajes instantáneos
   } else {
+    if (cleanupMobileChatViewportHandlers) {
+      cleanupMobileChatViewportHandlers();
+      cleanupMobileChatViewportHandlers = null;
+    }
+
+    if (chatMessagesAbortController) {
+      chatMessagesAbortController.abort();
+      chatMessagesAbortController = null;
+    }
+    chatMessagesRequestNonce += 1;
+
+    const mensajesView = document.getElementById("mensajesView");
+    if (mensajesView) {
+      mensajesView.classList.remove("mobile-chat-keyboard-open");
+    }
+
     // Detener polling si salimos de mensajes
     if (window.mensajeriaGlobalInterval) {
       clearInterval(window.mensajeriaGlobalInterval);
@@ -162,8 +842,21 @@ async function navigateTo(viewName) {
     closeSidebarFn();
   }
 
+  // Evitar locks globales persistentes de scroll fuera de overlays/sidebar móvil.
+  const sidebarIsOpen = document.getElementById("sidebar")?.classList.contains("open");
+  if (!sidebarIsOpen && viewName !== "mensajes") {
+    document.body.style.overflow = "";
+  }
+
   // Scroll al Descubrir
-  window.scrollTo({ top: 0, behavior: "smooth" });
+  if (viewName !== "mensajes") {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  } else if (window.innerWidth <= 767) {
+    window.scrollTo({ top: 0, behavior: "auto" });
+  }
+
+  // Recalcular tras render para evitar desfases visuales por fuentes/cambios de layout.
+  setTimeout(syncAppHeaderHeight, 0);
 }
 
 // Función para abrir el sidebar
@@ -199,9 +892,9 @@ function showLogoutModal() {
   const t = (key) => translations[currentLanguage][key] || key;
   const modalHTML = `
                 <div class="custom-modal-overlay" id="logoutModal" onclick="closeLogoutModal(event)">
-                    <div class="custom-modal" onclick="event.stopPropagation()">
+          <div class="custom-modal custom-modal-logout" role="dialog" aria-modal="true" onclick="event.stopPropagation()">
                         <div class="modal-header">
-                            <div class="modal-icon">⚠</div>
+              <div class="modal-icon modal-icon-logout" aria-hidden="true"><svg class="logout-title-svg" xmlns="http://www.w3.org/2000/svg" width="72" height="72" viewBox="0 0 72 72"><path fill="#fcea2b" d="M32.294 14.233a3.892 3.892 0 0 1 6.706 0l20.12 40.142a4.5 4.5 0 0 1 .574 1.916a3.885 3.885 0 0 1-3.832 3.88H15.528a3.803 3.803 0 0 1-3.832-3.784a3.45 3.45 0 0 1 .575-1.916z"/><path fill="#d22f27" d="M35.854 39.049c0 1.505-2.728 3.81-2.728 5.991l-.06.188s-.322 1.428-1.39 1.428a1.3 1.3 0 0 1-.772-.325c-.262-.244-.6.13-.547.458c.16 1.31 3.023 5.521 5.17 5.521c2.456 0 4.629-2.945 4.822-3.985c0-.498-.834-.187-.834-.873c0-.582.507-.964.507-1.729a.41.41 0 0 0-.424-.378c-.191 0-.46.134-.674.134c-.82 0-1.007-.746-1.007-1.51c0 0 .154.05.154-1.58a5.9 5.9 0 0 0-1.422-3.493a.55.55 0 0 0-.357-.133c-.19 0-.438.084-.438.286"/><g fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M29.548 52.622a8.3 8.3 0 0 0 5.936 2.332a8.84 8.84 0 0 0 6.02-2.332M27.69 50.224s-4.452-4.75-.212-11.025c0 0 .856 1.088 1.508 2.132c.486.56 1.367 1.515 1.833 1.515a1.004 1.004 0 0 0 1.018-1.102v-.382a15.5 15.5 0 0 1 1.526-7.293s2.969 1.611 1.697-6.191c0 0 6.763 4.558 6.509 12.106c0 .551.248.975.847.975c.59 0 2.388-.572 2.388-1.124c.042.043 2.671 5.555-1.06 10.389"/><path d="M33.079 45.118s-.298 1.641-1.488 1.527a2.7 2.7 0 0 1-.61-.245c-.328-.36-.674.084-.624.39a10.96 10.96 0 0 0 3.02 4.472s.93.685.98.685m2.609.063a12.4 12.4 0 0 0 1.547-1.048a6.84 6.84 0 0 0 1.806-2.487a.335.335 0 0 0-.297-.458a.78.78 0 0 1-.496-.458h0s-.1-.305.297-.992a1.6 1.6 0 0 0 .199-.916a.47.47 0 0 0-.645-.267a.96.96 0 0 1-1.29-.42s-.312-.153-.014-1.64a6 6 0 0 0-1.425-4.428a.55.55 0 0 0-.377-.133a.395.395 0 0 0-.417.286"/><path d="M32.294 14.233a3.892 3.892 0 0 1 6.706 0l20.12 40.142a4.5 4.5 0 0 1 .574 1.916a3.885 3.885 0 0 1-3.832 3.88H15.528a3.803 3.803 0 0 1-3.832-3.784a3.45 3.45 0 0 1 .575-1.916z"/></g></svg></div>
                             <div class="modal-title" data-i18n="logout.title">${t("logout.title")}</div>
                         </div>
                         <div class="modal-message" data-i18n="logout.message">
@@ -297,7 +990,7 @@ document.addEventListener("keydown", (e) => {
 // ========================================
 // CARGAR INFORMACIÓN DEL USUARIO EN SIDEBAR
 // ========================================
-const API_BASE = `${window.BACKEND_URL}/api`;
+const API_BASE = window.APP_CONFIG?.API_BASE || `${window.BACKEND_URL}/api`;
 
 // Variable global para el usuario actual
 let miPerfilIdGlobal = null;
@@ -312,9 +1005,153 @@ let currentSort = "recent";
 let allUsers = []; // Copia completa de usuarios para ordenamiento
 let currentCategoryFilter = null; // Filtro de categoría activo
 let currentSearchFilter = ""; // Filtro de búsqueda activo
+const verificationStatusCache = new Map();
 
 // Variable global para almacenar ID_Persona del usuario actual
 let usuarioActualPersonaId = null;
+
+function normalizarGenero(valorGenero) {
+  const genero = (valorGenero || "").toString().trim().toLowerCase();
+  if (!genero) return "";
+
+  if (["femenino", "mujer", "female", "f"].includes(genero)) {
+    return "femenino";
+  }
+
+  if (["masculino", "hombre", "male", "m"].includes(genero)) {
+    return "masculino";
+  }
+
+  return "";
+}
+
+function obtenerClaseBannerPorGenero(valorGenero) {
+  const genero = normalizarGenero(valorGenero);
+  if (genero === "femenino") {
+    return "bg-gradient-to-r from-pink-400 via-pink-500 to-fuchsia-500";
+  }
+  return "bg-gradient-to-r from-blue-400 via-blue-500 to-blue-600";
+}
+
+function normalizarDisponibilidad(valorDisponibilidad) {
+  const disponibilidad = (valorDisponibilidad || "")
+    .toString()
+    .trim()
+    .toLowerCase();
+
+  if (!disponibilidad) return "";
+
+  if (["disponible", "available", "libre", "activo", "active"].includes(disponibilidad)) {
+    return "disponible";
+  }
+
+  if (
+    [
+      "en obra",
+      "en_obra",
+      "ocupado",
+      "busy",
+      "trabajando",
+      "no disponible",
+      "no_disponible",
+      "inactivo",
+      "inactive",
+    ].includes(disponibilidad)
+  ) {
+    return "en_obra";
+  }
+
+  return "";
+}
+
+function obtenerEstadoDisponibilidadCard(valorDisponibilidad) {
+  const disponibilidad = normalizarDisponibilidad(valorDisponibilidad);
+
+  if (disponibilidad === "disponible") {
+    return {
+      label: "Disponible",
+      textColor: "#059669",
+      dotColor: "#10b981",
+    };
+  }
+
+  if (disponibilidad === "en_obra") {
+    return {
+      label: "En obra",
+      textColor: "#b45309",
+      dotColor: "#f59e0b",
+    };
+  }
+
+  return {
+    label: "Estado no definido",
+    textColor: "#6b7280",
+    dotColor: "#9ca3af",
+  };
+}
+
+function normalizarEstadoVerificacion(valorEstado) {
+  if (valorEstado === true || valorEstado === 1 || valorEstado === "1") {
+    return "aprobada";
+  }
+
+  if (valorEstado === false || valorEstado === 0 || valorEstado === "0") {
+    return "no_verificado";
+  }
+
+  const estado = (valorEstado || "").toString().trim().toLowerCase();
+  if (!estado) return "";
+
+  if (["aprobada", "aprobado", "verificado", "verified", "true"].includes(estado)) {
+    return "aprobada";
+  }
+
+  if (["pendiente", "pending"].includes(estado)) {
+    return "pendiente";
+  }
+
+  if (["rechazada", "rechazado", "denegada", "denegado", "no_verificado", "not_verified", "false"].includes(estado)) {
+    return "no_verificado";
+  }
+
+  return estado;
+}
+
+function esPerfilVerificado(estadoVerificacion) {
+  return normalizarEstadoVerificacion(estadoVerificacion) === "aprobada";
+}
+
+async function obtenerEstadoVerificacionPerfil(idPerfilPersona, estadoFallback = "") {
+  const estadoLocal = normalizarEstadoVerificacion(estadoFallback);
+  if (estadoLocal) {
+    return estadoLocal;
+  }
+
+  const cacheKey = Number(idPerfilPersona);
+  if (verificationStatusCache.has(cacheKey)) {
+    return verificationStatusCache.get(cacheKey);
+  }
+
+  try {
+    const res = await fetch(
+      `${API_BASE}/verificacion-usuarios/perfil/${idPerfilPersona}`,
+    );
+    const data = await res.json().catch(() => ({}));
+    const estado = normalizarEstadoVerificacion(
+      data?.estado_verificacion || data?.estado || data?.verificacion || "",
+    ) || "no_verificado";
+
+    verificationStatusCache.set(cacheKey, estado);
+    return estado;
+  } catch (error) {
+    console.warn(
+      `No se pudo obtener estado de verificacion para el perfil ${idPerfilPersona}:`,
+      error,
+    );
+    verificationStatusCache.set(cacheKey, "no_verificado");
+    return "no_verificado";
+  }
+}
 
 async function cargarDatosUsuario() {
   try {
@@ -624,6 +1461,15 @@ async function aplicarFiltros() {
     // 3. Procesar usuarios en paralelo
     const usuariosPromises = personasFiltradas.map(async (persona) => {
       try {
+        const estadoVerificacion = await obtenerEstadoVerificacionPerfil(
+          persona.id_Perfil_Persona,
+          persona.estado_verificacion || persona.estadoVerificacion || persona.verificado,
+        );
+
+        if (!esPerfilVerificado(estadoVerificacion)) {
+          return null;
+        }
+
         const [resHabilidades, resDireccion] = await Promise.all([
           fetch(
             `${API_BASE}/habilidades/persona/${persona.id_Perfil_Persona}`,
@@ -687,14 +1533,22 @@ async function aplicarFiltros() {
             "Usuario",
           profession:
             persona.descripcionPerfil_Persona || "Usuario SEMACKRO",
+          genero:
+            persona.genero_Persona || persona.genero || persona.genero_Usuario || "",
+          availability:
+            persona.disponibilidad_Persona || persona.disponibilidad || "",
           location: location,
           skills: habilidades,
           bio: persona.descripcionPerfil_Persona || "Sin descripción",
+          experienceYears: Number(
+            persona.anios_experiencia || persona.anios_experiencia_Persona || 0,
+          ),
           rating: rating,
           exchanges: exchanges,
           online: Math.random() > 0.5,
           avatar: persona.imagenUrl_Persona || null,
           avatarInitials: (persona.nombre_Persona || "U")[0].toUpperCase(),
+          estadoVerificacion,
         };
       } catch (error) {
         console.error(
@@ -739,6 +1593,14 @@ async function aplicarFiltros() {
 // CARGAR ESTADÍSTICAS GLOBALES
 // ========================================
 async function cargarEstadisticasGlobales() {
+  const idsStats = [
+    "usuarios-activos",
+    "categorias-disponibles",
+    "intercambios-exitosos",
+  ];
+  const hasStatsUI = idsStats.some((id) => document.getElementById(id));
+  if (!hasStatsUI) return;
+
   try {
     console.log(" Cargando estadísticas globales...");
     const response = await fetch(
@@ -775,7 +1637,6 @@ async function cargarEstadisticasGlobales() {
 function animarContador(elementId, valorFinal) {
   const elemento = document.getElementById(elementId);
   if (!elemento) {
-    console.error(` No se encontró el elemento con ID: ${elementId}`);
     return;
   }
 
@@ -830,6 +1691,15 @@ async function cargarUsuariosReales() {
     // 2. Procesar usuarios en paralelo (mucho más rápido)
     const usuariosPromises = personasFiltradas.map(async (persona) => {
       try {
+        const estadoVerificacion = await obtenerEstadoVerificacionPerfil(
+          persona.id_Perfil_Persona,
+          persona.estado_verificacion || persona.estadoVerificacion || persona.verificado,
+        );
+
+        if (!esPerfilVerificado(estadoVerificacion)) {
+          return null;
+        }
+
         // Hacer ambas peticiones en paralelo
         const [resHabilidades, resDireccion] = await Promise.all([
           fetch(
@@ -897,14 +1767,22 @@ async function cargarUsuariosReales() {
             "Usuario",
           profession:
             persona.descripcionPerfil_Persona || "Usuario SEMACKRO",
+          genero:
+            persona.genero_Persona || persona.genero || persona.genero_Usuario || "",
+          availability:
+            persona.disponibilidad_Persona || persona.disponibilidad || "",
           location: location,
           skills: habilidades,
           bio: persona.descripcionPerfil_Persona || "Sin descripción",
+          experienceYears: Number(
+            persona.anios_experiencia || persona.anios_experiencia_Persona || 0,
+          ),
           rating: rating,
           exchanges: exchanges,
           online: Math.random() > 0.5,
           avatar: persona.imagenUrl_Persona || null,
           avatarInitials: (persona.nombre_Persona || "U")[0].toUpperCase(),
+          estadoVerificacion,
         };
       } catch (error) {
         console.error(
@@ -930,7 +1808,7 @@ async function cargarUsuariosReales() {
   } catch (error) {
     console.error("Error al cargar usuarios:", error);
     usersGrid.innerHTML =
-      '<p class="col-span-full text-center text-red-500">Error al cargar usuarios. Por favor, recarga la página.</p>';
+      '<p class="col-span-full text-center text-red-500">Error al cargar usuarios. por favor, recarga la página.</p>';
   }
 }
 
@@ -981,7 +1859,7 @@ function renderPagination() {
                 <button
                     onclick="changePage(${currentPage - 1})"
                     ${currentPage === 1 ? "disabled" : ""}
-                    class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition">
+            class="px-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
                     </svg>
@@ -999,7 +1877,7 @@ function renderPagination() {
 
   if (startPage > 1) {
     buttons += `
-                    <button onclick="changePage(1)" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition">
+            <button onclick="changePage(1)" class="px-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-700 hover:bg-gray-50 transition">
                         1
                     </button>
                 `;
@@ -1012,7 +1890,7 @@ function renderPagination() {
     buttons += `
                     <button
                         onclick="changePage(${i})"
-                        class="px-4 py-2 border rounded-lg transition ${i === currentPage ? "bg-blue-600 text-white border-blue-600" : "border-gray-300 hover:bg-gray-50"}">
+              class="px-4 py-2 border rounded-lg transition ${i === currentPage ? "bg-blue-600 text-white border-blue-600" : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"}">
                         ${i}
                     </button>
                 `;
@@ -1023,7 +1901,7 @@ function renderPagination() {
       buttons += `<span class="px-2 py-2">...</span>`;
     }
     buttons += `
-                    <button onclick="changePage(${totalPages})" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition">
+            <button onclick="changePage(${totalPages})" class="px-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-700 hover:bg-gray-50 transition">
                         ${totalPages}
                     </button>
                 `;
@@ -1034,7 +1912,7 @@ function renderPagination() {
                 <button
                     onclick="changePage(${currentPage + 1})"
                     ${currentPage === totalPages ? "disabled" : ""}
-                    class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition">
+            class="px-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                     </svg>
@@ -1295,9 +2173,21 @@ function mostrarFavoritos(favoritos) {
       const ubicacion = userCompleto
         ? userCompleto.location
         : fav.ubicacion || fav.ciudad || "Ubicación no especificada";
-      const bio = userCompleto
-        ? userCompleto.bio
-        : fav.descripcion || "Sin descripción";
+      const experienceYears = userCompleto
+        ? Number(userCompleto.experienceYears || 0)
+        : Number(fav.anios_experiencia || fav.aniosExperiencia || 0);
+      const experienceText =
+        experienceYears > 0
+          ? `${experienceYears} año${experienceYears === 1 ? "" : "s"} de experiencia`
+          : "Sin experiencia registrada";
+      const availabilityRaw = userCompleto
+        ? userCompleto.availability
+        : fav.disponibilidad ||
+          fav.disponibilidad_Persona ||
+          fav.disponibilidad_Usuario ||
+          fav.estado_disponibilidad ||
+          "";
+      const availabilityData = obtenerEstadoDisponibilidadCard(availabilityRaw);
       const habilidades = userCompleto
         ? userCompleto.skills
         : fav.habilidades || fav.skills || [];
@@ -1307,6 +2197,10 @@ function mostrarFavoritos(favoritos) {
       const intercambios = userCompleto
         ? userCompleto.exchanges
         : fav.intercambios || fav.total_intercambios || 0;
+      const genero = userCompleto
+        ? userCompleto.genero
+        : fav.genero || fav.genero_Persona || fav.genero_Usuario || "";
+      const bannerGradientClass = obtenerClaseBannerPorGenero(genero);
 
       const initials = nombreCompleto
         .split(" ")
@@ -1325,7 +2219,7 @@ function mostrarFavoritos(favoritos) {
                         </button>
 
                         <!-- Banner superior con gradiente -->
-                        <div class="user-card-banner bg-gradient-to-r from-blue-400 via-blue-500 to-blue-600"></div>
+                        <div class="user-card-banner ${bannerGradientClass}"></div>
 
                         <!-- Contenido de la tarjeta -->
                         <div class="user-card-content">
@@ -1362,8 +2256,15 @@ function mostrarFavoritos(favoritos) {
                                     <span class="truncate">${ubicacion}</span>
                                 </div>
 
-                                <!-- Bio -->
-                                <p class="text-gray-600 text-sm user-bio mb-3" title="${bio}">${bio}</p>
+                                <!-- Experiencia -->
+                                <p class="text-gray-600 text-sm user-bio mb-3" title="${experienceText} • ${availabilityData.label}">
+                                  ${experienceText}
+                                  <span class="mx-1.5 text-gray-300">•</span>
+                                  <span class="inline-flex items-center gap-1 font-semibold" style="color:${availabilityData.textColor};">
+                                    <span class="w-2 h-2 rounded-full" style="background:${availabilityData.dotColor};"></span>
+                                    ${availabilityData.label}
+                                  </span>
+                                </p>
 
                                 <!-- Habilidades -->
                                 <div class="skills-container-card">
@@ -1455,7 +2356,7 @@ function showNotification(message, type = "info") {
 // Función para renderizar las tarjetas con datos reales
 function renderUserCardsReal() {
   if (allUsers.length === 0) {
-    let mensaje = "No hay usuarios disponibles";
+    let mensaje = "No hay perfiles verificados disponibles";
     let icono = `<svg class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
                 </svg>`;
@@ -1498,7 +2399,16 @@ function renderUserCardsReal() {
 
   usersGrid.innerHTML = paginatedUsers
     .map(
-      (user) => `
+      (user) => {
+        const bannerGradientClass = obtenerClaseBannerPorGenero(user.genero);
+        const experienceYears = Number(user.experienceYears || 0);
+        const experienceText =
+          experienceYears > 0
+            ? `${experienceYears} año${experienceYears === 1 ? "" : "s"} de experiencia`
+            : "Sin experiencia registrada";
+        const availabilityData = obtenerEstadoDisponibilidadCard(user.availability);
+
+        return `
                 <div class="user-card" onclick="viewProfile(${user.id})">
                     <!-- Botón de favoritos (ocultar si es el propio usuario) -->
                     ${
@@ -1507,7 +2417,7 @@ function renderUserCardsReal() {
                     <button type="button"
                             onclick="toggleFavorite(event, ${user.id}, '${user.name.replace(/'/g, "\\'")}')"
                             class="favorite-btn ${esFavorito(user.id) ? "active" : ""}"
-                            title="${esFavorito(user.id) ? "Quitar de favoritos" : "Agregar a favoritos"}"
+                        title="${esFavorito(user.id) ? "Quitar de favoritos" : "Agregar a favoritos"}"
                             data-user-id="${user.id}">
                         <span class="iconify favorite-icon" data-icon="${esFavorito(user.id) ? "ph:heart-fill" : "ph:heart"}"></span>
                     </button>
@@ -1516,7 +2426,7 @@ function renderUserCardsReal() {
                     }
 
                     <!-- Banner superior con gradiente -->
-                    <div class="user-card-banner bg-gradient-to-r from-blue-400 via-blue-500 to-blue-600"></div>
+                    <div class="user-card-banner ${bannerGradientClass}"></div>
 
                     <!-- Contenido de la tarjeta -->
                     <div class="user-card-content">
@@ -1526,7 +2436,7 @@ function renderUserCardsReal() {
                                 <div class="relative inline-block">
                                     ${
                                       user.avatar
-                                        ? `<img src="${user.avatar}" alt="${user.name}" class="user-avatar object-cover">`
+                                  ? `<img src="${user.avatar}" alt="${user.name}" class="user-avatar object-cover">`
                                         : `<div class="user-avatar"><span class="text-white text-3xl font-bold">${user.avatarInitials}</span></div>`
                                     }
                                     ${user.online ? '<div class="online-badge"></div>' : ""}
@@ -1546,8 +2456,15 @@ function renderUserCardsReal() {
                                 <span class="truncate">${user.location}</span>
                             </div>
 
-                            <!-- Bio -->
-                            <p class="text-gray-600 text-sm user-bio mb-3" title="${user.bio}">${user.bio}</p>
+                            <!-- Experiencia -->
+                            <p class="text-gray-600 text-sm user-bio mb-3" title="${experienceText} • ${availabilityData.label}">
+                              ${experienceText}
+                              <span class="mx-1.5 text-gray-300">•</span>
+                              <span class="inline-flex items-center gap-1 font-semibold" style="color:${availabilityData.textColor};">
+                                <span class="w-2 h-2 rounded-full" style="background:${availabilityData.dotColor};"></span>
+                                ${availabilityData.label}
+                              </span>
+                            </p>
 
                             <!-- Habilidades -->
                             <div class="skills-container-card">
@@ -1598,7 +2515,8 @@ function renderUserCardsReal() {
 </div>
                     </div>
                 </div>
-            `,
+                `;
+              },
     )
     .join("");
 
@@ -1644,21 +2562,41 @@ async function inicializarDashboard() {
   // Mostrar skeleton mientras carga
   mostrarSkeletonLoaders(6);
 
-  // Cargar todo en paralelo para mejorar el rendimiento
-  await Promise.all([
-    cargarDatosUsuario(),
-    cargarCategorias(),
-    cargarUsuariosReales(),
-    cargarFavoritosDesdeBackend(),
-    cargarEstadisticasGlobales(),
-    cargarSolicitudesEnviadas(),
-  ]);
+  // Cargar todo en paralelo sin bloquear toda la vista si una tarea falla.
+  const tareasInit = [
+    ["cargarDatosUsuario", cargarDatosUsuario()],
+    ["cargarCategorias", cargarCategorias()],
+    ["cargarUsuariosReales", cargarUsuariosReales()],
+    ["cargarFavoritosDesdeBackend", cargarFavoritosDesdeBackend()],
+    ["cargarEstadisticasGlobales", cargarEstadisticasGlobales()],
+    ["cargarSolicitudesEnviadas", cargarSolicitudesEnviadas()],
+  ];
+
+  const resultadosInit = await Promise.allSettled(
+    tareasInit.map(([, promesa]) => promesa),
+  );
+
+  resultadosInit.forEach((resultado, indice) => {
+    if (resultado.status === "rejected") {
+      console.warn(
+        `[Init Descubrir] Fallo en ${tareasInit[indice][0]}:`,
+        resultado.reason,
+      );
+    }
+  });
 
   // Verificar actualizaciones de imagen
   verificarActualizacionesPendientes();
 
   // Actualizar badge de favoritos
   actualizarBadgeFavoritos();
+
+  // Si por algún fallo parcial no se renderizó el grid, forzamos render final.
+  try {
+    renderUserCardsReal();
+  } catch (error) {
+    console.warn("No se pudo renderizar grid final de usuarios:", error);
+  }
 
   // Aplicar traducciones después de cargar los datos
   applyTranslations();
@@ -2019,7 +2957,7 @@ async function cargarPerfilEnSeccion(perfilId) {
                     <div class="profile-modal-avatar" style="cursor: ${persona.imagenUrl_Persona ? "zoom-in" : "default"};" ${persona.imagenUrl_Persona ? `onclick="openImageFullscreen('${persona.imagenUrl_Persona}')"` : ""}>
                         ${
                           persona.imagenUrl_Persona
-                            ? `<img src="${persona.imagenUrl_Persona}" alt="${nombreCompleto}">`
+                            ? `<img src="${persona.imagenUrl_Persona}" alt="${Nombrecompleto}">`
                             : `<span>${iniciales}</span>`
                         }
                     </div>
@@ -2353,7 +3291,7 @@ async function cargarPerfilEnModal(perfilId) {
                 <div class="profile-modal-avatar" style="cursor: ${persona.imagenUrl_Persona ? "zoom-in" : "default"};" ${persona.imagenUrl_Persona ? `onclick="openImageFullscreen('${persona.imagenUrl_Persona}')"` : ""}>
                     ${
                       persona.imagenUrl_Persona
-                        ? `<img src="${persona.imagenUrl_Persona}" alt="${nombreCompleto}">`
+                        ? `<img src="${persona.imagenUrl_Persona}" alt="${Nombrecompleto}">`
                         : `<span>${iniciales}</span>`
                     }
                 </div>
@@ -2732,7 +3670,7 @@ async function cargarEstadisticasYCalificaciones(perfilId) {
                                 <div style="width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; flex-shrink: 0; overflow: hidden; position: relative;">
                                     ${
                                       getImagenCalificador(cal)
-                                        ? `<img src="${getImagenCalificador(cal)}" alt="${nombreCalificador}" style="width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0;">`
+                                        ? `<img src="${getImagenCalificador(cal)}" alt="${Nombrecalificador}" style="width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0;">`
                                         : `<span style="font-size: 20px;">${iniciales}</span>`
                                     }
                                 </div>
@@ -2995,7 +3933,7 @@ document
 // ========================================
 function showSkillDetailInModal(skill, categoria, type) {
   const detailId =
-    type === "offered" ? "selectedOfferedDetail" : "selectedRequiredDetail";
+    type === "offered" ? "selectedOfferedDetail" : "Selectedrequireddetail";
   const detailDiv = document.getElementById(detailId);
 
   if (!detailDiv) return;
@@ -3218,7 +4156,7 @@ async function reportUser(reportedId, reportedName) {
       html:
         `
                         <div style="text-align:left; margin-bottom:8px; color:#374151;">
-                            <p style="margin:0 0 6px 0; font-size:14px;">Por favor, selecciona el motivo del reporte y agrega una descripción si crees que es necesaria. Nuestro equipo revisará el caso.</p>
+                            <p style="margin:0 0 6px 0; font-size:14px;">Por favor, selecciona el motivo del reporte y agrega una descripción si crees que es necesaria. nuestro equipo revisará el caso.</p>
                         </div>
                         <div style="margin-top:6px; text-align:left;">
                             <label for="swal-motivo" style="display:block; font-weight:600; margin-bottom:6px;">Motivo</label>
@@ -3229,7 +4167,7 @@ async function reportUser(reportedId, reportedName) {
         `</select>
                         </div>
                         <div style="margin-top:12px; text-align:left;">
-                            <label for="swal-descripcion" style="display:block; font-weight:600; margin-bottom:6px;">Descripción adicional <span style=\"font-weight:400; font-size:12px; color:#6b7280;\">(opcional)</span></label>
+                            <label for="swal-descripcion" style="display:block; font-weight:600; margin-bottom:6px;">Descripción adicional <span style=\"font-weight:400; font-size:12px; color:#6b7280;\">(Opcional)</span></label>
                             <textarea id="swal-descripcion" rows="5" maxlength="500" placeholder="Añade más contexto: qué pasó, enlaces, capturas o mensajes relevantes (máx. 500 caracteres)" style="width:100%; padding:10px; border-radius:8px; border:1px solid #d1d5db; resize:vertical; font-size:14px;"></textarea>
                             <div id="swal-charcount" style="text-align:right; font-size:12px; color:#6b7280; margin-top:6px;">0/500</div>
                         </div>
@@ -3688,6 +4626,17 @@ window.addEventListener("message", function (ev) {
           },
           window.location.origin,
         );
+
+        if (pendingProfileOnboardingTourStart) {
+          iframe.contentWindow.postMessage(
+            {
+              type: "startProfileOnboardingTour",
+              source: "descubrirOnboarding",
+            },
+            window.location.origin,
+          );
+          pendingProfileOnboardingTourStart = false;
+        }
       }
     }
   } catch (err) {
@@ -4132,7 +5081,7 @@ function mostrarEstadoVacioEnviadas() {
                         <h3 class="text-lg font-semibold text-gray-700 mb-2">No tienes solicitudes enviadas</h3>
                         <p class="text-gray-500 mb-4">Busca usuarios y envíales solicitudes de intercambio</p>
                         <button onclick="window.location.href='Descubrir.html'" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
-                        Explorar Usuarios
+                        Explorar usuarios
                         </button>
                     </div>
                 </div>
@@ -4232,6 +5181,78 @@ let conversacionesDashboard = window.conversacionesDashboard;
 let selectedFilesDashboard = []; // array de File
 let conversacionActivaDashboard = null;
 let mensajeriaInterval = null;
+let isSendingDashboardMessage = false;
+
+const MENSAJERIA_LIMITES = {
+  MAX_CARACTERES_MENSAJE: 1500,
+  MAX_ADJUNTOS: 8,
+  MAX_MB_POR_ARCHIVO: 15,
+  MAX_MB_TOTAL: 40,
+};
+
+const MIME_PERMITIDOS_MENSAJERIA = [
+  "image/",
+  "video/",
+  "application/pdf",
+  "application/msword",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  "application/vnd.ms-powerpoint",
+  "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+];
+
+function esMimePermitidoMensajeria(file) {
+  const mime = (file?.type || "").toLowerCase();
+  return MIME_PERMITIDOS_MENSAJERIA.some((allowed) =>
+    allowed.endsWith("/") ? mime.startsWith(allowed) : mime === allowed,
+  );
+}
+
+function normalizarContenidoMensaje(texto) {
+  return String(texto || "")
+    .replace(/\r\n/g, "\n")
+    .replace(/\u00A0/g, " ")
+    .trim();
+}
+
+function validarAdjuntosMensajeria(files) {
+  if (!Array.isArray(files)) return { ok: true };
+
+  if (files.length > MENSAJERIA_LIMITES.MAX_ADJUNTOS) {
+    return {
+      ok: false,
+      mensaje: `Solo puedes adjuntar hasta ${MENSAJERIA_LIMITES.MAX_ADJUNTOS} archivos.`,
+    };
+  }
+
+  const maxBytesPorArchivo = MENSAJERIA_LIMITES.MAX_MB_POR_ARCHIVO * 1024 * 1024;
+  const maxBytesTotal = MENSAJERIA_LIMITES.MAX_MB_TOTAL * 1024 * 1024;
+  let totalBytes = 0;
+
+  for (const f of files) {
+    if (!esMimePermitidoMensajeria(f)) {
+      return {
+        ok: false,
+        mensaje: `Tipo de archivo no permitido: ${f.name}`,
+      };
+    }
+    if ((f.size || 0) > maxBytesPorArchivo) {
+      return {
+        ok: false,
+        mensaje: `El archivo ${f.name} supera ${MENSAJERIA_LIMITES.MAX_MB_POR_ARCHIVO} MB.`,
+      };
+    }
+    totalBytes += f.size || 0;
+  }
+
+  if (totalBytes > maxBytesTotal) {
+    return {
+      ok: false,
+      mensaje: `El total de adjuntos supera ${MENSAJERIA_LIMITES.MAX_MB_TOTAL} MB.`,
+    };
+  }
+
+  return { ok: true };
+}
 
 // Variables globales para polling de mensajes (accesibles desde navigateTo)
 window.conversacionActivaDashboard = null;
@@ -4244,6 +5265,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Event listener para enviar mensajes
   const formDashboard = document.getElementById("chat-form-dashboard");
   if (formDashboard) {
+    formDashboard.removeEventListener("submit", enviarMensajeDashboard);
     formDashboard.addEventListener("submit", enviarMensajeDashboard);
   }
 
@@ -4391,18 +5413,45 @@ function actualizarBadgeSidebarMensajes(conversaciones) {
   }
 }
 
+function limpiarContenedorMensajesDashboard(mensaje = "Cargando mensajes...") {
+  const container = document.getElementById("mensajes-container-dashboard");
+  if (!container) return;
+
+  if (!mensaje) {
+    container.innerHTML = "";
+    return;
+  }
+
+  container.innerHTML = `
+    <div class="flex items-center justify-center h-full text-gray-400">
+      <p class="text-sm">${mensaje}</p>
+    </div>
+  `;
+}
+
 // Seleccionar conversación
 async function seleccionarConversacionDashboard(idConversacion) {
+  const idConversacionNumerico = Number(idConversacion);
+  const idConversacionAnterior = Number(
+    conversacionActivaDashboard?.id_conversacion || 0,
+  );
+
   conversacionActivaDashboard = conversacionesDashboard.find(
-    (c) => c.id_conversacion === idConversacion,
+    (c) => Number(c.id_conversacion) === idConversacionNumerico,
   );
   window.conversacionActivaDashboard = conversacionActivaDashboard; // Sincronizar con global
 
   // Resetear tracking de mensajes al cambiar de conversación
   ultimoMensajeId = null;
   ultimaCantidadMensajes = 0;
+  fueReRenderizado = false;
+  window.lastReadStatusString = "";
 
   if (!conversacionActivaDashboard) return;
+
+  if (idConversacionAnterior !== idConversacionNumerico) {
+    limpiarContenedorMensajesDashboard("Cargando mensajes...");
+  }
 
   // Mostrar panel de chat
   document.getElementById("chat-vacio-dashboard").classList.add("hidden");
@@ -4424,7 +5473,7 @@ async function seleccionarConversacionDashboard(idConversacion) {
   actualizarHeaderChatDashboard(conversacionActivaDashboard);
 
   // Cargar mensajes
-  await cargarMensajesDashboard(idConversacion, true);
+  await cargarMensajesDashboard(idConversacionNumerico, true);
 
   // Actualizar lista para mostrar cual está activa
   mostrarConversacionesDashboard(conversacionesDashboard);
@@ -4466,7 +5515,7 @@ function actualizarHeaderChatDashboard(conv) {
     : tieneImagen
     ? `<img src="${conv.imagenUrl_contacto}"
               class="w-10 h-10 md:w-12 md:h-12 rounded-full object-cover border-2 border-white shadow-sm"
-              alt="${nombreContacto}"
+            alt="${nombreContacto}"
               onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
          <div class="w-10 h-10 md:w-12 md:h-12 ${colorClass} rounded-full items-center justify-center text-white font-bold text-sm md:text-base hidden shadow-sm">
             ${initials}
@@ -4480,9 +5529,7 @@ function actualizarHeaderChatDashboard(conv) {
     : `<p class="text-[10px] md:text-xs text-green-500 font-medium">${t("messages.activeConversation")}</p>`;
 
   const botonesAccionHtml = esGrupo
-    ? `<button id="vaciarMensajesBtn" class="p-2 text-gray-500 hover:bg-gray-100 rounded-full transition-all" title="Vaciar chat">
-         <span class="iconify" data-icon="mdi:delete-sweep" data-width="22"></span>
-       </button>`
+    ? ``
     : `<button id="verPerfilBtnDashboard" class="p-2 text-indigo-600 hover:bg-indigo-50 rounded-full transition-all" title="${t("messages.viewProfile")}">
            <span class="iconify" data-icon="mdi:account-circle" data-width="22"></span>
        </button>
@@ -4491,9 +5538,6 @@ function actualizarHeaderChatDashboard(conv) {
        </button>
        <button id="finalizarIntercambioBtn" class="p-2 text-red-600 hover:bg-red-50 rounded-full transition-all" title="${t("messages.finishExchange")}">
            <span class="iconify" data-icon="mdi:check-circle" data-width="22"></span>
-       </button>
-       <button id="vaciarMensajesBtn" class="p-2 text-gray-500 hover:bg-gray-100 rounded-full transition-all" title="Vaciar chat">
-           <span class="iconify" data-icon="mdi:delete-sweep" data-width="22"></span>
        </button>`;
 
   document.getElementById("chat-header-dashboard").innerHTML = `
@@ -4544,15 +5588,42 @@ let fueReRenderizado = false;
 
 // Cargar mensajes
 async function cargarMensajesDashboard(idConversacion, scrollToEnd = true) {
+  const idConversacionNumerico = Number(idConversacion);
+  const requestNonce = ++chatMessagesRequestNonce;
+
+  if (chatMessagesAbortController) {
+    chatMessagesAbortController.abort();
+  }
+  chatMessagesAbortController = new AbortController();
+
+  const esSolicitudObsoleta = () => {
+    const idConversacionActiva = Number(
+      window.conversacionActivaDashboard?.id_conversacion ||
+        conversacionActivaDashboard?.id_conversacion ||
+        0,
+    );
+
+    return (
+      requestNonce !== chatMessagesRequestNonce ||
+      idConversacionActiva !== idConversacionNumerico
+    );
+  };
+
   try {
     const personaId = await obtenerPersonaIdActual();
+    if (esSolicitudObsoleta()) return;
+
     const response = await fetch(
-      `${window.APP_CONFIG.BACKEND_URL}/api/mensajeria/conversacion/${idConversacion}/mensajes?personaId=${personaId}`,
+      `${window.APP_CONFIG.BACKEND_URL}/api/mensajeria/conversacion/${idConversacionNumerico}/mensajes?personaId=${personaId}`,
+      {
+        signal: chatMessagesAbortController.signal,
+      },
     );
 
     if (!response.ok) throw new Error("Error al cargar mensajes");
 
     const resultado = await response.json();
+    if (esSolicitudObsoleta()) return;
 
     // La API devuelve { success: true, data: [...] }
     const mensajes = resultado.data || [];
@@ -4571,7 +5642,7 @@ async function cargarMensajesDashboard(idConversacion, scrollToEnd = true) {
       console.log(
         `[MENSAJES] Actualizando chat - Total: ${mensajes.length} mensajes`,
       );
-      mostrarMensajesDashboard(mensajes);
+      mostrarMensajesDashboard(mensajes, idConversacionNumerico);
       if (mensajes.length > 0) {
         ultimoMensajeId = mensajes[mensajes.length - 1].id_mensaje;
       }
@@ -4585,8 +5656,9 @@ async function cargarMensajesDashboard(idConversacion, scrollToEnd = true) {
 
     // Marcar mensajes como leídos (con manejo de errores silencioso)
     try {
+      if (esSolicitudObsoleta()) return;
       await fetch(
-        `${window.APP_CONFIG.BACKEND_URL}/api/mensajeria/conversacion/${idConversacion}/marcar-leidos`,
+        `${window.APP_CONFIG.BACKEND_URL}/api/mensajeria/conversacion/${idConversacionNumerico}/marcar-leidos`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
@@ -4599,20 +5671,39 @@ async function cargarMensajesDashboard(idConversacion, scrollToEnd = true) {
     }
 
     // Actualizar lista de conversaciones
+    if (esSolicitudObsoleta()) return;
     await cargarConversacionesDashboard();
   } catch (error) {
+    if (error?.name === "AbortError") {
+      return;
+    }
     console.error("Error:", error);
+  } finally {
+    if (requestNonce === chatMessagesRequestNonce) {
+      chatMessagesAbortController = null;
+    }
   }
 }
 
 // Mostrar mensajes
-function mostrarMensajesDashboard(mensajes) {
+function mostrarMensajesDashboard(mensajes, idConversacionRender = null) {
+  if (idConversacionRender !== null) {
+    const idConversacionActiva = Number(
+      window.conversacionActivaDashboard?.id_conversacion ||
+        conversacionActivaDashboard?.id_conversacion ||
+        0,
+    );
+    if (idConversacionActiva !== Number(idConversacionRender)) {
+      return;
+    }
+  }
+
   const container = document.getElementById("mensajes-container-dashboard");
 
   if (!mensajes || mensajes.length === 0) {
     container.innerHTML = `
                     <div class="flex items-center justify-center h-full text-gray-400">
-                        <p class="text-sm">No hay mensajes aún. ¡Envía el primero!</p>
+                        <p class="text-sm">No hay mensajes aún. ¡envía el primero!</p>
                     </div>
                 `;
     return;
@@ -4672,7 +5763,7 @@ function mostrarMensajesDashboard(mensajes) {
       const contenidoMostrado = msg.contenido_editado || msg.contenido;
       const badgeEdicion =
         veceEditado > 0
-          ? `<span class="text-[10px] opacity-70 ml-1 italic">(editado)</span>`
+          ? `<span class="text-[10px] opacity-70 ml-1 italic">(Editado)</span>`
           : "";
       const animationClass =
         esUltimo && !fueReRenderizado ? "message-enter" : "";
@@ -4681,17 +5772,23 @@ function mostrarMensajesDashboard(mensajes) {
         return `
                         <div class="flex justify-end group ${animationClass} w-full">
                             <div class="flex flex-col items-end max-w-[90%] md:max-w-[85%]">
-                                <div class="bg-gradient-to-br from-indigo-600 via-indigo-600 to-purple-600 text-white p-2.5 px-3.5 rounded-2xl rounded-tr-none shadow-md message-item hover:shadow-lg w-fit"
+                                  <div class="bg-gradient-to-br from-indigo-600 via-indigo-600 to-purple-600 text-white p-2.5 px-3.5 rounded-2xl rounded-tr-none shadow-md message-item hover:shadow-lg w-fit relative"
+                                    oncontextmenu="return abrirMenuMensajeDesdeInline(event, this)"
                                      data-message-id="${msg.id_mensaje}"
                                      data-message-content="${contenidoMostrado.replace(/"/g, "&quot;")}"
                                      data-puede-editar="${puedeEditar}"
-                                     oncontextmenu="mostrarMenuContextual(event, ${msg.id_mensaje}, '${contenidoMostrado.replace(/'/g, "\\'")}', ${puedeEditar}, ${puedeBorrarParaTodos}, ${puedeBorrarParaMi}); return false;">
+                                    data-es-mio="true"
+                                    data-puede-borrar-todos="${puedeBorrarParaTodos}"
+                                    data-puede-borrar-mi="${puedeBorrarParaMi}">
                                     <p class="leading-relaxed text-sm">${contenidoMostrado}</p>
                                     ${renderAdjuntosHTML(msg.adjuntos || [])}
                                     <div class="flex items-center justify-end gap-1.5 text-[10px] text-indigo-100 mt-1 opacity-90">
                                         <span class="whitespace-nowrap">${formatearHoraDashboard(msg.fecha_envio)}</span>
                                         ${badgeEdicion}
                                         <span class="iconify" data-icon="${msg.leido ? "mdi:check-all" : "mdi:check"}" style="${msg.leido ? "color: #7dd3fc;" : ""}" data-width="19"></span>
+                                      <button type="button" onclick="abrirAccionesMensajeDesdeBoton(event, this.closest('.message-item'))" class="btn-opciones-mensaje ml-1 text-indigo-200 hover:text-white transition-colors" title="Opciones de mensaje">
+                                        <span class="iconify" data-icon="mdi:dots-vertical" data-width="14"></span>
+                                      </button>
                                     </div>
                                 </div>
                             </div>
@@ -4706,16 +5803,22 @@ function mostrarMensajesDashboard(mensajes) {
                         <div class="flex justify-start group ${animationClass} w-full">
                             <div class="flex flex-col items-start max-w-[90%] md:max-w-[85%]">
                                 ${nombreEmisorHtml}
-                                <div class="bg-white border border-slate-200 p-2.5 px-3.5 rounded-2xl rounded-tl-none shadow-sm message-item hover:shadow-md w-fit"
+                                  <div class="bg-white border border-slate-200 p-2.5 px-3.5 rounded-2xl rounded-tl-none shadow-sm message-item hover:shadow-md w-fit relative"
+                                    oncontextmenu="return abrirMenuMensajeDesdeInline(event, this)"
                                      data-message-id="${msg.id_mensaje}"
                                      data-message-content="${(contenidoMostrado || "").replace(/\"/g, "&quot;")}"
                                      data-puede-editar="${puedeEditar}"
-                                     oncontextmenu="mostrarMenuContextual(event, ${msg.id_mensaje}, '${(contenidoMostrado || "").replace(/'/g, "\\'")}', ${puedeEditar}, ${puedeBorrarParaTodos}, ${puedeBorrarParaMi}); return false;">
+                                    data-es-mio="false"
+                                    data-puede-borrar-todos="${puedeBorrarParaTodos}"
+                                    data-puede-borrar-mi="${puedeBorrarParaMi}">
                                     <p class="text-slate-800 leading-relaxed text-sm">${contenidoMostrado}</p>
                                     ${renderAdjuntosHTML(msg.adjuntos || [])}
                                     <div class="flex items-center justify-start gap-1.5 text-[10px] text-slate-400 mt-1">
                                         <span class="whitespace-nowrap">${formatearHoraDashboard(msg.fecha_envio)}</span>
                                         ${badgeEdicion}
+                                      <button type="button" onclick="abrirAccionesMensajeDesdeBoton(event, this.closest('.message-item'))" class="btn-opciones-mensaje ml-1 text-slate-400 hover:text-slate-700 transition-colors" title="Opciones de mensaje">
+                                        <span class="iconify" data-icon="mdi:dots-vertical" data-width="14"></span>
+                                      </button>
                                     </div>
                                 </div>
                             </div>
@@ -4788,7 +5891,7 @@ function renderAdjuntosHTML(adjuntos) {
   // Imágenes que no son thumbnails de vídeo
   for (const img of images) {
     if (usedThumbs.has(img.url)) continue;
-    parts.push(`<div class="mt-2"><img src="${img.url}" alt="adjunto" class="max-w-xs rounded cursor-pointer" onclick="openImageFullscreen('${img.url}')"></div>`);
+    parts.push(`<div class="mt-2"><img src="${img.url}" alt="Adjunto" class="max-w-xs rounded cursor-pointer" onclick="openImageFullscreen('${img.url}')"></div>`);
   }
 
   // Documentos: tarjeta de descarga con icono SVG según tipo
@@ -4853,20 +5956,52 @@ let mensajeEnEdicion = null;
 async function enviarMensajeDashboard(e) {
   if (e && e.preventDefault) e.preventDefault();
 
-  const input = document.getElementById("message-input-dashboard");
-  const contenido = input && input.value ? input.value.trim() : "";
+  if (isSendingDashboardMessage) return;
 
-  if (
-    (!contenido && selectedFilesDashboard.length === 0) ||
-    !conversacionActivaDashboard
-  )
+  if (!conversacionActivaDashboard) {
+    Toast.error("Sin conversación", "Selecciona una conversación primero.");
     return;
+  }
+
+  const input = document.getElementById("message-input-dashboard");
+  const contenido = input && input.value ? normalizarContenidoMensaje(input.value) : "";
+
+  const validacionAdjuntos = validarAdjuntosMensajeria(selectedFilesDashboard);
+  if (!validacionAdjuntos.ok) {
+    Toast.error("Adjuntos inválidos", validacionAdjuntos.mensaje);
+    return;
+  }
+
+  if (contenido.length > MENSAJERIA_LIMITES.MAX_CARACTERES_MENSAJE) {
+    Toast.error(
+      "Mensaje demasiado largo",
+      `Máximo ${MENSAJERIA_LIMITES.MAX_CARACTERES_MENSAJE} caracteres.`,
+    );
+    return;
+  }
+
+  if (!contenido && selectedFilesDashboard.length === 0) {
+    Toast.error("Mensaje vacío", "Escribe un mensaje o adjunta un archivo.");
+    return;
+  }
+
+  const sendBtn = document.getElementById("send-message-btn-dashboard");
+  isSendingDashboardMessage = true;
+  if (sendBtn) sendBtn.disabled = true;
 
   try {
     const personaId = await obtenerPersonaIdActual();
 
     // Si estamos editando
     if (mensajeEnEdicion) {
+      if (selectedFilesDashboard.length > 0) {
+        Toast.error(
+          "Edición inválida",
+          "No puedes adjuntar archivos al editar un mensaje.",
+        );
+        return;
+      }
+
       const msgElement = document.querySelector(
         `[data-message-id="${mensajeEnEdicion.idMensaje}"]`,
       );
@@ -5031,6 +6166,9 @@ async function enviarMensajeDashboard(e) {
   } catch (error) {
     console.error("Error:", error);
     Toast.error("Error", error.message || "Error al procesar el mensaje");
+  } finally {
+    isSendingDashboardMessage = false;
+    if (sendBtn) sendBtn.disabled = false;
   }
 }
 
@@ -5268,7 +6406,7 @@ async function uploadSelectedFiles(filesArray) {
         mime: resp.mime || file.type,
         nombre_original: resp.nombre_original || file.name,
         tamano_bytes: resp.tamano_bytes || file.size,
-        tipo: file.type && file.type.startsWith("video/") ? "video" : "image",
+        tipo: file.type && file.type.startsWith("video/") ? "video" : "Image",
       };
       uploaded.push(mainMeta);
       if (thumbMeta) uploaded.push(thumbMeta);
@@ -5442,13 +6580,23 @@ function refreshAttachmentsPreview() {
   if (fileInput) {
     fileInput.addEventListener("change", (ev) => {
       const files = Array.from(ev.target.files || []);
-      // Limitar número/size si se desea (puedes ajustar aquí)
+
+      const proposed = [...selectedFilesDashboard, ...files];
+      const validacion = validarAdjuntosMensajeria(proposed);
+      if (!validacion.ok) {
+        Toast.error("Adjuntos inválidos", validacion.mensaje);
+        ev.target.value = "";
+        return;
+      }
+
       files.forEach((f) => selectedFilesDashboard.push(f));
       refreshAttachmentsPreview();
+      ev.target.value = "";
     });
   }
 
   if (form) {
+    form.removeEventListener("submit", enviarMensajeDashboard);
     form.addEventListener("submit", enviarMensajeDashboard);
   }
 })();
@@ -5630,7 +6778,7 @@ async function vaciarMensajesParaMi() {
                             ¿Estás seguro de que deseas eliminar todos los mensajes de la conversación con <strong>${nombreContacto}</strong>?
                         </p>
                         <p style="font-size: 14px; color: #6b7280; margin-bottom: 0;">
-                            Esta acción solo eliminará los mensajes para ti. El otro usuario seguirá viendo los mensajes.
+                            Esta acción solo eliminará los mensajes para ti. el otro usuario seguirá viendo los mensajes.
                         </p>
                     </div>
                 `,
@@ -5709,22 +6857,6 @@ async function vaciarMensajesParaMi() {
 // ============================================
 // FINALIZAR INTERCAMBIO DESDE DASHBOARD
 // ============================================
-
-// Event listener para el botón Vaciar Mensajes
-document.addEventListener(
-  "click",
-  (e) => {
-    if (
-      e.target.id === "vaciarMensajesBtn" ||
-      e.target.closest("#vaciarMensajesBtn")
-    ) {
-      e.preventDefault();
-      e.stopPropagation();
-      vaciarMensajesParaMi();
-    }
-  },
-  true,
-);
 
 // Event listener para el botón Finalizar Intercambio
 document.addEventListener(
@@ -5906,11 +7038,33 @@ async function finalizarIntercambioDashboard() {
       }
 
       // Mostrar modal de calificación
-      mostrarModalCalificacionDashboard(
-        data.intercambio.id_intercambio,
-        idContacto,
-        nombreContacto,
-      );
+      try {
+        mostrarModalCalificacionDashboard(
+          data.intercambio.id_intercambio,
+          idContacto,
+          nombreContacto,
+        );
+      } catch (modalError) {
+        console.error("Error al abrir modal de calificación:", modalError);
+        Swal.fire({
+          icon: "warning",
+          title: "Intercambio finalizado",
+          html: `
+                            <div style="text-align: center;">
+                                <p style="color: #4b5563; font-size: 15px; margin-bottom: 12px;">
+                                    El intercambio se finalizó correctamente.
+                                </p>
+                                <p style="color: #6b7280; font-size: 13px;">
+                                    Hubo un problema al abrir la ventana de calificación. Puedes calificar después desde tu historial.
+                                </p>
+                            </div>
+                        `,
+          confirmButtonColor: "#3b82f6",
+          customClass: {
+            popup: "rounded-lg shadow-2xl",
+          },
+        });
+      }
     } else {
       Swal.fire({
         icon: "error",
@@ -5955,6 +7109,11 @@ function mostrarModalCalificacionDashboard(
   idPersonaCalificada,
   nombrePersona,
 ) {
+  const nombrePersonaSeguro =
+    typeof nombrePersona === "string" && nombrePersona.trim()
+      ? nombrePersona
+      : "la otra persona";
+
   console.log("   mostrarModalCalificacionDashboard recibió:");
   console.log(
     "   idIntercambio:",
@@ -5968,7 +7127,7 @@ function mostrarModalCalificacionDashboard(
     "tipo:",
     typeof idPersonaCalificada,
   );
-  console.log("   nombrePersona:", nombrePersona);
+  console.log("   nombrePersona:", nombrePersonaSeguro);
 
   const modal = document.createElement("div");
   modal.id = "modalCalificacionDashboard";
@@ -5989,7 +7148,7 @@ function mostrarModalCalificacionDashboard(
                                     Califica tu experiencia
                                 </h2>
                                 <p style="margin: 0; font-size: 14px; color: #64748b; line-height: 1.5;">
-                                    ¿Cómo fue tu intercambio con <strong style="color: #334155;">${nombrePersona}</strong>?
+                                  ¿Cómo fue tu intercambio con <strong style="color: #334155;">${nombrePersonaSeguro}</strong>?
                                 </p>
                             </div>
                         </div>
@@ -6075,11 +7234,11 @@ function mostrarModalCalificacionDashboard(
                         <!-- Campo de comentario -->
                         <div class="mb-6">
                             <label style="display: block; font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 8px;">
-                                Comentario <span style="color: #94a3b8; font-weight: 400;">(opcional)</span>
+                                Comentario <span style="color: #94a3b8; font-weight: 400;">(Opcional)</span>
                             </label>
                             <textarea id="comentarioCalificacionDashboard" rows="3" maxlength="500"
                                       style="width: 100%; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; color: #1e293b; resize: none; font-family: inherit; transition: border-color 0.15s;"
-                                      placeholder="Comparte tu experiencia con ${nombrePersona}..."
+                                      placeholder="Comparte tu experiencia con ${nombrePersonaSeguro}..."
                                       onfocus="this.style.borderColor='#3b82f6'; this.style.outline='none';"
                                       onblur="this.style.borderColor='#cbd5e1';"></textarea>
                             <p style="margin: 6px 0 0; font-size: 12px; color: #94a3b8;">Máximo 500 caracteres</p>
@@ -6092,7 +7251,7 @@ function mostrarModalCalificacionDashboard(
                             Omitir
                         </button>
                         <button id="btnEnviarCalificacionDashboard" style="padding: 9px 18px; background: #3b82f6; color: white; border: none; border-radius: 8px; font-weight: 500; font-size: 14px; cursor: pointer; transition: all 0.15s; box-shadow: 0 1px 2px rgba(59, 130, 246, 0.2);" disabled>
-                            Enviar Calificación
+                            Enviar calificación
                         </button>
                     </div>
 
@@ -6509,7 +7668,7 @@ function mostrarModalCalificacionDashboard(
                                     No se pudo conectar con el servidor
                                 </p>
                                 <p style="color: #6b7280; font-size: 13px;">
-                                    Tu calificación no fue guardada. Por favor, intenta nuevamente.
+                                    Tu calificación no fue guardada. por favor, intenta nuevamente.
                                 </p>
                             </div>
                         `,
@@ -6558,6 +7717,7 @@ function formatearHoraDashboard(fecha) {
 
 function scrollToBottomDashboard() {
   const container = document.getElementById("mensajes-container-dashboard");
+  if (!container) return;
   setTimeout(() => {
     container.scrollTop = container.scrollHeight;
   }, 100);
@@ -6568,6 +7728,202 @@ function scrollToBottomDashboard() {
 // ============================================
 let mensajeSeleccionadoId = null;
 let mensajeSeleccionadoContenido = "";
+window.mensajeSeleccionadoId = null;
+let panelAccionesMensajeActivo = null;
+let hostPanelAccionesMensaje = null;
+let handlersPanelAccionesMensaje = null;
+
+function obtenerDatosMenuDesdeElemento(element) {
+  const asBool = (v, fallback = false) => {
+    if (v === "true") return true;
+    if (v === "false") return false;
+    return fallback;
+  };
+
+  if (!element) return null;
+
+  return {
+    messageId: element.getAttribute("data-message-id"),
+    messageContent: element.getAttribute("data-message-content") || "",
+    puedeEditar: asBool(element.getAttribute("data-puede-editar"), false),
+    puedeBorrarTodos: asBool(
+      element.getAttribute("data-puede-borrar-todos"),
+      false,
+    ),
+    puedeBorrarMi: asBool(element.getAttribute("data-puede-borrar-mi"), true),
+  };
+}
+
+function abrirMenuMensajeDesdeInline(event, element) {
+  if (event && typeof event.preventDefault === "function") event.preventDefault();
+  if (event && typeof event.stopPropagation === "function") event.stopPropagation();
+
+  const datos = obtenerDatosMenuDesdeElemento(element);
+  if (!datos || !datos.messageId) return false;
+
+  mostrarMenuContextual(
+    event || { preventDefault: () => {}, pageX: 0, pageY: 0 },
+    datos.messageId,
+    datos.messageContent,
+    datos.puedeEditar,
+    datos.puedeBorrarTodos,
+    datos.puedeBorrarMi,
+    element,
+  );
+
+  return false;
+}
+
+function abrirAccionesMensajeDesdeBoton(event, element) {
+  if (event && typeof event.preventDefault === "function") event.preventDefault();
+  if (event && typeof event.stopPropagation === "function") event.stopPropagation();
+
+  const datos = obtenerDatosMenuDesdeElemento(element);
+  if (!datos || !datos.messageId) return;
+
+  abrirPanelAccionesMensaje(element, datos);
+}
+
+function cerrarPanelAccionesMensaje() {
+  if (panelAccionesMensajeActivo) {
+    panelAccionesMensajeActivo.remove();
+    panelAccionesMensajeActivo = null;
+    hostPanelAccionesMensaje = null;
+  }
+
+  if (handlersPanelAccionesMensaje) {
+    const { onResize, onWheel, onScroll } = handlersPanelAccionesMensaje;
+    window.removeEventListener("resize", onResize);
+    window.removeEventListener("wheel", onWheel, true);
+    window.removeEventListener("scroll", onScroll, true);
+    handlersPanelAccionesMensaje = null;
+  }
+}
+
+function posicionarPanelAccionesMensaje(element, panel) {
+  if (!element || !panel) return;
+
+  const rect = element.getBoundingClientRect();
+  const panelRect = panel.getBoundingClientRect();
+  const gap = 8;
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  const esMio = element.getAttribute("data-es-mio") === "true";
+
+  // Preferir abajo como WhatsApp; si no cabe, subir.
+  let top = rect.bottom + gap;
+  if (top + panelRect.height > vh - 8) {
+    top = rect.top - panelRect.height - gap;
+  }
+  if (top < 8) top = 8;
+
+  let left = esMio ? rect.right - panelRect.width : rect.left;
+  if (left + panelRect.width > vw - 8) left = vw - panelRect.width - 8;
+  if (left < 8) left = 8;
+
+  panel.style.top = `${Math.round(top)}px`;
+  panel.style.left = `${Math.round(left)}px`;
+}
+
+function abrirPanelAccionesMensaje(element, datos) {
+  if (!element || !datos || !datos.messageId) return;
+
+  mensajeSeleccionadoId = datos.messageId;
+  mensajeSeleccionadoContenido = datos.messageContent || "";
+  window.mensajeSeleccionadoId = datos.messageId;
+
+  const allowEditar = !!datos.puedeEditar;
+  const allowBorrarTodos = !!datos.puedeBorrarTodos;
+  const allowBorrarMi =
+    !!datos.puedeBorrarMi || (!allowEditar && !allowBorrarTodos);
+
+  // Toggle si se vuelve a tocar el mismo mensaje
+  if (panelAccionesMensajeActivo && hostPanelAccionesMensaje === element) {
+    cerrarPanelAccionesMensaje();
+    return;
+  }
+
+  cerrarPanelAccionesMensaje();
+
+  const panel = document.createElement("div");
+  panel.className =
+    "fixed z-[10090] min-w-[190px] bg-white border border-slate-200 rounded-xl shadow-2xl p-2";
+
+  const botones = [];
+  if (allowEditar) {
+    botones.push(`
+      <button data-accion-msg="editar" class="w-full px-3 py-2 rounded-lg text-left hover:bg-slate-50 text-slate-700 text-sm font-medium flex items-center gap-2">
+        <span class="iconify" data-icon="mdi:pencil" data-width="16"></span>
+        Editar
+      </button>
+    `);
+  }
+  if (allowBorrarTodos) {
+    botones.push(`
+      <button data-accion-msg="borrar-todos" class="w-full px-3 py-2 rounded-lg text-left hover:bg-red-50 text-red-700 text-sm font-medium flex items-center gap-2">
+        <span class="iconify" data-icon="mdi:delete-outline" data-width="16"></span>
+        Eliminar para todos
+      </button>
+    `);
+  }
+  if (allowBorrarMi) {
+    botones.push(`
+      <button data-accion-msg="borrar-mi" class="w-full px-3 py-2 rounded-lg text-left hover:bg-amber-50 text-amber-700 text-sm font-medium flex items-center gap-2">
+        <span class="iconify" data-icon="mdi:delete-sweep-outline" data-width="16"></span>
+        Borrar solo para mí
+      </button>
+    `);
+  }
+
+  panel.innerHTML = botones.join("");
+  document.body.appendChild(panel);
+  if (window.Iconify) Iconify.scan(panel);
+  posicionarPanelAccionesMensaje(element, panel);
+
+  panel.addEventListener("click", async (ev) => {
+    const btn = ev.target.closest("button[data-accion-msg]");
+    if (!btn) return;
+
+    const accion = btn.getAttribute("data-accion-msg");
+    cerrarPanelAccionesMensaje();
+
+    if (accion === "editar") {
+      iniciarEdicionMensaje(mensajeSeleccionadoId, mensajeSeleccionadoContenido);
+      return;
+    }
+    if (accion === "borrar-todos") {
+      await confirmarBorrarMensaje(mensajeSeleccionadoId, "todos");
+      return;
+    }
+    if (accion === "borrar-mi") {
+      await confirmarBorrarMensaje(mensajeSeleccionadoId, "mi");
+    }
+  });
+
+  panelAccionesMensajeActivo = panel;
+  hostPanelAccionesMensaje = element;
+
+  const onResize = () => {
+    if (!panelAccionesMensajeActivo || !hostPanelAccionesMensaje) return;
+    posicionarPanelAccionesMensaje(hostPanelAccionesMensaje, panelAccionesMensajeActivo);
+  };
+
+  const onWheel = (ev) => {
+    if (!panelAccionesMensajeActivo) return;
+    const dentroPanel = panelAccionesMensajeActivo.contains(ev.target);
+    const enMensaje = hostPanelAccionesMensaje && hostPanelAccionesMensaje.contains(ev.target);
+    if (!dentroPanel && !enMensaje) cerrarPanelAccionesMensaje();
+  };
+
+  const onScroll = () => {
+    cerrarPanelAccionesMensaje();
+  };
+
+  window.addEventListener("resize", onResize);
+  window.addEventListener("wheel", onWheel, true);
+  window.addEventListener("scroll", onScroll, true);
+  handlersPanelAccionesMensaje = { onResize, onWheel, onScroll };
+}
 
 function mostrarMenuContextual(
   event,
@@ -6576,46 +7932,40 @@ function mostrarMenuContextual(
   puedeEditar,
   puedeBorrarParaTodos,
   puedeBorrarParaMi,
+  anchorElement = null,
 ) {
-  event.preventDefault();
+  if (event && typeof event.preventDefault === "function") event.preventDefault();
 
-  const menu = document.getElementById("messageContextMenu");
-  mensajeSeleccionadoId = messageId;
-  mensajeSeleccionadoContenido = messageContent;
+  const host =
+    anchorElement ||
+    (event && event.target && event.target.closest
+      ? event.target.closest(".message-item")
+      : null);
 
-  // Actualizar opciones del menú basado en permisos
-  const editarBtn = menu.querySelector('[data-action="editar"]');
-  const borrarTodosBtn = menu.querySelector('[data-action="borrar-todos"]');
-  const borrarMiBtn = menu.querySelector('[data-action="borrar-mi"]');
-
-  if (editarBtn) editarBtn.style.display = puedeEditar ? "flex" : "none";
-  if (borrarTodosBtn)
-    borrarTodosBtn.style.display = puedeBorrarParaTodos ? "flex" : "none";
-  if (borrarMiBtn)
-    borrarMiBtn.style.display = puedeBorrarParaMi ? "flex" : "none";
-
-  // Ajustar posición del menú para que no se salga de la pantalla
-  const menuWidth = 200; // ancho aproximado del menú
-  const windowWidth = window.innerWidth;
-  let leftPosition = event.pageX;
-
-  // Si el menú se saldría por la derecha, posicionarlo a la izquierda del cursor
-  if (leftPosition + menuWidth > windowWidth) {
-    leftPosition = event.pageX - menuWidth;
+  if (!host) {
+    confirmarBorrarMensaje(messageId, puedeBorrarParaTodos ? "todos" : "mi");
+    return false;
   }
 
-  menu.style.left = leftPosition + "px";
-  menu.style.top = event.pageY + "px";
-  menu.classList.remove("hidden");
+  abrirPanelAccionesMensaje(host, {
+    messageId,
+    messageContent,
+    puedeEditar,
+    puedeBorrarTodos: puedeBorrarParaTodos,
+    puedeBorrarMi: puedeBorrarParaMi,
+  });
 
   return false;
 }
 
 // Cerrar menú contextual al hacer clic fuera
 document.addEventListener("click", function (event) {
-  const menu = document.getElementById("messageContextMenu");
-  if (menu && !menu.contains(event.target)) {
-    menu.classList.add("hidden");
+  if (!panelAccionesMensajeActivo) return;
+
+  const clicDentroPanel = panelAccionesMensajeActivo.contains(event.target);
+  const clicEnDisparador = !!event.target.closest(".btn-opciones-mensaje");
+  if (!clicDentroPanel && !clicEnDisparador) {
+    cerrarPanelAccionesMensaje();
   }
 });
 
@@ -6624,17 +7974,62 @@ function agregarLongPressListeners() {
   const messages = document.querySelectorAll(".message-item");
   let longPressTimer;
 
+  const asBool = (v, fallback = false) => {
+    if (v === "true") return true;
+    if (v === "false") return false;
+    return fallback;
+  };
+
   messages.forEach((msg) => {
+    // Evitar re-vincular listeners en cada re-render del chat
+    if (msg.dataset.contextBound === "1") return;
+    msg.dataset.contextBound = "1";
+
+    // Click derecho (desktop)
+    msg.addEventListener("contextmenu", function (e) {
+      e.preventDefault();
+      const messageId = this.getAttribute("data-message-id");
+      const messageContent = this.getAttribute("data-message-content") || "";
+      const puedeEditar = asBool(this.getAttribute("data-puede-editar"), false);
+      const puedeBorrarTodos = asBool(
+        this.getAttribute("data-puede-borrar-todos"),
+        false,
+      );
+      const puedeBorrarMi = asBool(
+        this.getAttribute("data-puede-borrar-mi"),
+        true,
+      );
+
+      mostrarMenuContextual(
+        e,
+        messageId,
+        messageContent,
+        puedeEditar,
+        puedeBorrarTodos,
+        puedeBorrarMi,
+        this,
+      );
+    });
+
     // Touch events para móvil
     msg.addEventListener(
       "touchstart",
       function (e) {
+        const messageElement = this;
         const messageId = this.getAttribute("data-message-id");
         const messageContent = this.getAttribute("data-message-content");
+        const puedeEditar = asBool(this.getAttribute("data-puede-editar"), false);
+        const puedeBorrarTodos = asBool(
+          this.getAttribute("data-puede-borrar-todos"),
+          false,
+        );
+        const puedeBorrarMi = asBool(
+          this.getAttribute("data-puede-borrar-mi"),
+          true,
+        );
 
         longPressTimer = setTimeout(() => {
           const touch = e.touches[0];
-          // Si no conocemos permisos, mostramos todas las opciones posibles
           mostrarMenuContextual(
             {
               preventDefault: () => {},
@@ -6643,9 +8038,10 @@ function agregarLongPressListeners() {
             },
             messageId,
             messageContent,
-            true,
-            true,
-            true,
+            puedeEditar,
+            puedeBorrarTodos,
+            puedeBorrarMi,
+            messageElement,
           );
         }, 500);
       },
@@ -6681,9 +8077,22 @@ async function editarMensaje() {
 // Eliminar mensaje (confirmación con opción para todos)
 async function eliminarMensaje() {
   const menu = document.getElementById("messageContextMenu");
-  menu.classList.add("hidden");
+  if (menu) menu.classList.add("hidden");
 
   await confirmarBorrarMensaje(mensajeSeleccionadoId, "todos");
+}
+
+async function eliminarMensajeParaMi() {
+  const menu = document.getElementById("messageContextMenu");
+  if (menu) menu.classList.add("hidden");
+
+  const idMensaje = mensajeSeleccionadoId || window.mensajeSeleccionadoId;
+  if (!idMensaje) {
+    Toast.warning("Selecciona un mensaje", "No se detectó el mensaje a eliminar.");
+    return;
+  }
+
+  await confirmarBorrarMensaje(idMensaje, "mi");
 }
 
 // Limpiar intervalo al cambiar de vista
@@ -6771,13 +8180,13 @@ window.addEventListener("beforeunload", () => {
   const aiChatSend = document.getElementById("aiChatSend");
 
   if (!aiChatBtn || !aiChatModal) {
-    console.warn("AI Chat elements not found");
+    // AI Chat esta deshabilitado si los elementos no existen en el DOM.
     return;
   }
 
   // n8n Webhook URL for the AI agent
   const N8N_WEBHOOK_URL =
-    "http://localhost:5678/webhook/e198fe85-0b97-4d32-8a5a-889aa29cd142/chat";
+    "https://tu-n8n-publico.com/webhook/e198fe85-0b97-4d32-8a5a-889aa29cd142/chat";
 
   // Session ID for conversation memory
   let sessionId = localStorage.getItem("aiChatSessionId");
@@ -6811,7 +8220,7 @@ window.addEventListener("beforeunload", () => {
   // Add message to chat
   function addMessage(content, isUser = false) {
     const messageDiv = document.createElement("div");
-    messageDiv.className = `ai-message ${isUser ? "user" : "bot"}`;
+    messageDiv.className = `ai-message ${isUser ? "user" : "Bot"}`;
 
     const icon = isUser ? "mdi:account" : "mdi:robot-happy";
 
@@ -7106,7 +8515,7 @@ window.addEventListener("beforeunload", () => {
           for (const line of lines) {
             try {
               const lineData = JSON.parse(line);
-              // Handle n8n streaming format: {"type":"item","content":"..."}
+              // Handle n8n streaming format: {"type":"Item","content":"..."}
               if (lineData.content) {
                 accumulatedText += lineData.content;
                 validJsonFound = true;
@@ -7152,7 +8561,7 @@ window.addEventListener("beforeunload", () => {
         error.message.includes("NetworkError")
       ) {
         errorMsg +=
-          "Por favor verifica que el servidor n8n esté activo en http://localhost:5678";
+          "Por favor verifica que el servidor n8n esté activo";
       } else {
         errorMsg += "Por favor intenta de nuevo.";
       }
@@ -7392,6 +8801,9 @@ window.addEventListener("beforeunload", () => {
       console.warn("No se pudo obtener nombre de usuario:", e);
     }
 
+    // Abrir modal de inmediato para dar feedback visual aunque la señalizacion tarde.
+    abrirJitsiModal(roomId, nombreUsuario, conv.nombre_contacto || "Contacto");
+
     // Enviar notificación de llamada al otro usuario via SISTEMA DE SEÑALIZACIÓN (no chat)
     try {
       const personaIdRaw = await obtenerPersonaIdActual();
@@ -7421,7 +8833,7 @@ window.addEventListener("beforeunload", () => {
 
       // POST /api/call-signals/send
       // id_mensaje = null (no vinculamos a un mensaje de chat visible)
-      await fetch(`${window.APP_CONFIG.BACKEND_URL}/api/call-signals/send`, {
+      fetch(`${window.APP_CONFIG.BACKEND_URL}/api/call-signals/send`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -7435,6 +8847,8 @@ window.addEventListener("beforeunload", () => {
             room_id: roomId,
           }),
         }),
+      }).catch((err) => {
+        console.warn("No se pudo enviar señal de videollamada (continuando):", err);
       });
       console.log(
         "✅ Señal de videollamada enviada correctamenta a ID:",
@@ -7442,11 +8856,9 @@ window.addEventListener("beforeunload", () => {
       );
     } catch (e) {
       console.error("Error enviando notificación de videollamada:", e);
-      alert("Error al conectar la llamada. Revisa la consola.");
+      // No bloquear la apertura del modal por errores de señalizacion.
+      Toast?.warning?.("Se abrio la llamada", "No se pudo notificar al contacto automaticamente");
     }
-
-    // Abrir modal y cargar Jitsi
-    abrirJitsiModal(roomId, nombreUsuario, conv.nombre_contacto || "Contacto");
   };
 
   // --- POLLING para llamadas entrantes usando call-signals ---
@@ -7548,8 +8960,18 @@ window.addEventListener("beforeunload", () => {
     // Limpiar contenedor
     container.innerHTML = "";
 
+    // Asegurar que el modal no quede atrapado en contenedores con overflow/transform.
+    if (modal.parentElement !== document.body) {
+      document.body.appendChild(modal);
+    }
+
     // Mostrar modal
     modal.classList.remove("hidden");
+    modal.style.display = "block";
+    modal.style.visibility = "visible";
+    modal.style.opacity = "1";
+    modal.style.zIndex = "2147483000";
+    document.body.style.overflow = "hidden";
     statusEl.textContent = `Conectando con ${nombreContacto}...`;
 
     // Crear instancia de Jitsi con configuración compatible
@@ -7570,8 +8992,9 @@ window.addEventListener("beforeunload", () => {
           displayName: nombreUsuario,
         },
         configOverwrite: {
-          startWithAudioMuted: false,
-          startWithVideoMuted: false,
+          // Evita fallos de permisos/dispositivo al entrar a la sala.
+          startWithAudioMuted: true,
+          startWithVideoMuted: true,
           // Habilitar prejoin es CLAVE para evitar el error membersOnly en muchas ocasiones
           prejoinPageEnabled: true,
           // Deshabilitar lobby explícitamente
@@ -7637,8 +9060,13 @@ window.addEventListener("beforeunload", () => {
 
     if (modal) {
       modal.classList.add("hidden");
+      modal.style.display = "";
+      modal.style.visibility = "";
+      modal.style.opacity = "";
+      modal.style.zIndex = "";
     }
 
+    document.body.style.overflow = "";
     currentJitsiRoomId = null;
     console.log("📞 Videollamada cerrada");
   };
@@ -7935,15 +9363,6 @@ async function cargarOrdenesTrabajo() {
   }
   // ──────────────────────────────────────────────────────────────
 
-  // Mostrar spinner
-  grid.innerHTML = `
-    <div class="col-span-full flex items-center justify-center py-16">
-      <div class="text-center">
-        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-        <p class="text-gray-500">Cargando órdenes de trabajo...</p>
-      </div>
-    </div>`;
-
   // Admin también carga especialidades para el modal de creación
   if (esAdmin) await cargarEspecialidadesOrden();
 
@@ -8043,7 +9462,7 @@ function renderizarOrdenes(ordenes, esAdmin, misPostulacionesMap) {
         <div class="text-center">
           <span class="iconify text-gray-300 mx-auto mb-4" data-icon="mdi:clipboard-text-off-outline" style="font-size:64px;"></span>
           <p class="text-gray-500 font-medium">No hay órdenes de trabajo disponibles${!esAdmin && _ubicacionUsuarioActual ? ` en tu zona (${_ubicacionUsuarioActual})` : ''}</p>
-          ${esAdmin ? '<p class="text-gray-400 text-sm mt-1">Haz clic en &ldquo;Nueva Orden&rdquo; para crear una</p>' : ''}
+          ${esAdmin ? '<p class="text-gray-400 text-sm mt-1">Haz clic en &ldquo;nueva orden&rdquo; para crear una</p>' : ''}
         </div>
       </div>`;
     return;
@@ -8163,8 +9582,12 @@ function filtrarOrdenes(filtro) {
   document.querySelectorAll('.filtro-orden-btn').forEach(btn => {
     const esFiltro = btn.dataset.filtro === filtro;
     btn.classList.toggle('bg-blue-600', esFiltro);
+    btn.classList.toggle('hover:bg-blue-700', esFiltro);
     btn.classList.toggle('text-white', esFiltro);
+    btn.classList.toggle('border-blue-600', esFiltro);
+
     btn.classList.toggle('bg-white', !esFiltro);
+    btn.classList.toggle('hover:bg-gray-50', !esFiltro);
     btn.classList.toggle('text-gray-600', !esFiltro);
     btn.classList.toggle('border', !esFiltro);
     btn.classList.toggle('border-gray-200', !esFiltro);
@@ -8200,12 +9623,17 @@ function abrirModalCrearOrden() {
 
   cargarEspecialidadesOrden();
   modal.classList.remove('hidden');
+
+  // SCRUM-25: Resetear y ocultar mapa al abrir
+  if (window.MapaOT) MapaOT.reset();
 }
 
 /** Cierra el modal de crear/editar */
 function cerrarModalOrden(event) {
   if (event && event.target !== document.getElementById('modalOrdenTrabajo')) return;
   document.getElementById('modalOrdenTrabajo').classList.add('hidden');
+  // SCRUM-25: Resetear mapa al cerrar
+  if (window.MapaOT) MapaOT.reset();
 }
 
 /** Envía el formulario para crear o actualizar una orden */
@@ -8249,7 +9677,7 @@ async function guardarOrdenTrabajo(event) {
     });
 
     const url    = id ? `${API_BASE}/ordenes-trabajo/${id}` : `${API_BASE}/ordenes-trabajo`;
-    const method = id ? 'PUT' : 'POST';
+    const method = id ? 'PUT' : 'Post';
 
     const res = await fetch(url, { method, headers, body });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -8288,6 +9716,9 @@ async function editarOrden(id) {
   document.getElementById('modalOrdenTitulo').textContent = 'Editar Orden de Trabajo';
   document.getElementById('btnGuardarOrden').textContent = 'Guardar Cambios';
   document.getElementById('modalOrdenTrabajo').classList.remove('hidden');
+
+  // SCRUM-25: Resetear mapa al editar para evitar estados anteriores
+  if (window.MapaOT) MapaOT.reset();
 }
 
 /** Cancela (cambia estado a 'cancelada') una orden */
@@ -8304,8 +9735,8 @@ async function cancelarOrden(id) {
             <div class="w-12 h-12 rounded-full bg-orange-100 text-orange-500 flex items-center justify-center mb-4">
               <span class="iconify text-2xl" data-icon="mdi:close-circle-outline"></span>
             </div>
-            <h3 class="text-lg font-bold text-gray-900 mb-2">Cancelar Orden</h3>
-            <p class="text-sm text-gray-500 mb-6">¿Seguro que deseas cancelar esta orden de trabajo? Esta acción no se puede deshacer.</p>
+            <h3 class="text-lg font-bold text-gray-900 mb-2">Cancelar orden</h3>
+            <p class="text-sm text-gray-500 mb-6">¿Seguro que deseas cancelar esta orden de trabajo? esta acción no se puede deshacer.</p>
             <div class="flex gap-3 w-full">
               <button id="ot-cancel-no" class="flex-1 px-4 py-2.5 bg-gray-100 text-gray-700 font-medium rounded-xl hover:bg-gray-200 transition-colors">No, mantener</button>
               <button id="ot-cancel-yes" class="flex-1 px-4 py-2.5 bg-orange-500 text-white font-semibold rounded-xl hover:bg-orange-600 shadow-lg shadow-orange-200 transition-all">Sí, cancelar</button>
@@ -8365,8 +9796,8 @@ async function verDetalleOrden(id) {
       ${orden.descripcion ? `<div><span class="font-semibold text-gray-800">Descripción:</span><p class="text-gray-600 mt-0.5">${escapeHtml(orden.descripcion)}</p></div>` : ''}
       ${(orden.ubicacion || orden.ubicacion_obra) ? `<div><span class="font-semibold text-gray-800">Ubicación:</span><p class="text-gray-600 mt-0.5">${escapeHtml(orden.ubicacion || orden.ubicacion_obra)}</p></div>` : ''}
       <div class="grid grid-cols-2 gap-3">
-        <div><span class="font-semibold text-gray-800">Fecha Inicio:</span><p class="text-gray-600 mt-0.5">${fechaInicio}</p></div>
-        <div><span class="font-semibold text-gray-800">Fecha Fin:</span><p class="text-gray-600 mt-0.5">${fechaFin}</p></div>
+        <div><span class="font-semibold text-gray-800">Fecha inicio:</span><p class="text-gray-600 mt-0.5">${fechaInicio}</p></div>
+        <div><span class="font-semibold text-gray-800">Fecha fin:</span><p class="text-gray-600 mt-0.5">${fechaFin}</p></div>
       </div>
       ${(orden.especialidad || orden.nombre_categoria) ? `<div><span class="font-semibold text-gray-800">Especialidad:</span><p class="text-gray-600 mt-0.5">${escapeHtml(orden.especialidad || orden.nombre_categoria)}</p></div>` : ''}
       <div class="grid grid-cols-2 gap-3">
@@ -8374,7 +9805,7 @@ async function verDetalleOrden(id) {
         <div><span class="font-semibold text-gray-800">Estado:</span><p class="text-gray-600 mt-0.5">${estadoLabels[orden.estado] || orden.estado || '—'}</p></div>
       </div>
       <div class="grid grid-cols-2 gap-3">
-        <div><span class="font-semibold text-gray-800">Máx. Postulantes:</span><p class="text-gray-600 mt-0.5">${orden.max_postulantes || 1}</p></div>
+        <div><span class="font-semibold text-gray-800">Máx. postulantes:</span><p class="text-gray-600 mt-0.5">${orden.max_postulantes || 1}</p></div>
         <div><span class="font-semibold text-gray-800">Postulantes:</span><p class="text-gray-600 mt-0.5">${orden.total_postulaciones || 0} / ${orden.max_postulantes || 1}</p></div>
       </div>
 
@@ -8383,7 +9814,7 @@ async function verDetalleOrden(id) {
         <button onclick="descargarPDFOrden(${id})"
           class="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-red-50 hover:bg-red-100 text-red-600 font-medium text-sm rounded-xl transition-colors border border-red-200">
           <span class="iconify" data-icon="mdi:file-pdf-box" style="font-size:18px;"></span>
-          Descargar PDF de la orden
+          Descargar pdf de la orden
         </button>
       </div>
 
@@ -8393,7 +9824,7 @@ async function verDetalleOrden(id) {
           <span class="iconify text-blue-500" data-icon="mdi:account-group-outline" style="font-size:17px;"></span>
           Postulantes
         </p>
-        <div id="ot-postulantes-list" class="text-xs text-gray-400 italic">Cargando postulantes...</div>
+        <div id="ot-postulantes-list" class="text-xs text-gray-400 italic"></div>
       </div>` : ''}
     </div>`;
 
@@ -8401,6 +9832,16 @@ async function verDetalleOrden(id) {
 
   // Cargar postulantes para admin (SCRUM-25)
   if (esAdmin) {
+    const container = document.getElementById('ot-postulantes-list');
+    if (!container) return;
+
+    const LOADER_POSTULANTES_DELAY_MS = 1200;
+    let postulantesFinalizados = false;
+    const postulantesLoadingTimer = setTimeout(() => {
+      if (postulantesFinalizados) return;
+      container.innerHTML = '<p class="text-xs text-gray-400 italic">Cargando postulantes...</p>';
+    }, LOADER_POSTULANTES_DELAY_MS);
+
     try {
       const token = localStorage.getItem('token') || localStorage.getItem('authToken');
       const rp = await fetch(`${API_BASE}/ordenes-trabajo/${id}/postulaciones`, {
@@ -8408,38 +9849,109 @@ async function verDetalleOrden(id) {
       });
       const dp = await rp.json();
       const lista = dp.data || [];
-      const container = document.getElementById('ot-postulantes-list');
-      if (!container) return;
       if (!lista.length) {
         container.innerHTML = '<p class="text-xs text-gray-400 italic">Aún no hay postulantes.</p>';
         return;
       }
       container.innerHTML = lista.map(p => {
         const estadoBadge = {
-          pendiente: 'bg-yellow-50 text-yellow-700',
-          aceptada:  'bg-green-50 text-green-700',
-          rechazada: 'bg-red-50 text-red-500'
-        }[p.estado] || 'bg-gray-50 text-gray-600';
+          pendiente: 'bg-yellow-50 text-yellow-700 border-yellow-200',
+          aceptada:  'bg-green-50 text-green-700 border-green-200',
+          rechazada: 'bg-red-50 text-red-500 border-red-200'
+        }[p.estado] || 'bg-gray-50 text-gray-600 border-gray-200';
+
+        // ── Calcular puntuación global (promedio de las 4 métricas) ───────────
+        const punt   = Number(p.puntualidad      || 0);
+        const cal    = Number(p.calidad_trabajo  || 0);
+        const limp   = Number(p.limpieza         || 0);
+        const com    = Number(p.comunicacion     || 0);
+        const nCal   = Number(p.cantidad_calificaciones || 0);
+        const promedio = nCal > 0 ? Math.round((punt + cal + limp + com) / 4) : 0;
+        // Convertir promedio 0-100 → 0-5 estrellas
+        const estrellasNum  = promedio > 0 ? Math.round((promedio / 100) * 5 * 10) / 10 : 0;
+        // Render de estrellas (enteras + media + vacías)
+        function renderEstrellas(val) {
+          const full  = Math.floor(val);
+          const half  = val - full >= 0.3 && val - full < 0.8 ? 1 : 0;
+          const empty = 5 - full - half - (val - full >= 0.8 ? 1 : 0);
+          const fullExtra = val - full >= 0.8 ? 1 : 0;
+          let s = '';
+          for (let i = 0; i < full + fullExtra; i++) s += '<span class="iconify text-amber-400" data-icon="mdi:star" style="font-size:14px;"></span>';
+          if (half) s += '<span class="iconify text-amber-400" data-icon="mdi:star-half-full" style="font-size:14px;"></span>';
+          for (let i = 0; i < Math.max(0, 5 - full - fullExtra - half); i++) s += '<span class="iconify text-gray-300" data-icon="mdi:star-outline" style="font-size:14px;"></span>';
+          return s;
+        }
+
+        // ── Barras de métricas ────────────────────────────────────────────────
+        function barra(label, valor, color) {
+          if (!valor) return '';
+          return `
+            <div class="flex items-center gap-1.5">
+              <span class="text-[10px] text-gray-500 w-20 shrink-0">${label}</span>
+              <div class="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                <div class="h-full rounded-full ${color}" style="width:${valor}%"></div>
+              </div>
+              <span class="text-[10px] text-gray-500 w-6 text-right">${valor}</span>
+            </div>`;
+        }
+
+        const tieneMetricas = nCal > 0;
+        const metricasHtml  = tieneMetricas ? `
+          <div class="mt-2 space-y-1">
+            ${barra('Puntualidad', punt, 'bg-blue-400')}
+            ${barra('Calidad',     cal,  'bg-emerald-400')}
+            ${barra('Limpieza',    limp, 'bg-sky-400')}
+            ${barra('Comunic.',    com,  'bg-violet-400')}
+          </div>` : '';
+
+        // ── Botón Ver Perfil (SCRUM-25) ─────────────────────────────────────────
+        const idUsuarioPostulante = p.usuario_id || p.id_usuario || p.id_Usuario;
+        const btnPerfil = '';
+
         return `
-          <div class="flex items-start gap-3 py-2.5 border-b border-gray-50 last:border-0">
-            <img src="${p.imagen_tecnico || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(p.nombre_tecnico || 'U') + '&size=36&background=e0e7ff&color=4f46e5&rounded=true'}"
-              class="w-9 h-9 rounded-full object-cover shrink-0" onerror="this.src='https://ui-avatars.com/api/?name=U&size=36&background=e0e7ff&color=4f46e5&rounded=true'">
-            <div class="flex-1 min-w-0">
-              <p class="text-sm font-medium text-gray-800 truncate">${escapeHtml(p.nombre_tecnico || 'Usuario')}</p>
-              ${p.mensaje ? `<p class="text-xs text-gray-500 mt-0.5 line-clamp-2">${escapeHtml(p.mensaje)}</p>` : ''}
-              ${p.portafolio_url ? `<a href="${escapeHtml(p.portafolio_url)}" target="_blank" rel="noopener"
-                class="inline-flex items-center gap-1 mt-1.5 px-2 py-1 bg-red-50 hover:bg-red-100 text-red-700 text-xs font-medium rounded-lg transition-colors">
-                <span class="iconify" data-icon="mdi:file-pdf-box" style="font-size:14px;"></span>
-                Ver portafolio PDF
-              </a>` : '<span class="text-xs text-gray-400 italic mt-1 block">Sin portafolio adjunto</span>'}
+          <div class="py-3 border-b border-gray-100 last:border-0">
+            <!-- Fila superior: foto + nombre + estado -->
+            <div class="flex items-start gap-3">
+              <img src="${p.imagen_tecnico || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(p.nombre_tecnico || 'U') + '&size=40&background=e0e7ff&color=4f46e5&rounded=true'}"
+                class="w-10 h-10 rounded-full object-cover shrink-0 ring-2 ring-white shadow"
+                onerror="this.src='https://ui-avatars.com/api/?name=U&size=40&background=e0e7ff&color=4f46e5&rounded=true'">
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center justify-between gap-2 flex-wrap">
+                  <p class="text-sm font-semibold text-gray-800 truncate">${escapeHtml(p.nombre_tecnico || 'Usuario')}</p>
+                  <span class="shrink-0 px-2 py-0.5 rounded-full text-[10px] font-semibold border ${estadoBadge}">${p.estado}</span>
+                </div>
+                <!-- Estrellas -->
+                <div class="flex items-center gap-1 mt-0.5">
+                  ${tieneMetricas
+                    ? `<div class="flex items-center gap-0.5">${renderEstrellas(estrellasNum)}</div>
+                       <span class="text-[10px] text-gray-500">${estrellasNum.toFixed(1)} · ${nCal} reseña${nCal !== 1 ? 's' : ''}</span>`
+                    : `<span class="text-[10px] text-gray-400 italic">Sin calificaciones aún</span>`}
+                </div>
+                <!-- Mensaje de postulación -->
+                ${p.mensaje ? `<p class="text-xs text-gray-500 mt-1 line-clamp-2">${escapeHtml(p.mensaje)}</p>` : ''}
+              </div>
             </div>
-            <span class="shrink-0 px-2 py-0.5 rounded-full text-xs font-medium ${estadoBadge}">${p.estado}</span>
+            <!-- Barras de métricas -->
+            ${metricasHtml}
+            <!-- Línea de acciones: portafolio + ver perfil -->
+            <div class="mt-2 flex flex-wrap items-center gap-2">
+              ${p.portafolio_url
+                ? `<a href="${escapeHtml(p.portafolio_url)}" target="_blank" rel="noopener"
+                     class="inline-flex items-center gap-1 px-2.5 py-1 bg-red-50 hover:bg-red-100 text-red-700 text-[10px] font-medium rounded-lg border border-red-200 transition-colors">
+                     <span class="iconify" data-icon="mdi:file-pdf-box" style="font-size:13px;"></span>
+                     Portafolio PDF
+                   </a>`
+                : `<span class="text-[10px] text-gray-400 italic">Sin portafolio</span>`}
+              ${btnPerfil}
+            </div>
           </div>`;
       }).join('');
       if (window.Iconify) Iconify.scan();
     } catch (e) {
-      const c = document.getElementById('ot-postulantes-list');
-      if (c) c.innerHTML = '<p class="text-xs text-gray-400">No se pudieron cargar los postulantes.</p>';
+      container.innerHTML = '<p class="text-xs text-gray-400">No se pudieron cargar los postulantes.</p>';
+    } finally {
+      postulantesFinalizados = true;
+      clearTimeout(postulantesLoadingTimer);
     }
   }
 }
@@ -8639,21 +10151,21 @@ async function postularseOrden(id) {
                 <p class="text-xs text-gray-400 mt-0.5 line-clamp-1">${titulo}</p>
               </div>
             </div>
-            <label class="text-sm font-medium text-gray-700 mb-1.5">Mensaje <span class="text-gray-400 font-normal">(opcional)</span></label>
+            <label class="text-sm font-medium text-gray-700 mb-1.5">Mensaje <span class="text-gray-400 font-normal">(Opcional)</span></label>
             <textarea id="ot-postular-msg" rows="3"
               class="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-400 resize-none bg-gray-50"
               placeholder="Describe tu experiencia o disponibilidad..."></textarea>
             <label class="text-sm font-medium text-gray-700 mt-3 mb-1.5 flex items-center gap-1">
               <span class="iconify text-red-500" data-icon="mdi:file-pdf-box" style="font-size:15px"></span>
-              Portafolio en PDF <span class="text-gray-400 font-normal">(opcional)</span>
+              Portafolio en PDF <span class="text-gray-400 font-normal">(Opcional)</span>
             </label>
             <label id="ot-pdf-label"
               class="flex items-center gap-2 w-full border-2 border-dashed border-gray-200 rounded-xl px-3 py-2.5 cursor-pointer hover:border-green-400 hover:bg-green-50 transition-colors bg-gray-50">
               <span class="iconify text-red-400" data-icon="mdi:file-pdf-box" style="font-size:20px"></span>
-              <span id="ot-pdf-name" class="text-xs text-gray-500 truncate flex-1">Haz clic para seleccionar un PDF...</span>
+              <span id="ot-pdf-name" class="text-xs text-gray-500 truncate flex-1">Haz clic para seleccionar un pdf...</span>
               <input type="file" id="ot-postular-portfolio" accept=".pdf,application/pdf" class="hidden" />
             </label>
-            <p class="text-xs text-gray-400 mt-1">Máximo 10 MB. El administrador podrá verlo en la lista de postulantes.</p>
+            <p class="text-xs text-gray-400 mt-1">Máximo 10 mb. el administrador podrá verlo en la lista de postulantes.</p>
             <div class="flex gap-3 mt-4">
               <button id="ot-postular-cancel" class="flex-1 px-4 py-2.5 bg-gray-100 text-gray-700 font-medium rounded-xl hover:bg-gray-200 transition-colors">Cancelar</button>
               <button id="ot-postular-confirm" class="flex-1 px-4 py-2.5 bg-green-600 text-white font-semibold rounded-xl hover:bg-green-700 shadow-lg shadow-green-200 transition-all">Postularme</button>
@@ -8773,6 +10285,7 @@ let _alertasLeidas = new Set(           // IDs de alertas ya leídas/descartadas
     JSON.parse(sessionStorage.getItem('alertasLeidas') || '[]')
 );
 let _alertasAnteriorIds = new Set();    // IDs de la vez anterior (para detectar nuevas)
+let _alertaEmailCrossOriginWarned = false;
 let _solicitudesPendientesCount = 0;    // Contador de solicitudes (para badge combinado)
 
 /** Cambia entre las pestañas Solicitudes / Alertas del dropdown */
@@ -9030,11 +10543,19 @@ async function cargarAlertasContextuales() {
         if (realesNuevas.length > 0) {
             const usuarioId = localStorage.getItem('usuarioId');
             if (usuarioId) {
-                fetch(`${API_BASE}/ordenes-trabajo/enviar-alerta-email`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ usuario_id: usuarioId, alertas: realesNuevas })
-                }).catch(e => console.debug('[H8 email]', e));
+            // En despliegues cross-origin (ej. Vercel -> Railway) este endpoint puede fallar por CORS/502.
+            // El disparo de correo debe vivir en backend (job/trigger server-side).
+            const esMismoOrigenApi = API_BASE.startsWith(`${window.location.origin}/api`);
+            if (esMismoOrigenApi) {
+              fetch(`${API_BASE}/ordenes-trabajo/enviar-alerta-email`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ usuario_id: usuarioId, alertas: realesNuevas })
+              }).catch(e => console.debug('[H8 email]', e));
+            } else if (!_alertaEmailCrossOriginWarned) {
+              _alertaEmailCrossOriginWarned = true;
+              console.info('[H8 email] envio desde frontend omitido en cross-origin; mover a backend.');
+            }
             }
         }
 

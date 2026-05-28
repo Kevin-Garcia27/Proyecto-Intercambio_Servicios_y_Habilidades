@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Iniciar Sesión - SEMACKRO</title>
+    <title>Iniciar sesión - SEMACKRO</title>
     <script src="config.js"></script>
     <script src="js/apiHelper.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -142,7 +142,7 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="index.html#como-funciona" data-i18n="nav.howItWorks">Cómo Funciona</a>
+                        <a class="nav-link" href="index.html#como-funciona" data-i18n="nav.howItWorks">Cómo funciona</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="index.html#habilidades" data-i18n="nav.skills">Habilidades</a>
@@ -163,7 +163,7 @@
                                     d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129">
                                 </path>
                             </svg>
-                            <span id="currentLang" class="fw-semibold small">ES</span>
+                            <span id="currentLang" class="fw-semibold small">Es</span>
                             <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M19 9l-7 7-7-7"></path>
@@ -180,7 +180,7 @@
                                         d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129">
                                     </path>
                                 </svg>
-                                <span class="small fw-semibold text-secondary">ES</span>
+                                <span class="small fw-semibold text-secondary">Es</span>
                                 <span class="fw-medium">Español</span>
                             </button>
                             <button onclick="changeLanguage('en')"
@@ -191,13 +191,13 @@
                                         d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129">
                                     </path>
                                 </svg>
-                                <span class="small fw-semibold text-secondary">EN</span>
+                                <span class="small fw-semibold text-secondary">En</span>
                                 <span class="fw-medium">English</span>
                             </button>
                         </div>
                     </div>
 
-                    <a href="registro_prueba.html" class="btn btn-register" data-i18n="nav.register">Crear Cuenta</a>
+                    <a href="registro_prueba.html" class="btn btn-register" data-i18n="nav.register">Crear cuenta</a>
                 </div>
             </div>
         </div>
@@ -216,54 +216,49 @@
                         <polyline points="10 17 15 12 10 7" />
                         <line x1="15" y1="12" x2="3" y2="12" />
                     </svg>
-                    <h1 class="text-2xl sm:text-3xl font-extrabold text-gray-900" data-i18n="login.title">
-                        Iniciar Sesión
+                    <h1 class="text-2xl sm:text-3xl font-extrabold text-gray-900" data-i18n="login.title">Iniciar sesión
                     </h1>
                 </div>
-                <p class="text-sm text-gray-600" data-i18n="login.subtitle">
-                    Inicia sesión para acceder y conectar con la comunidad.
-                </p>
+                <p class="text-sm text-gray-600" data-i18n="login.subtitle">Inicia sesión para acceder y conectar con la
+                    comunidad.</p>
             </div>
 
             <!-- Mensaje de Estado/Error -->
-            <div id="message-box" class="p-3 text-sm font-medium rounded-lg mb-4 text-center hidden">
-            </div>
+            <div id="message-box" class="p-3 text-sm font-medium rounded-lg mb-4 text-center hidden"></div>
 
             <!-- Formulario de Login -->
             <form id="login-form" class="space-y-4">
                 <div>
-                    <label for="email" class="block text-sm font-medium text-gray-700 mb-2" data-i18n="login.email">
-                        Correo Electrónico
-                    </label>
+                    <label for="email" class="block text-sm font-medium text-gray-700 mb-2"
+                        data-i18n="login.email">Correo electrónico</label>
                     <input type="email" id="email" name="email" required autocomplete="email"
                         class="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-150 ease-in-out text-base sm:text-sm"
-                        placeholder="tucorreo@ejemplo.com" data-i18n-placeholder="login.emailPlaceholder">
+                        placeholder="Tucorreo@ejemplo.com" data-i18n-placeholder="login.emailPlaceholder">
                 </div>
 
                 <div>
                     <label for="password" class="block text-sm font-medium text-gray-700 mb-2"
-                        data-i18n="login.password">
-                        Contraseña
-                    </label>
-                    <input type="password" id="password" name="password" required autocomplete="current-password"
-                        class="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-150 ease-in-out text-base sm:text-sm"
-                        placeholder="••••••••" data-i18n-placeholder="login.passwordPlaceholder">
+                        data-i18n="login.password">Contraseña</label>
+                    <div class="relative">
+                        <input type="password" id="password" name="password" required autocomplete="current-password"
+                            class="w-full px-4 py-3 pr-24 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-150 ease-in-out text-base sm:text-sm"
+                            placeholder="••••••••" data-i18n-placeholder="login.passwordPlaceholder">
+                        <button type="button" id="toggle-password-btn"
+                            class="absolute inset-y-0 right-3 my-auto h-fit text-sm font-semibold text-blue-600 hover:text-blue-500 focus:outline-none"
+                            data-i18n="login.showPassword" aria-controls="password" aria-label="Mostrar">Mostrar</button>
+                    </div>
                 </div>
 
                 <div class="flex items-center justify-end">
                     <a href="recuperar-password.html"
                         class="text-sm font-medium text-blue-600 hover:text-blue-500 transition duration-150"
-                        data-i18n="login.forgotPassword">
-                        ¿Olvidaste tu contraseña?
-                    </a>
+                        data-i18n="login.forgotPassword">¿Olvidaste tu contraseña?</a>
                 </div>
 
                 <!-- Botón de Envío -->
                 <button type="submit" id="login-button"
                     class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm sm:text-base font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out active:scale-95"
-                    data-i18n="login.submit">
-                    Iniciar Sesión
-                </button>
+                    data-i18n="login.submit">Iniciar sesión</button>
             </form>
 
             <!-- Divider -->
@@ -272,7 +267,7 @@
                     <div class="w-full border-t border-gray-300"></div>
                 </div>
                 <div class="relative flex justify-center text-sm">
-                    <span class="px-2 bg-white text-gray-500" data-i18n="login.orContinue">o continúa con</span>
+                    <span class="px-2 bg-white text-gray-500" data-i18n="login.orContinue">O continúa con</span>
                 </div>
             </div>
 
@@ -301,9 +296,7 @@
                     <span data-i18n="login.noAccount">¿No tienes una cuenta?</span>
                     <a href="registro_prueba.html"
                         class="font-medium text-blue-600 hover:text-blue-500 transition duration-150"
-                        data-i18n="login.signUp">
-                        Regístrate aquí
-                    </a>
+                        data-i18n="login.signUp">Regístrate aquí</a>
                 </p>
             </div>
 
@@ -313,13 +306,13 @@
     <!-- FOOTER -->
     <footer class="bg-gray-800 text-white py-6 mt-auto">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-xs sm:text-sm">
-            <p data-i18n="footer.rights">&copy; 2025 SEMACKRO. Todos los derechos reservados.</p>
+            <p data-i18n="footer.rights">&Copy; 2025 SEMACKRO. todos los derechos reservados.</p>
             <div class="mt-2 space-x-2 sm:space-x-4 flex justify-center flex-wrap gap-2">
                 <a href="terminos_de_servicio.html" class="hover:text-blue-400 transition duration-150"
-                    data-i18n="footer.terms">Términos de Servicio</a>
+                    data-i18n="footer.terms">Términos de servicio</a>
                 <span class="text-gray-600 hidden sm:inline">|</span>
                 <a href="politica_de_privacidad.html" class="hover:text-blue-400 transition duration-150"
-                    data-i18n="footer.privacy">Política de Privacidad</a>
+                    data-i18n="footer.privacy">Política de privacidad</a>
             </div>
         </div>
     </footer>
@@ -377,6 +370,43 @@
                 messageBox.className = `p-3 text-sm font-medium rounded-lg mb-6 text-center ${classes}`;
                 messageBox.textContent = text;
             }
+        }
+
+        function syncLoginPasswordToggleLabel() {
+            const passwordInput = document.getElementById('password');
+            const togglePasswordBtn = document.getElementById('toggle-password-btn');
+
+            if (!passwordInput || !togglePasswordBtn) return;
+
+            const key = passwordInput.type === 'password' ? 'login.showPassword' : 'login.hidePassword';
+            const translatedText =
+                (typeof translations !== 'undefined' && translations[currentLanguage] && translations[currentLanguage][key])
+                    ? translations[currentLanguage][key]
+                    : (passwordInput.type === 'password' ? 'Mostrar' : 'Ocultar');
+
+            togglePasswordBtn.setAttribute('data-i18n', key);
+            togglePasswordBtn.textContent = translatedText;
+            togglePasswordBtn.setAttribute('aria-label', translatedText);
+        }
+
+        function marcarOnboardingPostLoginPendiente() {
+            try {
+                const usuarioId = localStorage.getItem('usuarioId') || '';
+                const onboardingData = JSON.stringify({
+                    pending: true,
+                    usuarioId,
+                    ts: Date.now()
+                });
+                sessionStorage.setItem('semackro_post_login_onboarding', onboardingData);
+                localStorage.setItem('semackro_post_login_onboarding', onboardingData);
+                localStorage.removeItem(`semackro_onboarding_seen_user_${usuarioId || 'anon'}`);
+            } catch (e) {
+                console.warn('No se pudo marcar onboarding post-login:', e);
+            }
+        }
+
+        function obtenerDestinoDescubrirOnboarding() {
+            return "Descubrir.html?onboarding=1";
         }
 
         // Autenticar con Firebase
@@ -442,8 +472,10 @@
                     const successMessage = translations[currentLanguage]['login.successRedirect'] || "Sesión iniciada. Redirigiendo...";
                     showMessage(successMessage, "bg-green-100 text-green-700");
 
+                    marcarOnboardingPostLoginPendiente();
+
                     setTimeout(() => {
-                        window.location.href = "Descubrir.html";
+                        window.location.href = obtenerDestinoDescubrirOnboarding();
                     }, 1500);
                 } else {
                     throw new Error(loginData.error || "Error al autenticar");
@@ -457,6 +489,19 @@
 
         // Script Principal
         document.addEventListener("DOMContentLoaded", async () => {
+            const passwordInput = document.getElementById('password');
+            const togglePasswordBtn = document.getElementById('toggle-password-btn');
+
+            if (passwordInput && togglePasswordBtn) {
+                togglePasswordBtn.addEventListener('click', () => {
+                    passwordInput.type = passwordInput.type === 'password' ? 'text' : 'password';
+                    syncLoginPasswordToggleLabel();
+                    passwordInput.focus({ preventScroll: true });
+                });
+
+                syncLoginPasswordToggleLabel();
+            }
+
             // Verificar sesión activa
             try {
                 const hasUser = localStorage.getItem('usuarioId');
@@ -495,8 +540,10 @@
                 const successMessage = translations[currentLanguage]['login.successRedirect'] || "Sesión iniciada. Redirigiendo...";
                 showMessage(successMessage, "bg-green-100 text-green-700");
 
+                marcarOnboardingPostLoginPendiente();
+
                 setTimeout(() => {
-                    window.location.href = "Descubrir.html";
+                    window.location.href = obtenerDestinoDescubrirOnboarding();
                 }, 1500);
 
                 return;
@@ -555,8 +602,10 @@
                             const successMessage = translations[currentLanguage]['login.successRedirect'] || "Sesión iniciada. Redirigiendo...";
                             showMessage(successMessage, "bg-green-100 text-green-700");
 
+                            marcarOnboardingPostLoginPendiente();
+
                             setTimeout(() => {
-                                window.location.href = "Descubrir.html";
+                                window.location.href = obtenerDestinoDescubrirOnboarding();
                             }, 1000);
 
                         } else {
@@ -585,52 +634,56 @@
     <script>
         const translations = {
             es: {
-                'nav.howItWorks': 'Cómo Funciona',
+                'nav.howItWorks': 'Cómo funciona',
                 'nav.skills': 'Habilidades',
                 'nav.community': 'Comunidad',
-                'nav.register': 'Crear Cuenta',
-                'login.title': 'Iniciar Sesión',
+                'nav.register': 'Crear cuenta',
+                'login.title': 'Iniciar sesión',
                 'login.subtitle': 'Inicia sesión para acceder y conectar con la comunidad.',
-                'login.email': 'Correo Electrónico',
-                'login.emailPlaceholder': 'tucorreo@ejemplo.com',
+                'login.email': 'Correo electrónico',
+                'login.emailPlaceholder': 'Tucorreo@ejemplo.com',
                 'login.password': 'Contraseña',
                 'login.passwordPlaceholder': '••••••••',
+                'login.showPassword': 'Mostrar',
+                'login.hidePassword': 'Ocultar',
                 'login.forgotPassword': '¿Olvidaste tu contraseña?',
-                'login.submit': 'Iniciar Sesión',
+                'login.submit': 'Iniciar sesión',
                 'login.orContinue': 'O continuar con',
                 'login.googleFull': 'Continuar con Google',
                 'login.googleShort': 'Google',
-                'login.successRedirect': 'Sesión iniciada. Redirigiendo...',
+                'login.successRedirect': 'Sesión iniciada. redirigiendo...',
                 'login.redirectingGoogle': 'Redirigiendo a Google...',
                 'login.noAccount': '¿No tienes una cuenta?',
                 'login.signUp': 'Regístrate aquí',
-                'footer.rights': '© 2025 SEMACKRO. Todos los derechos reservados.',
-                'footer.terms': 'Términos de Servicio',
-                'footer.privacy': 'Política de Privacidad'
+                'footer.rights': '© 2025 SEMACKRO. todos los derechos reservados.',
+                'footer.terms': 'Términos de servicio',
+                'footer.privacy': 'Política de privacidad'
             },
             en: {
-                'nav.howItWorks': 'How It Works',
+                'nav.howItWorks': 'How it works',
                 'nav.skills': 'Skills',
                 'nav.community': 'Community',
-                'nav.register': 'Sign Up',
+                'nav.register': 'Sign up',
                 'login.title': 'Login',
                 'login.subtitle': 'Login to access and connect with the community.',
-                'login.email': 'Email Address',
-                'login.emailPlaceholder': 'youremail@example.com',
+                'login.email': 'Email address',
+                'login.emailPlaceholder': 'Youremail@example.com',
                 'login.password': 'Password',
                 'login.passwordPlaceholder': '••••••••',
+                'login.showPassword': 'Show',
+                'login.hidePassword': 'Hide',
                 'login.forgotPassword': 'Forgot your password?',
                 'login.submit': 'Login',
                 'login.orContinue': 'Or continue with',
-                'login.googleFull': 'Continue with Google',
+                'login.googleFull': 'Continue with google',
                 'login.googleShort': 'Google',
-                'login.successRedirect': 'Session started. Redirecting...',
-                'login.redirectingGoogle': 'Redirecting to Google...',
+                'login.successRedirect': 'Session started. redirecting...',
+                'login.redirectingGoogle': 'Redirecting to google...',
                 'login.noAccount': 'Don\'t have an account?',
                 'login.signUp': 'Sign up here',
-                'footer.rights': '© 2025 SEMACKRO. All rights reserved.',
-                'footer.terms': 'Terms of Service',
-                'footer.privacy': 'Privacy Policy'
+                'footer.rights': '© 2025 SEMACKRO. all rights reserved.',
+                'footer.terms': 'Terms of service',
+                'footer.privacy': 'Privacy policy'
             }
         };
 
@@ -641,7 +694,7 @@
             localStorage.setItem('preferred_language', lang);
 
             const langSpan = document.getElementById('currentLang');
-            if (langSpan) langSpan.textContent = lang === 'es' ? 'ES' : 'EN';
+            if (langSpan) langSpan.textContent = lang === 'es' ? 'ES' : 'En';
 
             const dropdown = document.getElementById('languageDropdown');
             if (dropdown) dropdown.style.display = 'none';
@@ -670,12 +723,14 @@
                 const translation = t(key);
                 element.placeholder = translation;
             });
+
+            syncLoginPasswordToggleLabel();
         }
 
         document.getElementById('languageBtn')?.addEventListener('click', function (e) {
             e.stopPropagation();
             const dropdown = document.getElementById('languageDropdown');
-            dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+            dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'None';
         });
 
         document.addEventListener('click', function (e) {
@@ -688,7 +743,7 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             const langSpan = document.getElementById('currentLang');
-            if (langSpan) langSpan.textContent = currentLanguage === 'en' ? 'EN' : 'ES';
+            if (langSpan) langSpan.textContent = currentLanguage === 'en' ? 'EN' : 'Es';
             applyTranslations();
         });
     </script>

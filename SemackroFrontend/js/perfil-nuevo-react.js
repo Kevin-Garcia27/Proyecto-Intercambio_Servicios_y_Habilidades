@@ -535,7 +535,7 @@ function QuickStats({ aniosExperiencia, intercambiosCount, promedioCalificacion,
             icon: <Icons.Clock size={32} disponible={esDisponible} />, 
             label: t('profile.status'), 
             value: esDisponible ? t('status.available') : t('status.atWork'), 
-            color: esDisponible ? 'success' : 'primary' 
+            color: esDisponible ? 'success' : 'Primary' 
         }
     ];
 
@@ -607,7 +607,7 @@ function Specialties({ habilidades, tipo = 'Ofrece' }) {
                                 : '#eff6ff',
                             color: selectedIndex === index 
                                 ? 'white' 
-                                : '#2563eb'
+                                : '#2563Eb'
                         }}
                     >
                         {skill.nombre_Habilidad}
@@ -741,7 +741,7 @@ function ProfessionalInfo({ persona, certificaciones }) {
                                         rel="noopener noreferrer"
                                         className="perfil-certification-btn"
                                         style={{ 
-                                            pointerEvents: cert.url_certificado ? 'auto' : 'none',
+                                            pointerEvents: cert.url_certificado ? 'auto' : 'None',
                                             opacity: cert.url_certificado ? 1 : 0.7
                                         }}
                                     >
@@ -828,7 +828,7 @@ function PostulacionesHistory({ postulaciones }) {
         <div className="perfil-section">
             <div className="perfil-section-title">
                 <Icons.ClipboardCheck />
-                <h3>Mis Postulaciones a Órdenes de Trabajo</h3>
+                <h3>Mis postulaciones a órdenes de trabajo</h3>
                 {postulaciones.length > 5 && (
                     <span className="perfil-section-count">({postulaciones.length} total)</span>
                 )}
@@ -863,7 +863,7 @@ function PostulacionesHistory({ postulaciones }) {
                             {item.portafolio_url && (
                                 <a href={item.portafolio_url} target="_blank" rel="noopener noreferrer"
                                     style={{ fontSize: '12px', color: '#dc2626', display: 'inline-flex', alignItems: 'center', gap: '4px', background: '#fef2f2', padding: '3px 8px', borderRadius: '6px', textDecoration: 'none', fontWeight: 500 }}>
-                                    📄 Ver portafolio PDF
+                                    📄 Ver portafolio pdf
                                 </a>
                             )}
                         </div>
@@ -1263,6 +1263,7 @@ function ImageModal({ imageData, onClose }) {
 // ========================================
 function NuevoPerfilUsuario({ perfilId, onVolver, onSolicitar, onReportar }) {
     const [loading, setLoading] = useState(true);
+    const [showLoadingIndicator, setShowLoadingIndicator] = useState(false);
     const [persona, setPersona] = useState(null);
     const [habilidadesOfrece, setHabilidadesOfrece] = useState([]);
     const [habilidadesNecesita, setHabilidadesNecesita] = useState([]);
@@ -1288,9 +1289,18 @@ function NuevoPerfilUsuario({ perfilId, onVolver, onSolicitar, onReportar }) {
 
     // Cargar datos del perfil
     useEffect(() => {
+        let isMounted = true;
+        let loadingTimerId = null;
+
         async function cargarDatos() {
             setLoading(true);
+            setShowLoadingIndicator(false);
             setError(null);
+
+            // Mostrar loader solo si la red tarda demasiado
+            loadingTimerId = setTimeout(() => {
+                if (isMounted) setShowLoadingIndicator(true);
+            }, 2000);
 
             try {
                 // 1. Obtener datos de la persona
@@ -1317,6 +1327,17 @@ function NuevoPerfilUsuario({ perfilId, onVolver, onSolicitar, onReportar }) {
                 if (personaData.imagen2Url_Persona) imagenes.push(personaData.imagen2Url_Persona);
                 if (personaData.imagen3Url_Persona) imagenes.push(personaData.imagen3Url_Persona);
                 setGaleriaImagenes(imagenes);
+
+                // Abrir el perfil en cuanto tengamos datos base.
+                // El resto de secciones se completan en segundo plano.
+                if (isMounted) {
+                    setLoading(false);
+                    setShowLoadingIndicator(false);
+                }
+                if (loadingTimerId) {
+                    clearTimeout(loadingTimerId);
+                    loadingTimerId = null;
+                }
 
                 // 2. Obtener habilidades
                 try {
@@ -1469,13 +1490,25 @@ function NuevoPerfilUsuario({ perfilId, onVolver, onSolicitar, onReportar }) {
                 console.error('Error cargando perfil:', err);
                 setError(err.message);
             } finally {
-                setLoading(false);
+                if (loadingTimerId) {
+                    clearTimeout(loadingTimerId);
+                    loadingTimerId = null;
+                }
+                if (isMounted) {
+                    setLoading(false);
+                    setShowLoadingIndicator(false);
+                }
             }
         }
 
         if (perfilId) {
             cargarDatos();
         }
+
+        return () => {
+            isMounted = false;
+            if (loadingTimerId) clearTimeout(loadingTimerId);
+        };
     }, [perfilId]);
 
     // Handlers
@@ -1543,6 +1576,14 @@ function NuevoPerfilUsuario({ perfilId, onVolver, onSolicitar, onReportar }) {
 
     // Loading state
     if (loading) {
+        if (!showLoadingIndicator) {
+            return (
+                <div className="nuevo-perfil-container">
+                    <div className="nuevo-perfil-wrapper" style={{ minHeight: '320px' }}></div>
+                </div>
+            );
+        }
+
         return (
             <div className="nuevo-perfil-container">
                 <div className="nuevo-perfil-wrapper">

@@ -178,9 +178,9 @@ Proyecto-Intercambio_Servicios_y_Habilidades/
 
 | Servicio | URL Local | Producción |
 |----------|-----------|------------|
-| Frontend | http://localhost:5050 | https://SEMACKRO.duckdns.org |
-| Backend | http://localhost:3001 | https://SEMACKRO.duckdns.org/api |
-| API | http://localhost:3001/api | https://SEMACKRO.duckdns.org/api |
+| Frontend | http://localhost:5050 | https://semackro.vercel.app |
+| Backend | http://localhost:3001 |https://serversemackro.up.railway.app/ |
+| API | http://localhost:3001/api | https://serversemackro.up.railway.app/api |
 
 ## 🎨 Flujo de Desarrollo
 

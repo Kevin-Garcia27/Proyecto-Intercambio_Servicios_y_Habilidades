@@ -47,12 +47,8 @@
     <!-- Contenedor Principal con Diseño de Tarjeta -->
     <div class="w-full max-w-lg bg-white p-8 md:p-10 rounded-xl shadow-2xl">
 
-        <h1 class="text-3xl font-bold text-center mb-6 text-indigo-700">
-            Solicitar Intercambio
-        </h1>
-        <p class="text-center text-gray-500 mb-8">
-            Define la habilidad que ofreces y la que te gustaría recibir.
-        </p>
+        <h1 class="text-3xl font-bold text-center mb-6 text-indigo-700">Solicitar intercambio</h1>
+        <p class="text-center text-gray-500 mb-8">Define la habilidad que ofreces y la que te gustaría recibir.</p>
 
         <form id="solicitudForm">
             <!-- IDs Fijos para la Prueba (NOTA: En el proyecto real, se obtienen de la sesión/URL) -->
@@ -63,40 +59,38 @@
             <!-- Campo Habilidad Ofrecida -->
             <div class="mb-5">
                 <label for="habilidad_ofrecida" class="block text-sm font-semibold text-gray-700 mb-2">Habilidad que
-                    Ofreces</label>
-                <input type="text" id="habilidad_ofrecida" required placeholder="Ej: Clases de Desarrollo Web"
+                    ofreces</label>
+                <input type="text" id="habilidad_ofrecida" required placeholder="Ej: clases de desarrollo web"
                     class="w-full p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 shadow-sm transition duration-150 ease-in-out">
             </div>
 
             <!-- Campo Habilidad Solicitada -->
             <div class="mb-5">
                 <label for="habilidad_solicitada" class="block text-sm font-semibold text-gray-700 mb-2">Habilidad que
-                    Solicitas (del Receptor)</label>
-                <input type="text" id="habilidad_solicitada" required placeholder="Ej: Asesoría de Marketing Digital"
+                    solicitas (del receptor)</label>
+                <input type="text" id="habilidad_solicitada" required placeholder="Ej: asesoría de marketing digital"
                     class="w-full p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 shadow-sm transition duration-150 ease-in-out">
             </div>
 
             <!-- Campo Fecha Sugerida -->
             <div class="mb-5">
                 <label for="fecha_sugerida" class="block text-sm font-semibold text-gray-700 mb-2">Fecha
-                    Sugerida</label>
+                    sugerida</label>
                 <input type="date" id="fecha_sugerida" required
                     class="w-full p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 shadow-sm transition duration-150 ease-in-out">
             </div>
 
             <!-- Campo Tiempo Estimado -->
             <div class="mb-6">
-                <label for="tiempo_estimado" class="block text-sm font-semibold text-gray-700 mb-2">Tiempo Estimado
-                    (Duración)</label>
+                <label for="tiempo_estimado" class="block text-sm font-semibold text-gray-700 mb-2">Tiempo estimado
+                    (duración)</label>
                 <input type="text" id="tiempo_estimado" required placeholder="Ej: 2 horas, 1 sesión semanal, 3 meses"
                     class="w-full p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 shadow-sm transition duration-150 ease-in-out">
             </div>
 
             <!-- Botón de Envío -->
             <button type="submit" id="submitButton"
-                class="w-full py-3 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-4 focus:ring-indigo-500 focus:ring-opacity-50 transition duration-300 ease-in-out shadow-lg">
-                Enviar Solicitud
-            </button>
+                class="w-full py-3 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-4 focus:ring-indigo-500 focus:ring-opacity-50 transition duration-300 ease-in-out shadow-lg">Enviar solicitud</button>
         </form>
 
         <!-- Contenedor de Mensajes (Oculto inicialmente) -->

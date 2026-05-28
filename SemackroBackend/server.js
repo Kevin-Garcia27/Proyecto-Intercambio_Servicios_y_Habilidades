@@ -35,6 +35,7 @@ const certificacionesRoutes = require('./routes/Certificaciones');
 const metricasRoutes = require('./routes/MetricasDesempeno');
 const perfilCompletoRoutes = require('./routes/PerfilCompleto');
 const ordenesTrabajoRoutes = require('./routes/ordenesTrabajo');
+const onboardingDriversRoutes = require('./routes/onboardingDrivers');
 
 // 2. Crear instancia de Express
 const app = express();
@@ -48,13 +49,14 @@ app.use(cors({
         // Orígenes permitidos fijos
         const allowedOrigins = [
             'http://127.0.0.1:5500',
-            'http://localhost:5500', 
-            'http://127.0.0.1:5050', 
-            'http://localhost:5050', 
-            'http://localhost:3000', 
-            'http://localhost:3001', 
-            'http://152.70.120.174:5050', 
-            'http://152.70.120.174:3001'
+            'http://localhost:5500',
+            'http://127.0.0.1:5050',
+            'http://localhost:5050',
+            'http://localhost:3000',
+            'http://localhost:3001',
+            'https://semackro.vercel.app',
+            'https://tu-dominio.com',
+            'https://www.tu-dominio.com'
         ];
         
         // Verificar si es un origen permitido fijo
@@ -64,6 +66,11 @@ app.use(cors({
         
         // Verificar si es una URL de ngrok (cualquier subdominio)
         if (origin.includes('.ngrok-free.dev') || origin.includes('.ngrok.io')) {
+            return callback(null, true);
+        }
+
+        // Permitir previews/despliegues de Vercel
+        if (origin.includes('.vercel.app')) {
             return callback(null, true);
         }
         
@@ -119,6 +126,7 @@ app.use('/api/certificaciones', certificacionesRoutes); // Rutas de certificacio
 app.use('/api/metricas', metricasRoutes); // Rutas de métricas de desempeño
 app.use('/api/perfil-completo', perfilCompletoRoutes); // Rutas de perfil completo
 app.use('/api/ordenes-trabajo', ordenesTrabajoRoutes); // Rutas de órdenes de trabajo
+app.use('/api/onboarding-drivers', onboardingDriversRoutes); // Estado de drivers/onboarding por persona
 
 // 8. Prueba básica de que el servidor Express funciona
 app.get('/', (req, res) => {
@@ -178,7 +186,7 @@ const server = http.createServer(app);
 // Configuración básica de CORS para Socket.io (ajusta orígenes en producción)
 const io = new Server(server, {
     cors: {
-        origin: ['http://127.0.0.1:5500', 'http://localhost:5500', 'http://127.0.0.1:5050', 'http://localhost:5050', 'http://localhost:3000', 'http://localhost:3001', 'http://152.70.120.174:5050', 'http://152.70.120.174:3001', 'https://SEMACKRO.duckdns.org', 'http://SEMACKRO.duckdns.org'],
+        origin: ['http://127.0.0.1:5500', 'http://localhost:5500', 'http://127.0.0.1:5050', 'http://localhost:5050', 'http://localhost:3000', 'http://localhost:3001', 'https://semackro.vercel.app', 'https://tu-dominio.com', 'https://www.tu-dominio.com'],
         methods: ['GET', 'POST']
     }
 });

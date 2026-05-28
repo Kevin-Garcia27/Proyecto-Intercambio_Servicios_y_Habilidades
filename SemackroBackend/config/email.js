@@ -1,23 +1,324 @@
 const nodemailer = require('nodemailer');
+const https = require('https');
 
-// Configuración del transporte de correo (Gmail)
-const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-        user: process.env.EMAIL_USER, // Tu correo de Gmail
-        pass: process.env.EMAIL_PASSWORD // Contraseña de aplicación de Gmail
+const EMAIL_TIMEOUT_MS = Number(process.env.EMAIL_TIMEOUT_MS || 15000);
+const EMAIL_PROVIDER = (process.env.EMAIL_PROVIDER || 'gmail').toLowerCase();
+const EMAIL_FROM_NAME = process.env.EMAIL_FROM_NAME || 'SEMACKRO';
+const BREVO_API_URL = 'https://api.brevo.com/v3/smtp/email';
+const EMAIL_FROM_ADDRESS = process.env.EMAIL_FROM_ADDRESS || process.env.EMAIL_USER || '';
+const EMAIL_HOST_LOWER = String(process.env.EMAIL_HOST || '').toLowerCase();
+
+let transporterInstance = null;
+
+function maskEmail(email) {
+    if (!email || typeof email !== 'string' || !email.includes('@')) return '[email-invalido]';
+    const [local, domain] = email.split('@');
+    const visibleLocal = local.length <= 2 ? local[0] || '*' : local.slice(0, 2);
+    return `${visibleLocal}***@${domain}`;
+}
+
+function normalizeFrontendUrl(rawUrl) {
+    try {
+        if (!rawUrl) return null;
+        const normalized = new URL(String(rawUrl));
+        return normalized.origin;
+    } catch (_) {
+        return null;
     }
-});
+}
+
+function isConnectionTimeoutError(error) {
+    const code = String((error && error.code) || '').toUpperCase();
+    const command = String((error && error.command) || '').toUpperCase();
+    return code === 'ETIMEDOUT' || code === 'ECONNECTION' || code === 'EMAIL_TIMEOUT' || command === 'CONN';
+}
+
+function parseFallbackPorts(defaultPort) {
+    const rawFallback = process.env.EMAIL_FALLBACK_PORTS || '2525,465';
+    const parsed = rawFallback
+        .split(',')
+        .map((p) => Number(String(p).trim()))
+        .filter((p) => Number.isInteger(p) && p > 0);
+
+    return parsed.filter((p) => p !== defaultPort);
+}
+
+function parseFromAddress(rawFrom) {
+    const fromValue = String(rawFrom || '').trim();
+    const match = fromValue.match(/^(?:"?([^"<>]*)"?\s*)?<([^<>]+)>$/);
+
+    if (match) {
+        const name = (match[1] || EMAIL_FROM_NAME || 'SEMACKRO').trim();
+        return {
+            name: name || 'SEMACKRO',
+            email: match[2].trim()
+        };
+    }
+
+    return {
+        name: EMAIL_FROM_NAME || 'SEMACKRO',
+        email: EMAIL_FROM_ADDRESS || fromValue
+    };
+}
+
+function canUseBrevoHttpFallback() {
+    return EMAIL_PROVIDER === 'smtp' &&
+        (EMAIL_HOST_LOWER.includes('brevo') || EMAIL_HOST_LOWER.includes('sendinblue'));
+}
+
+function getBrevoApiKeyWithSource() {
+    if (process.env.BREVO_API_KEY) {
+        return { key: process.env.BREVO_API_KEY, source: 'BREVO_API_KEY' };
+    }
+
+    if (canUseBrevoHttpFallback() && process.env.EMAIL_PASSWORD) {
+        return { key: process.env.EMAIL_PASSWORD, source: 'EMAIL_PASSWORD(smtp)' };
+    }
+
+    return { key: null, source: null };
+}
+
+const sendMailViaBrevoApi = (mailOptions, context = {}) =>
+    new Promise((resolve, reject) => {
+        const traceId = context.traceId || 'sin-trace';
+        const destination = context.destination || maskEmail(mailOptions.to);
+        const { key: apiKey, source: keySource } = getBrevoApiKeyWithSource();
+
+        if (!apiKey) {
+            const err = new Error('No hay API key para fallback HTTP de Brevo (define BREVO_API_KEY o usa SMTP Brevo con EMAIL_PASSWORD)');
+            err.code = 'BREVO_API_KEY_MISSING';
+            return reject(err);
+        }
+
+        const from = parseFromAddress(mailOptions.from);
+        const payload = JSON.stringify({
+            sender: {
+                name: from.name,
+                email: from.email
+            },
+            to: [{ email: mailOptions.to }],
+            subject: mailOptions.subject,
+            htmlContent: mailOptions.html
+        });
+
+        const url = new URL(BREVO_API_URL);
+        const requestOptions = {
+            method: 'POST',
+            hostname: url.hostname,
+            path: url.pathname,
+            headers: {
+                accept: 'application/json',
+                'api-key': apiKey,
+                'content-type': 'application/json',
+                'content-length': Buffer.byteLength(payload)
+            }
+        };
+
+        console.log(`[email:brevo-api][${traceId}] Intentando envío HTTP a ${destination} usando key=${keySource}`);
+
+        const req = https.request(requestOptions, (res) => {
+            let body = '';
+            res.on('data', (chunk) => {
+                body += chunk;
+            });
+            res.on('end', () => {
+                if (res.statusCode >= 200 && res.statusCode < 300) {
+                    let parsed;
+                    try {
+                        parsed = body ? JSON.parse(body) : {};
+                    } catch (_) {
+                        parsed = {};
+                    }
+
+                    const messageId = parsed.messageId || parsed.messageid || `brevo-http-${Date.now()}`;
+                    console.log(`[email:brevo-api][${traceId}] Envío HTTP exitoso a ${destination} messageId=${messageId}`);
+                    return resolve({ messageId });
+                }
+
+                const apiError = new Error(`Brevo API respondió ${res.statusCode}: ${body || 'sin detalle'}`);
+                apiError.code = `BREVO_API_${res.statusCode}`;
+                return reject(apiError);
+            });
+        });
+
+        req.on('error', (error) => {
+            const wrapped = new Error(error.message || 'Error de conexión con Brevo API');
+            wrapped.code = error.code || 'BREVO_API_CONNECTION_ERROR';
+            reject(wrapped);
+        });
+
+        req.setTimeout(EMAIL_TIMEOUT_MS, () => {
+            const timeoutError = new Error(`Tiempo de espera excedido en Brevo API (${EMAIL_TIMEOUT_MS}ms)`);
+            timeoutError.code = 'BREVO_API_TIMEOUT';
+            req.destroy(timeoutError);
+        });
+
+        req.write(payload);
+        req.end();
+    });
+
+function getTransportConfig() {
+    if (EMAIL_PROVIDER === 'smtp') {
+        const smtpPort = Number(process.env.EMAIL_PORT || 587);
+        const secureByPort = smtpPort === 465;
+        const secureByEnv = String(process.env.EMAIL_SECURE || '').toLowerCase() === 'true';
+
+        return {
+            host: process.env.EMAIL_HOST,
+            port: smtpPort,
+            secure: secureByEnv || secureByPort,
+            auth: {
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASSWORD
+            },
+            connectionTimeout: EMAIL_TIMEOUT_MS,
+            greetingTimeout: EMAIL_TIMEOUT_MS,
+            socketTimeout: EMAIL_TIMEOUT_MS
+        };
+    }
+
+    return {
+        service: 'gmail',
+        auth: {
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASSWORD
+        },
+        connectionTimeout: EMAIL_TIMEOUT_MS,
+        greetingTimeout: EMAIL_TIMEOUT_MS,
+        socketTimeout: EMAIL_TIMEOUT_MS
+    };
+}
+
+function getTransporter() {
+    if (transporterInstance) return transporterInstance;
+    const transportConfig = getTransportConfig();
+    transporterInstance = nodemailer.createTransport(transportConfig);
+
+    const descriptor = EMAIL_PROVIDER === 'smtp'
+        ? `host=${transportConfig.host || 'no-definido'} port=${transportConfig.port} secure=${transportConfig.secure}`
+        : 'service=gmail';
+
+    console.log(`[email:${EMAIL_PROVIDER}] Transporte inicializado (${descriptor}) user=${maskEmail(process.env.EMAIL_USER)}`);
+    return transporterInstance;
+}
+
+function getEmailConfigError() {
+    if (EMAIL_PROVIDER === 'brevo-api') {
+        const { key: apiKey } = getBrevoApiKeyWithSource();
+        if (!apiKey) {
+            return 'No hay API key para EMAIL_PROVIDER=brevo-api (define BREVO_API_KEY)';
+        }
+
+        if (!EMAIL_FROM_ADDRESS) {
+            return 'EMAIL_FROM_ADDRESS o EMAIL_USER no configurada para EMAIL_PROVIDER=brevo-api';
+        }
+
+        return null;
+    }
+
+    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASSWORD) {
+        return 'Variables EMAIL_USER/EMAIL_PASSWORD no configuradas';
+    }
+
+    if (EMAIL_PROVIDER === 'smtp' && !process.env.EMAIL_HOST) {
+        return 'EMAIL_HOST no configurado para EMAIL_PROVIDER=smtp';
+    }
+
+    return null;
+}
+
+const sendMailWithTimeout = (mailOptions, timeoutMs = EMAIL_TIMEOUT_MS, context = {}) =>
+    new Promise((resolve, reject) => {
+        const startedAt = Date.now();
+        const traceId = context.traceId || 'sin-trace';
+        const destination = context.destination || maskEmail(mailOptions.to);
+
+        console.log(`[email:${EMAIL_PROVIDER}][${traceId}] Iniciando envío a ${destination} con timeout=${timeoutMs}ms`);
+
+        const timer = setTimeout(() => {
+            const timeoutError = new Error(`Tiempo de espera excedido al enviar correo (${timeoutMs}ms)`);
+            timeoutError.code = 'EMAIL_TIMEOUT';
+            reject(timeoutError);
+        }, timeoutMs);
+
+        getTransporter()
+            .sendMail(mailOptions)
+            .then((info) => {
+                clearTimeout(timer);
+                console.log(`[email:${EMAIL_PROVIDER}][${traceId}] Envío exitoso a ${destination} en ${Date.now() - startedAt}ms messageId=${info.messageId || 'n/a'}`);
+                resolve(info);
+            })
+            .catch((error) => {
+                clearTimeout(timer);
+                const errorCode = error && (error.code || error.responseCode || error.command || 'UNKNOWN_ERROR');
+                console.error(`[email:${EMAIL_PROVIDER}][${traceId}] Error enviando a ${destination} en ${Date.now() - startedAt}ms code=${errorCode}`, {
+                    message: error && error.message,
+                    responseCode: error && error.responseCode,
+                    command: error && error.command
+                });
+                reject(error);
+            });
+    });
+
+const sendMailWithTransportConfig = (mailOptions, transportConfig, timeoutMs = EMAIL_TIMEOUT_MS, context = {}) =>
+    new Promise((resolve, reject) => {
+        const startedAt = Date.now();
+        const traceId = context.traceId || 'sin-trace';
+        const destination = context.destination || maskEmail(mailOptions.to);
+        const attemptedPort = transportConfig.port || 'n/a';
+
+        console.log(`[email:${EMAIL_PROVIDER}][${traceId}] Reintento por puerto ${attemptedPort} a ${destination} con timeout=${timeoutMs}ms`);
+
+        const timer = setTimeout(() => {
+            const timeoutError = new Error(`Tiempo de espera excedido al enviar correo (${timeoutMs}ms)`);
+            timeoutError.code = 'EMAIL_TIMEOUT';
+            reject(timeoutError);
+        }, timeoutMs);
+
+        const tempTransporter = nodemailer.createTransport(transportConfig);
+        tempTransporter
+            .sendMail(mailOptions)
+            .then((info) => {
+                clearTimeout(timer);
+                console.log(`[email:${EMAIL_PROVIDER}][${traceId}] Reintento exitoso por puerto ${attemptedPort} en ${Date.now() - startedAt}ms messageId=${info.messageId || 'n/a'}`);
+                resolve(info);
+            })
+            .catch((error) => {
+                clearTimeout(timer);
+                const errorCode = error && (error.code || error.responseCode || error.command || 'UNKNOWN_ERROR');
+                console.error(`[email:${EMAIL_PROVIDER}][${traceId}] Reintento falló por puerto ${attemptedPort} en ${Date.now() - startedAt}ms code=${errorCode}`, {
+                    message: error && error.message,
+                    responseCode: error && error.responseCode,
+                    command: error && error.command
+                });
+                reject(error);
+            });
+    });
 
 // Función para enviar correo de recuperación de contraseña
-const enviarCorreoRecuperacion = async (destinatario, token) => {
-    // Auto-detectar entorno: si NODE_ENV no es production, usar localhost
-    const isLocal = process.env.NODE_ENV !== 'production';
-    const frontendUrl = isLocal ? 'http://localhost:5050' : (process.env.FRONTEND_URL || 'https://SEMACKRO.duckdns.org');
+const enviarCorreoRecuperacion = async (destinatario, token, options = {}) => {
+    const traceId = options.traceId || 'sin-trace';
+    const destinatarioMask = maskEmail(destinatario);
+
+    console.log(`[email:${EMAIL_PROVIDER}][${traceId}] Preparando correo de recuperación para ${destinatarioMask}`);
+
+    const configError = getEmailConfigError();
+    if (configError) {
+        console.error(`[email:${EMAIL_PROVIDER}][${traceId}] Configuración inválida: ${configError}`);
+        return { success: false, error: configError };
+    }
+
+    const frontendUrl =
+        normalizeFrontendUrl(options.frontendUrl) ||
+        normalizeFrontendUrl(process.env.FRONTEND_URL) ||
+        'https://semackro.vercel.app';
+
+    const fromName = String(options.emailFromName || EMAIL_FROM_NAME || 'SEMACKRO').trim().slice(0, 80) || 'SEMACKRO';
     const enlaceRecuperacion = `${frontendUrl}/restablecer-password.html?token=${token}`;
+    console.log(`[email:${EMAIL_PROVIDER}][${traceId}] Enlace de recuperación generado con frontend=${frontendUrl}`);
     
     const mailOptions = {
-        from: `"SEMACKRO" <${process.env.EMAIL_USER}>`,
+        from: `"${fromName}" <${EMAIL_FROM_ADDRESS}>`,
         to: destinatario,
         subject: 'Recuperación de Contraseña - SEMACKRO',
         html: `
@@ -110,12 +411,97 @@ const enviarCorreoRecuperacion = async (destinatario, token) => {
         `
     };
 
+    if (EMAIL_PROVIDER === 'brevo-api') {
+        try {
+            const apiInfo = await sendMailViaBrevoApi(mailOptions, {
+                traceId,
+                destination: destinatarioMask
+            });
+            return { success: true, messageId: apiInfo.messageId, channel: 'brevo-api' };
+        } catch (apiError) {
+            console.error(`[email:brevo-api][${traceId}] Error al enviar correo de recuperación para ${destinatarioMask}:`, {
+                message: apiError && apiError.message,
+                code: apiError && apiError.code
+            });
+            return { success: false, error: apiError.message };
+        }
+    }
+
     try {
-        const info = await transporter.sendMail(mailOptions);
-        console.log('Correo enviado:', info.messageId);
+        const info = await sendMailWithTimeout(mailOptions, EMAIL_TIMEOUT_MS, {
+            traceId,
+            destination: destinatarioMask
+        });
+        console.log(`[email:${EMAIL_PROVIDER}][${traceId}] Correo de recuperación confirmado para ${destinatarioMask} messageId=${info.messageId || 'n/a'}`);
         return { success: true, messageId: info.messageId };
     } catch (error) {
-        console.error('Error al enviar correo:', error);
+        console.error(`[email:${EMAIL_PROVIDER}][${traceId}] Error al enviar correo de recuperación para ${destinatarioMask}:`, {
+            message: error && error.message,
+            code: error && (error.code || error.responseCode || error.command || 'UNKNOWN_ERROR')
+        });
+
+        if (EMAIL_PROVIDER === 'smtp' && isConnectionTimeoutError(error)) {
+            const defaultPort = Number(process.env.EMAIL_PORT || 587);
+            const fallbackPorts = parseFallbackPorts(defaultPort);
+
+            for (const fallbackPort of fallbackPorts) {
+                try {
+                    const fallbackConfig = {
+                        host: process.env.EMAIL_HOST,
+                        port: fallbackPort,
+                        secure: fallbackPort === 465,
+                        auth: {
+                            user: process.env.EMAIL_USER,
+                            pass: process.env.EMAIL_PASSWORD
+                        },
+                        connectionTimeout: EMAIL_TIMEOUT_MS,
+                        greetingTimeout: EMAIL_TIMEOUT_MS,
+                        socketTimeout: EMAIL_TIMEOUT_MS
+                    };
+
+                    const fallbackInfo = await sendMailWithTransportConfig(
+                        mailOptions,
+                        fallbackConfig,
+                        EMAIL_TIMEOUT_MS,
+                        {
+                            traceId: `${traceId}-p${fallbackPort}`,
+                            destination: destinatarioMask
+                        }
+                    );
+
+                    return {
+                        success: true,
+                        messageId: fallbackInfo.messageId,
+                        fallbackPort
+                    };
+                } catch (_) {
+                    // El detalle del error ya se registra en sendMailWithTransportConfig.
+                }
+            }
+
+            if (process.env.BREVO_API_KEY || canUseBrevoHttpFallback()) {
+                try {
+                    const apiInfo = await sendMailViaBrevoApi(mailOptions, {
+                        traceId: `${traceId}-brevo-api`,
+                        destination: destinatarioMask
+                    });
+
+                    return {
+                        success: true,
+                        messageId: apiInfo.messageId,
+                        channel: 'brevo-api'
+                    };
+                } catch (apiError) {
+                    console.error(`[email:brevo-api][${traceId}] Fallback HTTP también falló para ${destinatarioMask}:`, {
+                        message: apiError && apiError.message,
+                        code: apiError && apiError.code
+                    });
+                }
+            } else {
+                console.warn(`[email:brevo-api][${traceId}] Se omite fallback HTTP: no hay BREVO_API_KEY y el host SMTP no parece ser Brevo.`);
+            }
+        }
+
         return { success: false, error: error.message };
     }
 };
@@ -123,9 +509,13 @@ const enviarCorreoRecuperacion = async (destinatario, token) => {
 // Función para enviar notificación contextual (H8)
 const enviarNotificacionContextual = async (destinatario, alertas, frontendUrl) => {
     if (!destinatario || !alertas || alertas.length === 0) return { success: false };
+    const configError = getEmailConfigError();
+    if (configError) {
+        return { success: false, error: configError };
+    }
 
     // Prioridad: 1) URL enviada como parámetro  2) variable de entorno  3) localhost
-    const appUrl = (frontendUrl || process.env.FRONTEND_URL || 'http://localhost:5050').replace(/\/$/, '');
+    const appUrl = (frontendUrl || process.env.FRONTEND_URL || 'https://semackro.vercel.app').replace(/\/$/, '');
     const urlDestino = `${appUrl}/Descubrir.html`;
 
     const filasHtml = alertas.map(a => {
@@ -146,7 +536,7 @@ const enviarNotificacionContextual = async (destinatario, alertas, frontendUrl) 
     }).join('');
 
     const mailOptions = {
-        from: `"SEMACKRO" <${process.env.EMAIL_USER}>`,
+        from: `"${EMAIL_FROM_NAME}" <${process.env.EMAIL_USER}>`,
         to: destinatario,
         subject: `${alertas.length} alerta${alertas.length > 1 ? 's' : ''} nueva${alertas.length > 1 ? 's' : ''} en SEMACKRO`,
         html: `
@@ -171,11 +561,11 @@ const enviarNotificacionContextual = async (destinatario, alertas, frontendUrl) 
     };
 
     try {
-        const info = await transporter.sendMail(mailOptions);
+        const info = await sendMailWithTimeout(mailOptions);
         console.log('Notificación contextual enviada:', info.messageId);
         return { success: true };
     } catch (error) {
-        console.error('Error al enviar notificación contextual:', error);
+        console.error(`[email:${EMAIL_PROVIDER}] Error al enviar notificación contextual:`, error);
         return { success: false, error: error.message };
     }
 };

@@ -60,7 +60,7 @@ router.post('/registro', async (req, res) => {
 
     } catch (error) {
         console.error('Error durante el registro:', error);
-        res.status(500).json({ error: 'Ocurrió un error en el servidor al intentar registrar el usuario.' });
+        res.status(500).json({ error: 'Ocurrió un error en el servidor al intentar registrar el usuario.', details: error.message });
     }
 });
 
@@ -108,7 +108,7 @@ router.post('/login', async (req, res) => {
 
     } catch (error) {
         console.error('Error durante el login:', error);
-        res.status(500).json({ error: 'Ocurrió un error en el servidor al intentar iniciar sesión.' });
+        res.status(500).json({ error: 'Ocurrió un error en el servidor al intentar iniciar sesión.', details: error.message });
     }
 });
 
@@ -163,7 +163,7 @@ router.post('/login-jwt', async (req, res) => {
 
     } catch (error) {
         console.error('Error durante el login JWT:', error);
-        res.status(500).json({ error: 'Ocurrió un error en el servidor al intentar iniciar sesión.' });
+        res.status(500).json({ error: 'Ocurrió un error en el servidor al intentar iniciar sesión.', details: error.message });
     }
 });
 

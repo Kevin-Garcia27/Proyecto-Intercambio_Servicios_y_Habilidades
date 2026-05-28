@@ -100,6 +100,41 @@
 
 
         /* Tarjetas de perfil de usuario */
+        #usersGrid {
+            align-items: start;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)) !important;
+            gap: 1.25rem;
+            max-width: 100% !important;
+            margin-inline: 0 !important;
+            width: 100%;
+        }
+
+        #favoritosGrid,
+        #ordenesTrabajoGrid {
+            align-items: start;
+            grid-auto-rows: min-content;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)) !important;
+            gap: 1.25rem;
+            width: 100%;
+        }
+
+        #solicitudesEnviadasGrid {
+            align-items: start;
+            grid-auto-rows: min-content;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)) !important;
+            gap: 1.25rem;
+            width: 100%;
+        }
+
+        #favoritosGrid > *,
+        #ordenesTrabajoGrid > * {
+            align-self: start;
+        }
+
+        #solicitudesEnviadasGrid > * {
+            align-self: start;
+        }
+
         .user-card {
             background: white;
             border-radius: 1rem;
@@ -107,10 +142,14 @@
             transition: all 0.3s ease;
             overflow: hidden;
             border: 1px solid #e5e7eb;
-            min-height: 580px;
+            min-height: 500px;
             display: flex;
             flex-direction: column;
             position: relative;
+            align-self: start;
+            width: 100%;
+            max-width: none;
+            margin-inline: 0;
         }
 
         .user-card:hover {
@@ -469,6 +508,77 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
+        #descubrirView .discover-hero-banner {
+            position: relative;
+            padding: 1.75rem 1.5rem 1.3rem;
+            border-radius: 1.25rem;
+            overflow: hidden;
+            background-image: url('../FondoBusqueda.jpeg');
+            background-size: cover;
+            background-position: center center;
+            background-repeat: no-repeat;
+            box-shadow: 0 14px 30px rgba(15, 23, 42, 0.24);
+        }
+
+        #descubrirView .discover-hero-banner h2,
+        #descubrirView .discover-hero-banner p {
+            color: #ffffff !important;
+            text-shadow: 0 2px 6px rgba(2, 6, 23, 0.45);
+        }
+
+        #descubrirView .discover-hero-banner .search-container {
+            background: rgba(255, 255, 255, 0.96);
+            border: 1px solid rgba(255, 255, 255, 0.85);
+            box-shadow: 0 10px 22px rgba(2, 6, 23, 0.22);
+        }
+
+        #descubrirView .discover-hero-banner #searchButton {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            box-shadow: 0 6px 14px rgba(37, 99, 235, 0.35);
+        }
+
+        #descubrirView .discover-hero-banner #searchButton:hover {
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+        }
+
+        @media (max-width: 767px) {
+            #descubrirView .discover-hero-banner {
+                padding: 1rem 0.7rem 0.85rem;
+                border-radius: 0.95rem;
+                background-position: center center;
+            }
+
+            #descubrirView .discover-hero-banner .text-center {
+                margin-bottom: 0.8rem;
+            }
+
+            #descubrirView .discover-hero-banner h2 {
+                font-size: 1.55rem;
+                line-height: 1.14;
+                margin-bottom: 0.35rem;
+            }
+
+            #descubrirView .discover-hero-banner p {
+                font-size: 0.88rem;
+                line-height: 1.25;
+            }
+
+            #descubrirView .discover-hero-banner .search-container {
+                padding: 0.42rem 0.55rem;
+            }
+
+            #descubrirView .discover-hero-banner #searchInput {
+                font-size: 0.86rem;
+                margin-left: 0.55rem;
+            }
+
+            #descubrirView .discover-hero-banner #searchButton {
+                padding: 0.42rem 0.95rem;
+                font-size: 0.82rem;
+                min-width: 86px;
+            }
+        }
+
         /* Estilos del Modal de Cerrar Sesión */
         .custom-modal-overlay {
             position: fixed;
@@ -609,6 +719,151 @@
             background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
             transform: translateY(-2px);
             box-shadow: 0 6px 16px rgba(239, 68, 68, 0.4);
+        }
+
+        /* Variante visual premium para logout */
+        #logoutModal.custom-modal-overlay {
+            background:
+                radial-gradient(circle at 14% 18%, rgba(14, 165, 233, 0.2), transparent 42%),
+                radial-gradient(circle at 84% 86%, rgba(239, 68, 68, 0.24), transparent 40%),
+                rgba(10, 14, 26, 0.62);
+            backdrop-filter: blur(10px) saturate(120%);
+        }
+
+        #logoutModal .custom-modal.custom-modal-logout {
+            position: relative;
+            overflow: hidden;
+            width: min(92vw, 470px);
+            border-radius: 22px;
+            padding: 30px;
+            border: 1px solid rgba(148, 163, 184, 0.3);
+            box-shadow:
+                0 30px 60px rgba(2, 6, 23, 0.34),
+                0 14px 26px rgba(239, 68, 68, 0.16);
+            animation: slideUp 0.34s cubic-bezier(0.2, 0.9, 0.2, 1);
+        }
+
+        #logoutModal .custom-modal.custom-modal-logout::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #0ea5e9 0%, #f97316 45%, #ef4444 100%);
+        }
+
+        #logoutModal .modal-header {
+            gap: 14px;
+            margin-bottom: 14px;
+            align-items: center;
+        }
+
+        #logoutModal .modal-icon.modal-icon-logout {
+            width: auto;
+            height: auto;
+            border-radius: 0;
+            background: transparent;
+            box-shadow: none;
+            font-size: 0;
+            padding: 0;
+            position: relative;
+        }
+
+        #logoutModal .modal-icon.modal-icon-logout::after {
+            display: none;
+        }
+
+        #logoutModal .logout-title-svg {
+            width: 54px;
+            height: 54px;
+            display: block;
+            filter: drop-shadow(0 8px 16px rgba(194, 65, 12, 0.28));
+            flex-shrink: 0;
+        }
+
+        #logoutModal .modal-title {
+            font-size: clamp(1.45rem, 1.8vw, 1.75rem);
+            letter-spacing: -0.02em;
+            color: #0f172a;
+            margin: 0;
+            line-height: 1.15;
+        }
+
+        #logoutModal .modal-message {
+            margin-bottom: 22px;
+            border: 1px solid #e2e8f0;
+            background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+            border-radius: 14px;
+            padding: 14px 16px;
+            color: #475569;
+            font-size: 0.96rem;
+            line-height: 1.62;
+        }
+
+        #logoutModal .modal-actions {
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        #logoutModal .modal-btn {
+            min-width: 140px;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            padding: 11px 18px;
+            border: 1px solid transparent;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.25s ease;
+        }
+
+        #logoutModal .modal-btn:active {
+            transform: translateY(1px);
+        }
+
+        #logoutModal .modal-btn-cancel {
+            background: linear-gradient(180deg, #f8fafc 0%, #eef2f7 100%);
+            border-color: #dbe4ee;
+            color: #334155;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85);
+        }
+
+        #logoutModal .modal-btn-cancel:hover {
+            background: linear-gradient(180deg, #f1f5f9 0%, #e2e8f0 100%);
+            transform: translateY(-1px);
+        }
+
+        #logoutModal .modal-btn-confirm {
+            background: linear-gradient(135deg, #f97316 0%, #ef4444 48%, #dc2626 100%);
+            border-color: rgba(220, 38, 38, 0.35);
+            color: #fff;
+            box-shadow: 0 10px 22px rgba(220, 38, 38, 0.32);
+        }
+
+        #logoutModal .modal-btn-confirm:hover {
+            background: linear-gradient(135deg, #ea580c 0%, #dc2626 52%, #b91c1c 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 14px 24px rgba(220, 38, 38, 0.38);
+        }
+
+        @media (max-width: 520px) {
+            #logoutModal .custom-modal.custom-modal-logout {
+                width: min(94vw, 440px);
+                padding: 25px 20px 20px;
+                border-radius: 20px;
+            }
+
+            #logoutModal .logout-title-svg {
+                width: 48px;
+                height: 48px;
+            }
+
+            #logoutModal .modal-actions {
+                flex-direction: column-reverse;
+            }
+
+            #logoutModal .modal-btn {
+                width: 100%;
+            }
         }
 
         /* Estilos del Modal de Perfil */
@@ -1096,26 +1351,30 @@
         /* Vista de mensajería con fondo transparente */
         #mensajesView {
             background: transparent !important;
-            min-height: calc(100vh - 40px);
+            height: calc(100dvh - var(--app-header-height, 56px));
+            min-height: calc(100dvh - var(--app-header-height, 56px));
             width: 100%;
-            margin-bottom: -48px;
+            margin-bottom: 0;
             padding-bottom: 0;
+            overflow: hidden;
         }
         
         #mensajesView > div,
         #mensajesView > div > div,
         #mensajesView > div > div > div {
-            min-height: calc(100vh - 40px);
+            min-height: 0;
             height: 100%;
         }
         
         #chat-layout-dashboard {
-            min-height: calc(100vh - 40px) !important;
+            height: 100% !important;
+            min-height: 0 !important;
         }
         
         #conversacionesColumn,
         #chatColumn {
-            min-height: calc(100vh - 40px);
+            min-height: 0;
+            height: 100%;
         }
 
         @keyframes fadeIn {
@@ -2077,4 +2336,376 @@
             0% { box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.4); }
             70% { box-shadow: 0 0 0 10px rgba(79, 70, 229, 0); }
             100% { box-shadow: 0 0 0 0 rgba(79, 70, 229, 0); }
+        }
+
+        /* ========================================
+           MESSAGING: SOLO SCROLL INTERNO
+           ======================================== */
+        #mensajesView.active {
+            height: calc(100dvh - var(--app-header-height, 56px));
+            min-height: calc(100dvh - var(--app-header-height, 56px));
+            overflow: hidden;
+            margin-bottom: 0 !important;
+        }
+
+        #mensajesView.active > div,
+        #mensajesView.active > div > div,
+        #mensajesView.active > div > div > div,
+        #mensajesView.active .bg-white.overflow-hidden,
+        #mensajesView.active #chat-layout-dashboard,
+        #mensajesView.active #chatColumn,
+        #mensajesView.active #chat-activo-dashboard {
+            height: 100% !important;
+            min-height: 0 !important;
+            overflow: hidden;
+        }
+
+        #mensajesView.active #mensajes-container-dashboard {
+            flex: 1 1 auto;
+            min-height: 0;
+            overflow-y: auto !important;
+            overscroll-behavior: contain;
+        }
+
+        #mensajesView.active #chat-input-dashboard {
+            flex-shrink: 0;
+            background: #ffffff;
+            box-shadow: 0 -1px 0 rgba(226, 232, 240, 0.9);
+        }
+
+        @media (max-width: 767px) {
+            #mensajesView.active {
+                height: calc(100dvh - var(--app-header-height, 56px));
+                min-height: calc(100dvh - var(--app-header-height, 56px));
+            }
+
+            #mensajesView.active #chat-input-dashboard {
+                position: sticky;
+                bottom: 0;
+                left: auto;
+                right: auto;
+                z-index: 30;
+            }
+
+            #mensajesView.active #mensajes-container-dashboard {
+                padding-bottom: 12px;
+            }
+        }
+
+        /* ========================================
+           RESPONSIVE HARDENING: MENSAJERIA
+           ======================================== */
+        #mensajesView {
+            height: calc(var(--app-vh, 100dvh) - var(--app-header-height, 56px));
+            min-height: calc(var(--app-vh, 100dvh) - var(--app-header-height, 56px));
+        }
+
+        #mensajesView .mensajes-shell,
+        #mensajesView #chat-layout-dashboard,
+        #mensajesView #chatColumn,
+        #mensajesView #chat-activo-dashboard {
+            height: 100% !important;
+            min-height: 0 !important;
+        }
+
+        #mensajesView #chat-layout-dashboard {
+            max-height: 100%;
+        }
+
+        #mensajesView #mensajes-container-dashboard {
+            flex: 1 1 auto;
+            min-height: 0;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        #mensajesView #chat-input-dashboard {
+            position: sticky;
+            bottom: 0;
+            left: auto;
+            right: auto;
+            z-index: 30;
+            padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
+        }
+
+        #chat-form-dashboard > .flex.items-center {
+            min-width: 0;
+            gap: 0.5rem;
+        }
+
+        #message-input-dashboard {
+            min-width: 0;
+            width: 100%;
+        }
+
+        @media (max-width: 767px) {
+            #mensajesView.active {
+                height: calc(var(--app-vh, 100dvh) - var(--app-header-height, 56px));
+                min-height: calc(var(--app-vh, 100dvh) - var(--app-header-height, 56px));
+            }
+
+            #mensajesView #chat-layout-dashboard.mobile-show-chat #chatColumn {
+                width: 100%;
+                min-width: 0;
+            }
+
+            #mensajesView #chat-header-dashboard {
+                padding: 0.75rem 0.85rem;
+            }
+
+            #mensajesView #mensajes-container-dashboard {
+                padding: 0.75rem;
+                padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
+            }
+
+            #mensajesView #chat-input-dashboard {
+                padding: 0.65rem 0.75rem max(0.65rem, env(safe-area-inset-bottom));
+            }
+
+            #mensajesView #chat-form-dashboard > .flex.items-center {
+                gap: 0.45rem;
+            }
+
+            #mensajesView #message-input-dashboard {
+                padding-left: 0.9rem;
+                padding-right: 0.9rem;
+                font-size: 16px;
+            }
+
+            #mensajesView .chat-attach-btn {
+                width: 40px;
+                height: 40px;
+                min-width: 40px;
+                min-height: 40px;
+                padding: 0;
+            }
+
+            #mensajesView .chat-send-btn {
+                min-width: 86px;
+                padding: 0.62rem 0.9rem;
+                white-space: nowrap;
+                font-size: 0.95rem;
+            }
+        }
+
+        /* ========================================
+           MOBILE UX: DESCUBRIR + MENSAJERIA
+           ======================================== */
+        @media (max-width: 767px) {
+            /* Filtros menos invasivos: una sola fila con scroll horizontal */
+            #descubrirView #categoryFilters {
+                display: flex;
+                flex-wrap: nowrap !important;
+                justify-content: flex-start;
+                align-items: center;
+                gap: 0.5rem;
+                margin-bottom: 1rem;
+                padding: 0 0.25rem 0.25rem;
+                overflow-x: auto;
+                overflow-y: hidden;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: none;
+                white-space: nowrap;
+            }
+
+            #descubrirView #categoryFilters::-webkit-scrollbar {
+                display: none;
+            }
+
+            #descubrirView #categoryFilters .filter-button {
+                flex: 0 0 auto;
+                min-height: 38px;
+                padding: 0.48rem 0.85rem !important;
+                font-size: 0.88rem;
+                line-height: 1.1;
+                white-space: nowrap;
+                border-radius: 9999px;
+                background: #ffffff !important;
+                color: #374151 !important;
+                border-color: #e5e7eb !important;
+                box-shadow: 0 2px 7px rgba(15, 23, 42, 0.08) !important;
+            }
+
+            #descubrirView #categoryFilters .filter-button .iconify {
+                font-size: 17px;
+            }
+
+            #descubrirView #categoryFilters .filter-button.filter-active {
+                background: #ffffff !important;
+                color: #2563eb !important;
+                border-color: #3b82f6 !important;
+                box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.2), 0 2px 7px rgba(15, 23, 42, 0.08) !important;
+            }
+
+            /* Ordenar + Mostrar en la misma fila en móvil */
+            #discoverControls {
+                gap: 0.6rem 0.7rem !important;
+                align-items: flex-start !important;
+            }
+
+            #discoverControls > .flex.items-center.gap-2 {
+                flex: 0 0 calc(50% - 0.35rem);
+                min-width: 0;
+                display: flex;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.35rem;
+            }
+
+            #discoverControls > .flex.items-center.gap-2 label {
+                font-size: 0.9rem;
+                line-height: 1.1;
+                margin: 0;
+            }
+
+            #discoverControls #sortSelect,
+            #discoverControls #perPageSelect {
+                width: 100%;
+                min-width: 0;
+            }
+
+            #discoverControls > .text-sm.text-gray-600 {
+                flex: 0 0 100%;
+                margin-top: 0.15rem;
+            }
+
+            /* Cuando el teclado está abierto, usar viewport visual real en chat */
+            #mensajesView.mobile-chat-keyboard-open {
+                height: calc(var(--app-vh, 100dvh) - var(--app-header-height, 56px)) !important;
+                min-height: calc(var(--app-vh, 100dvh) - var(--app-header-height, 56px)) !important;
+            }
+
+            #mensajesView.mobile-chat-keyboard-open #chat-layout-dashboard,
+            #mensajesView.mobile-chat-keyboard-open #chatColumn,
+            #mensajesView.mobile-chat-keyboard-open #chat-activo-dashboard {
+                height: 100% !important;
+                min-height: 0 !important;
+            }
+
+            #mensajesView.mobile-chat-keyboard-open #mensajes-container-dashboard {
+                padding-bottom: 0.5rem;
+            }
+
+            /* Fondo móvil estable: mismo look, sin reacomodo al ocultarse/mostrarse la barra del navegador */
+            body {
+                position: relative;
+                background-image: none !important;
+                background-color: transparent !important;
+            }
+
+            body::before {
+                content: "";
+                position: fixed;
+                inset: 0;
+                width: 100vw;
+                height: 100svh;
+                background-image: url('../113435-OOM6G9-66.jpg');
+                background-size: cover;
+                background-position: center center;
+                background-repeat: no-repeat;
+                transform: translateZ(0);
+                will-change: transform;
+                pointer-events: none;
+                z-index: -1;
+            }
+
+            #descubrirView,
+            #descubrirView > .w-full {
+                background: transparent !important;
+            }
+
+            /* ========================================
+               HARD FIX: MENSAJERIA MOVIL ESTABLE
+               ======================================== */
+            body.mensajes-open {
+                overflow-x: hidden;
+                overflow-y: auto;
+                height: auto;
+            }
+
+            html.mensajes-open.chat-typing,
+            html.mensajes-open.chat-typing body,
+            body.mensajes-open.chat-typing {
+                overflow: hidden !important;
+                overscroll-behavior: none;
+                height: 100%;
+            }
+
+            body.mensajes-open::before {
+                display: none;
+            }
+
+            body.mensajes-open #mensajesView {
+                background: #f1f5f9 !important;
+                height: calc(var(--app-vh, 100dvh) - var(--app-header-height, 56px)) !important;
+                min-height: calc(var(--app-vh, 100dvh) - var(--app-header-height, 56px)) !important;
+                overflow: hidden !important;
+                overscroll-behavior-y: contain;
+            }
+
+            body.mensajes-open #mensajesView > div,
+            body.mensajes-open #mensajesView > div > div,
+            body.mensajes-open #mensajesView > div > div > div,
+            body.mensajes-open #mensajesView .mensajes-shell,
+            body.mensajes-open #mensajesView #chat-layout-dashboard,
+            body.mensajes-open #mensajesView #sidebar-react-root,
+            body.mensajes-open #mensajesView #chatColumn,
+            body.mensajes-open #mensajesView #chat-activo-dashboard {
+                height: 100% !important;
+                min-height: 0 !important;
+            }
+
+            body.mensajes-open #mensajesView #chat-layout-dashboard {
+                max-height: 100% !important;
+                overflow: hidden !important;
+            }
+
+            body.mensajes-open #mensajesView #chat-layout-dashboard:not(.mobile-show-chat) #sidebar-react-root {
+                display: block !important;
+                overflow-y: auto !important;
+                -webkit-overflow-scrolling: touch;
+                background: #ffffff !important;
+            }
+
+            body.mensajes-open #mensajesView #chat-layout-dashboard:not(.mobile-show-chat) #chatColumn {
+                display: none !important;
+            }
+
+            body.mensajes-open #mensajesView #chat-layout-dashboard.mobile-show-chat #sidebar-react-root {
+                display: none !important;
+            }
+
+            body.mensajes-open #mensajesView #chat-layout-dashboard.mobile-show-chat #chatColumn {
+                display: flex !important;
+                width: 100% !important;
+                overflow: hidden !important;
+            }
+
+            body.mensajes-open #mensajesView #mensajes-container-dashboard {
+                overflow-y: auto !important;
+                -webkit-overflow-scrolling: touch;
+                padding-bottom: max(0.75rem, env(safe-area-inset-bottom)) !important;
+            }
+
+            body.mensajes-open #mensajesView #chat-input-dashboard {
+                position: sticky !important;
+                bottom: 0 !important;
+                left: auto !important;
+                right: auto !important;
+                z-index: 40 !important;
+            }
+
+            body.mensajes-open #mensajesView #chat-layout-dashboard.mobile-show-chat #chat-input-dashboard {
+                position: fixed !important;
+                left: 0 !important;
+                right: 0 !important;
+                width: 100vw !important;
+                bottom: var(--chat-keyboard-offset, 0px) !important;
+                z-index: 2147483000 !important;
+                transform: translateZ(0);
+            }
+
+            body.mensajes-open #mensajesView #chat-layout-dashboard.mobile-show-chat #mensajes-container-dashboard {
+                padding-bottom: calc(96px + var(--chat-keyboard-offset, 0px)) !important;
+            }
         }

@@ -7,6 +7,23 @@ const router = express.Router();
 const db = require('../db');
 const { enviarNotificacionContextual } = require('../config/email');
 
+const ESTADOS_OT_VALIDOS = ['pendiente', 'en_progreso', 'completada', 'cancelada'];
+
+function normalizarEstadoOT(valor) {
+    if (valor === undefined || valor === null) return null;
+
+    const clave = String(valor)
+        .trim()
+        .toLowerCase()
+        .replace(/\s+/g, '_')
+        .replace(/-+/g, '_');
+
+    if (!clave) return null;
+    if (clave === 'enprogreso') return 'en_progreso';
+
+    return ESTADOS_OT_VALIDOS.includes(clave) ? clave : null;
+}
+
 // Crear las tablas automáticamente si no existen
 (async () => {
     try {
@@ -412,6 +429,10 @@ router.put('/:id', async (req, res) => {
         return res.status(400).json({ success: false, mensaje: 'La fecha de fin no puede ser anterior a la fecha de inicio.' });
     }
     const maxPost = parseInt(max_postulantes) || 1;
+    const estadoNormalizado = normalizarEstadoOT(estado);
+    if (estado !== undefined && estado !== null && String(estado).trim() !== '' && !estadoNormalizado) {
+        return res.status(400).json({ success: false, mensaje: `Estado inválido. Valores permitidos: ${ESTADOS_OT_VALIDOS.join(', ')}.` });
+    }
 
     try {
         const [result] = await db.query(
@@ -421,7 +442,7 @@ router.put('/:id', async (req, res) => {
                  max_postulantes = ?, restringir_por_ubicacion = IFNULL(?, restringir_por_ubicacion)
              WHERE id_orden = ?`,
             [titulo, descripcion || null, ubicacion_obra || null, fecha_inicio, fecha_fin,
-             especialidad || null, presupuesto_estimado || null, estado || null, maxPost,
+             especialidad || null, presupuesto_estimado || null, estadoNormalizado || null, maxPost,
              restringir_por_ubicacion !== undefined ? (restringir_por_ubicacion ? 1 : 0) : null,
              req.params.id]
         );
@@ -438,17 +459,17 @@ router.put('/:id', async (req, res) => {
 // --------------------------------------------------
 router.patch('/:id', async (req, res) => {
     const { estado, restringir_por_ubicacion } = req.body;
-    const estadosValidos = ['pendiente', 'en_progreso', 'completada', 'cancelada'];
 
     const setClauses = [];
     const params = [];
 
     if (estado !== undefined) {
-        if (!estadosValidos.includes(estado)) {
-            return res.status(400).json({ success: false, mensaje: `Estado inválido. Valores permitidos: ${estadosValidos.join(', ')}.` });
+        const estadoNormalizado = normalizarEstadoOT(estado);
+        if (!estadoNormalizado) {
+            return res.status(400).json({ success: false, mensaje: `Estado inválido. Valores permitidos: ${ESTADOS_OT_VALIDOS.join(', ')}.` });
         }
         setClauses.push('estado = ?');
-        params.push(estado);
+        params.push(estadoNormalizado);
     }
     if (restringir_por_ubicacion !== undefined) {
         setClauses.push('restringir_por_ubicacion = ?');
@@ -500,11 +521,17 @@ router.get('/:id/postulaciones', async (req, res) => {
             `SELECT po.*,
                     CONCAT(IFNULL(p.nombre_Persona,''), ' ', IFNULL(p.apellido_Persona,'')) AS nombre_tecnico,
                     p.imagenUrl_Persona AS imagen_tecnico,
-                    (SELECT p2.id_Perfil_Persona FROM Personas p2 WHERE p2.id_Usuario = po.usuario_id LIMIT 1) AS id_perfil_tecnico,
-                    u.correo AS correo_tecnico
+                    p.id_Perfil_Persona AS id_perfil_tecnico,
+                    u.correo AS correo_tecnico,
+                    md.puntualidad,
+                    md.calidad_trabajo,
+                    md.limpieza,
+                    md.comunicacion,
+                    md.cantidad_calificaciones
              FROM PostulacionesOrdenes po
              LEFT JOIN Usuarios u ON po.usuario_id = u.id_usuario
              LEFT JOIN Personas p ON p.id_Usuario = u.id_usuario
+             LEFT JOIN Metricas_Desempeno md ON md.id_perfil_persona = p.id_Perfil_Persona
              WHERE po.id_orden = ?
              ORDER BY po.fecha_postulacion ASC`,
             [req.params.id]

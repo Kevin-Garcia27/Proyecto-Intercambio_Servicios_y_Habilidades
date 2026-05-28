@@ -6,3 +6,4 @@
 
 # Ignorar logs de depuración
 npm-debug.log*
+error.log

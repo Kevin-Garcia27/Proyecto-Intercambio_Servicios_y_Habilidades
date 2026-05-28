@@ -461,7 +461,7 @@
 
     <script>
         // Backend URL y Socket.io cliente para señalización en tiempo real
-        const BACKEND_URL = window.APP_CONFIG ? window.APP_CONFIG.BACKEND_URL : 'https://SEMACKRO.duckdns.org';
+        const BACKEND_URL = window.APP_CONFIG ? window.APP_CONFIG.BACKEND_URL : 'https://serversemackro.up.railway.app';
 
         // Control de throttling para ICE candidates
         let _candidateBuffer = [];
@@ -1313,9 +1313,9 @@
 
                                     // Si es NotFoundError, puede ser que otra pestaña esté usando la cámara
                                     if (err.name === 'NotFoundError') {
-                                        alert('No se pudo acceder a tu camara.\n\nCIERRA otras pestanas del navegador que puedan estar usandola\n(incluyendo pestanas en modo incognito)\n\nLa llamada continuara pero no podras enviar video.');
+                                        alert('No se pudo acceder a tu cámara.\n\nCIERRA otras pestañas del navegador que puedan estar usándola\n(incluyendo pestañas en modo incógnito)\n\nLa llamada continuará pero no podrás enviar video.');
                                     } else if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
-                                        alert('Permisos denegados.\nPermite el acceso a camara y microfono en la configuracion del navegador.');
+                                        alert('Permisos denegados.\nPermite el acceso a cámara y micrófono en la configuración del navegador.');
                                     }
 
                                     // Intentar solo audio como fallback

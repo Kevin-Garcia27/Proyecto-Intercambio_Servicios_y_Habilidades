@@ -212,7 +212,7 @@
   <!-- NAVBAR -->
   <nav class="navbar navbar-expand-lg navbar-light fixed-top">
     <div class="container">
-      <a class="navbar-brand" href="/index.html">SEMACKRO</a>
+      <a class="navbar-brand" href="/index.html">Semackro</a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
         aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
@@ -220,7 +220,7 @@
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav me-auto">
           <li class="nav-item">
-            <a class="nav-link" href="/index.html#como-funciona" data-i18n="nav.howItWorks">Cómo Funciona</a>
+            <a class="nav-link" href="/index.html#como-funciona" data-i18n="nav.howItWorks">Cómo funciona</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="/index.html#habilidades" data-i18n="nav.skills">Habilidades</a>
@@ -241,7 +241,7 @@
                   d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129">
                 </path>
               </svg>
-              <span id="currentLang" class="fw-semibold small">ES</span>
+              <span id="currentLang" class="fw-semibold small">Es</span>
               <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
               </svg>
@@ -256,7 +256,7 @@
                     d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129">
                   </path>
                 </svg>
-                <span class="small fw-semibold text-secondary">ES</span>
+                <span class="small fw-semibold text-secondary">Es</span>
                 <span class="fw-medium">Español</span>
               </button>
               <button onclick="changeLanguage('en')"
@@ -267,7 +267,7 @@
                     d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129">
                   </path>
                 </svg>
-                <span class="small fw-semibold text-secondary">EN</span>
+                <span class="small fw-semibold text-secondary">En</span>
                 <span class="fw-medium">English</span>
               </button>
             </div>
@@ -275,8 +275,8 @@
 
           <a href="/login.html"
             class="text-gray-700 font-semibold hover:text-blue-600 transition duration-150 px-4 py-2 rounded-full"
-            data-i18n="nav.login">Iniciar Sesión</a>
-          <a href="/registro_prueba.html" class="btn btn-register" data-i18n="nav.register">Crear Cuenta</a>
+            data-i18n="nav.login">Iniciar sesión</a>
+          <a href="/registro_prueba.html" class="btn btn-register" data-i18n="nav.register">Crear cuenta</a>
         </div>
       </div>
     </div>
@@ -289,10 +289,8 @@
       <img src="/error-404.png" alt="Error 404" class="icon">
 
       <h1 data-i18n="error.title">404 — Página no encontrada</h1>
-      <p data-i18n="error.description">
-        Parece que la dirección que intentaste abrir no existe o fue modificada.
-        Si escribiste la URL manualmente, revisa posibles errores tipográficos.
-      </p>
+      <p data-i18n="error.description">Parece que la dirección que intentaste abrir no existe o fue modificada.
+        si escribiste la url manualmente, revisa posibles errores tipográficos.</p>
 
       <div style="margin-top:24px; display:flex; justify-content:center; gap:12px; flex-wrap:wrap;">
         <a class="btn-back" href="/index.html">
@@ -315,23 +313,23 @@
   <script>
     const translations = {
       es: {
-        'nav.howItWorks': 'Cómo Funciona',
+        'nav.howItWorks': 'Cómo funciona',
         'nav.skills': 'Habilidades',
         'nav.community': 'Comunidad',
-        'nav.login': 'Iniciar Sesión',
-        'nav.register': 'Crear Cuenta',
+        'nav.login': 'Iniciar sesión',
+        'nav.register': 'Crear cuenta',
         'error.title': '404 — Página no encontrada',
-        'error.description': 'Parece que la dirección que intentaste abrir no existe o fue modificada. Si escribiste la URL manualmente, revisa posibles errores tipográficos.',
+        'error.description': 'Parece que la dirección que intentaste abrir no existe o fue modificada. si escribiste la url manualmente, revisa posibles errores tipográficos.',
         'error.backButton': 'Volver al inicio'
       },
       en: {
-        'nav.howItWorks': 'How It Works',
+        'nav.howItWorks': 'How it works',
         'nav.skills': 'Skills',
         'nav.community': 'Community',
         'nav.login': 'Login',
-        'nav.register': 'Sign Up',
+        'nav.register': 'Sign up',
         'error.title': '404 — Page not found',
-        'error.description': 'It seems the address you tried to open does not exist or has been modified. If you typed the URL manually, check for possible typos.',
+        'error.description': 'It seems the address you tried to open does not exist or has been modified. if you typed the url manually, check for possible typos.',
         'error.backButton': 'Back to home'
       }
     };
@@ -370,7 +368,7 @@
         languageBtn.addEventListener('click', (e) => {
           e.stopPropagation();
           const isVisible = languageDropdown.style.display === 'block';
-          languageDropdown.style.display = isVisible ? 'none' : 'block';
+          languageDropdown.style.display = isVisible ? 'none' : 'Block';
         });
 
         document.addEventListener('click', () => {

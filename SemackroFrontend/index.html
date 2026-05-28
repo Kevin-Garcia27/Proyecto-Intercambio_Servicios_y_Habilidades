@@ -277,8 +277,7 @@
             }
 
             .hero-panel h3 {
-                opacity: 1;
-                transform: translateY(0);
+                display: none;
             }
 
             .hero-panel:nth-of-type(n+4) {
@@ -290,16 +289,35 @@
                 top: 50%;
                 left: 50%;
                 transform: translate(-50%, -50%);
-                width: 90%;
+                width: 92%;
+                max-width: 540px;
+                padding-inline: 0.25rem;
             }
 
             .hero-content h1 {
-                font-size: 2.5rem;
+                font-size: clamp(1.55rem, 8.2vw, 2.05rem);
+                line-height: 1.14;
+                margin-bottom: 0.75rem !important;
             }
 
             .hero-content .lead {
-                font-size: 1.2rem;
-                margin-top: 1rem;
+                font-size: 0.98rem;
+                line-height: 1.35;
+                margin-top: 0.25rem;
+                margin-bottom: 1rem !important;
+            }
+
+            .hero-content .lead .hero-sub-extra {
+                display: none;
+            }
+
+            .hero-content .cta-button-accent {
+                font-size: 0.98rem;
+                padding: 0.7rem 1.2rem;
+            }
+
+            .hero-content .hero-nopayments {
+                display: none;
             }
         }
 
@@ -446,6 +464,9 @@
             font-weight: 700 !important;
             background-color: transparent !important;
             border: 2px solid #2563EB !important;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
             padding: 0.5rem 1rem;
             border-radius: 9999px;
             transition: all 0.15s ease;
@@ -463,6 +484,9 @@
             background-color: #2563EB !important;
             color: #ffffff !important;
             font-weight: 700 !important;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
             padding: 0.5rem 1.5rem;
             border-radius: 9999px;
             border: none;
@@ -485,6 +509,58 @@
 
         .navbar-toggler-icon {
             background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(75, 85, 99, 1)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+        }
+
+        @media (max-width: 991.98px) {
+            .navbar-collapse {
+                margin-top: 0.85rem;
+                padding: 0.9rem;
+                border: 1px solid #e5e7eb;
+                border-radius: 14px;
+                background: #ffffff;
+                box-shadow: 0 14px 26px rgba(15, 23, 42, 0.08);
+            }
+
+            .navbar-nav {
+                gap: 0.2rem;
+            }
+
+            .navbar-nav .nav-link {
+                margin-right: 0;
+                padding: 0.5rem 0;
+            }
+
+            .navbar-actions {
+                width: 100%;
+                margin-top: 0.65rem;
+                display: grid !important;
+                grid-template-columns: 1fr;
+                gap: 0.6rem !important;
+                align-items: stretch !important;
+            }
+
+            .navbar-actions .position-relative,
+            .navbar-actions a {
+                width: 100%;
+            }
+
+            .navbar-actions .btn-login,
+            .navbar-actions .btn-register {
+                width: 100%;
+                text-align: center;
+                padding-block: 0.6rem;
+            }
+
+            #languageBtn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            #languageDropdown {
+                left: 0 !important;
+                right: 0 !important;
+                min-width: 100% !important;
+            }
         }
 
         /* Button styles - change from green to blue */
@@ -596,16 +672,16 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="#como-funciona" data-i18n="nav.howItWorks">Cómo Funciona</a>
+                        <a class="nav-link" href="#como-funciona" data-i18n="nav.howItWorks">Proceso de selección</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#habilidades" data-i18n="nav.skills">Habilidades</a>
+                        <a class="nav-link" href="#habilidades" data-i18n="nav.skills">Vacantes internas</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#comunidad" data-i18n="nav.community">Comunidad</a>
+                        <a class="nav-link" href="#comunidad" data-i18n="nav.community">Equipo SEMACKRO</a>
                     </li>
                 </ul>
-                <div class="d-flex gap-2 align-items-center">
+                <div class="d-flex gap-2 align-items-center navbar-actions">
                     <!-- Selector de idioma -->
                     <div class="position-relative">
                         <button id="languageBtn"
@@ -617,7 +693,7 @@
                                     d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129">
                                 </path>
                             </svg>
-                            <span id="currentLang" class="fw-semibold small">ES</span>
+                            <span id="currentLang" class="fw-semibold small">Es</span>
                             <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M19 9l-7 7-7-7"></path>
@@ -634,7 +710,7 @@
                                         d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129">
                                     </path>
                                 </svg>
-                                <span class="small fw-semibold text-secondary">ES</span>
+                                <span class="small fw-semibold text-secondary">Es</span>
                                 <span class="fw-medium">Español</span>
                             </button>
                             <button onclick="changeLanguage('en')"
@@ -645,16 +721,16 @@
                                         d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129">
                                     </path>
                                 </svg>
-                                <span class="small fw-semibold text-secondary">EN</span>
+                                <span class="small fw-semibold text-secondary">En</span>
                                 <span class="fw-medium">English</span>
                             </button>
                         </div>
                     </div>
 
                     <a href="login.html"
-                        class="btext-gray-700 font-semibold hover:text-blue-600 transition duration-150 px-4 py-2 rounded-full"
-                        data-i18n="nav.login">Iniciar Sesión</a>
-                    <a href="registro_prueba.html" class="btn btn-register" data-i18n="nav.register">Crear Cuenta</a>
+                        class="btn-login"
+                        data-i18n="nav.login">Iniciar sesión</a>
+                    <a href="registro_prueba.html" class="btn btn-register" data-i18n="nav.register">Crear perfil</a>
                 </div>
             </div>
         </div>
@@ -664,44 +740,41 @@
 
         <!-- Contenido superpuesto (título y botón) -->
         <div class="hero-content">
-            <h1 class="display-4 fw-bold mb-4" data-i18n="hero.title">Intercambia Habilidades<br>Desbloquea
-                Oportunidades</h1>
-            <p class="lead fs-4 mb-4" data-i18n="hero.subtitle">SEMACKRO te conecta con una comunidad global dispuesta a
-                enseñar y aprender.<br>¿Qué sabes hacer? ¿Qué quieres aprender?</p>
+            <h1 class="display-4 fw-bold mb-4" data-i18n="hero.title">Talento Interno SEMACKRO</h1>
+            <p class="lead fs-4 mb-4" data-i18n="hero.subtitle"><span class="hero-sub-main">Postúlate a vacantes internas y crece con nosotros.</span></p>
             <a href="login.html" class="btn btn-primary btn-lg cta-button-accent" id="main-cta"
-                data-i18n="hero.cta">Empieza Gratis Hoy</a>
-            <p class="mt-3 opacity-75"><small data-i18n="hero.nopayments">Sin Pagos. ¡Solo ganas conocimientos!</small>
+                data-i18n="hero.cta">Ver vacantes</a>
+            <p class="mt-3 opacity-75 hero-nopayments"><small data-i18n="hero.nopayments">Movilidad interna real.</small>
             </p>
         </div>
 
         <!-- Paneles de fondo -->
         <div class="hero-panel"
             style="background-image: url('https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=2071');">
-            <h3>Programación</h3>
+            <h3>Ingeniería</h3>
         </div>
         <div class="hero-panel"
             style="background-image: url('https://images.unsplash.com/photo-1542744173-8e7e53415bb0?q=80&w=2070');">
-            <h3>Diseño & UX</h3>
+            <h3>Producto & Diseño</h3>
         </div>
         <div class="hero-panel"
             style="background-image: url('https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=2070');">
-            <h3>Marketing</h3>
+            <h3>People & Cultura</h3>
         </div>
         <div class="hero-panel"
             style="background-image: url('https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=2070');">
-            <h3>Fotografía</h3>
+            <h3>Operaciones</h3>
         </div>
         <div class="hero-panel"
             style="background-image: url('https://images.unsplash.com/photo-1511379938547-c1f69419868d?q=80&w=2070');">
-            <h3>Música</h3>
+            <h3>Data & Analytics</h3>
         </div>
     </section>
 
     <section id="habilidades" class="section-padding mt-5">
         <div class="container">
-            <h2 class="text-center mb-3 fw-bold" data-i18n="skills.title">Un Universo de Habilidades</h2>
-            <p class="text-center text-muted mb-5 fs-5" data-i18n="skills.subtitle">Desde lo profesional hasta tus
-                hobbies más queridos</p>
+            <h2 class="text-center mb-3 fw-bold" data-i18n="skills.title">Vacantes y áreas estratégicas</h2>
+            <p class="text-center text-muted mb-5 fs-5" data-i18n="skills.subtitle">Explora dónde puedes aportar más valor dentro de SEMACKRO</p>
             <div class="row row-cols-1 row-cols-md-2 g-4">
 
                 <!-- Habilidad 1 -->
@@ -710,9 +783,8 @@
                         <img src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=2070"
                             class="park-card-img" alt="Diseño UX/UI">
                         <div class="park-card-content">
-                            <h5 class="park-card-title" data-i18n="skills.uxui">Diseño UX/UI</h5>
-                            <p class="park-card-text" data-i18n="skills.uxui.desc">Aprende a crear interfaces intuitivas
-                                y experiencias de usuario excepcionales con diseñadores profesionales.</p>
+                            <h5 class="park-card-title" data-i18n="skills.uxui">Diseño de Producto</h5>
+                            <p class="park-card-text" data-i18n="skills.uxui.desc">Buscamos talento para crear experiencias claras, accesibles y centradas en el usuario interno y externo.</p>
                             <a href="login.html" class="btn btn-primary park-card-btn"
                                 data-i18n="skills.explore">Explorar</a>
                         </div>
@@ -723,11 +795,10 @@
                 <div class="col">
                     <div class="park-card">
                         <img src="https://images.unsplash.com/photo-1461749280684-dccba630e2f6?q=80&w=2069"
-                            class="park-card-img" alt="Programación Web">
+                            class="park-card-img" alt="Programación web">
                         <div class="park-card-content">
-                            <h5 class="park-card-title" data-i18n="skills.programming">Programación Web</h5>
-                            <p class="park-card-text" data-i18n="skills.programming.desc">Domina JavaScript, React,
-                                Node.js y más. Conecta con desarrolladores que comparten tu pasión por el código.</p>
+                            <h5 class="park-card-title" data-i18n="skills.programming">Ingeniería de Software</h5>
+                            <p class="park-card-text" data-i18n="skills.programming.desc">Únete al equipo que construye plataformas escalables, seguras y de alto impacto para SEMACKRO.</p>
                             <a href="login.html" class="btn btn-primary park-card-btn"
                                 data-i18n="skills.explore">Explorar</a>
                         </div>
@@ -738,11 +809,10 @@
                 <div class="col">
                     <div class="park-card">
                         <img src="https://images.unsplash.com/photo-1505778276668-26b3ff7af103?q=80&w=2086"
-                            class="park-card-img" alt="Marketing Digital">
+                            class="park-card-img" alt="Marketing digital">
                         <div class="park-card-content">
-                            <h5 class="park-card-title" data-i18n="skills.marketing">Marketing Digital</h5>
-                            <p class="park-card-text" data-i18n="skills.marketing.desc">SEO, redes sociales, email
-                                marketing y estrategias de contenido. Impulsa tu marca con expertos.</p>
+                            <h5 class="park-card-title" data-i18n="skills.marketing">People & Cultura</h5>
+                            <p class="park-card-text" data-i18n="skills.marketing.desc">Impulsa marca empleadora, comunicación interna y programas de bienestar para fortalecer el talento.</p>
                             <a href="login.html" class="btn btn-primary park-card-btn"
                                 data-i18n="skills.explore">Explorar</a>
                         </div>
@@ -755,9 +825,8 @@
                         <img src="https://images.unsplash.com/photo-1611532736597-de2d4265fba3?q=80&w=2074"
                             class="park-card-img" alt="Idiomas">
                         <div class="park-card-content">
-                            <h5 class="park-card-title" data-i18n="skills.languages">Idiomas</h5>
-                            <p class="park-card-text" data-i18n="skills.languages.desc">Inglés, español, francés,
-                                mandarín y más. Practica conversación con hablantes nativos de todo el mundo.</p>
+                            <h5 class="park-card-title" data-i18n="skills.languages">Datos y Operaciones</h5>
+                            <p class="park-card-text" data-i18n="skills.languages.desc">Convierte métricas en decisiones y mejora procesos clave para acelerar resultados del negocio.</p>
                             <a href="login.html" class="btn btn-primary park-card-btn"
                                 data-i18n="skills.explore">Explorar</a>
                         </div>
@@ -770,9 +839,8 @@
 
     <section id="como-funciona" class="section-padding bg-light mt-5">
         <div class="container">
-            <h2 class="text-center mb-3 fw-bold" data-i18n="howItWorks.title">La Conexión es Simple</h2>
-            <p class="text-center text-muted mb-5 fs-5" data-i18n="howItWorks.subtitle">Solo tres pasos para comenzar tu
-                viaje de aprendizaje mutuo</p>
+            <h2 class="text-center mb-3 fw-bold" data-i18n="howItWorks.title">Reclutamiento interno en 3 pasos</h2>
+            <p class="text-center text-muted mb-5 fs-5" data-i18n="howItWorks.subtitle">Un proceso claro para mover talento dentro de SEMACKRO</p>
             <div class="row text-center">
                 <div class="col-md-4 mb-4">
                     <div class="feature-icon">
@@ -790,9 +858,8 @@
                             <path d="M10 22h4" />
                         </svg>
                     </div>
-                    <h3 class="fw-bold" data-i18n="howItWorks.step1.title">Ofrece tu Talento</h3>
-                    <p class="text-muted" data-i18n="howItWorks.step1.desc">Publica las habilidades que estás dispuesto
-                        a enseñar (ej. Excel, Yoga, Idiomas).</p>
+                    <h3 class="fw-bold" data-i18n="howItWorks.step1.title">Comparte tu perfil</h3>
+                    <p class="text-muted" data-i18n="howItWorks.step1.desc">Completa tu experiencia, logros y habilidades clave para que RRHH te evalúe con contexto.</p>
                 </div>
                 <div class="col-md-4 mb-4">
                     <div class="feature-icon">
@@ -808,9 +875,8 @@
                             <path d="m21 21-4.35-4.35" />
                         </svg>
                     </div>
-                    <h3 class="fw-bold" data-i18n="howItWorks.step2.title">Encuentra tu Maestro</h3>
-                    <p class="text-muted" data-i18n="howItWorks.step2.desc">Busca entre perfiles por la habilidad que
-                        quieres dominar (ej. Diseño Web, Cocina).</p>
+                    <h3 class="fw-bold" data-i18n="howItWorks.step2.title">Aplica a una vacante</h3>
+                    <p class="text-muted" data-i18n="howItWorks.step2.desc">Elige la posición interna que mejor se alinea con tu plan de carrera y tus fortalezas.</p>
                 </div>
                 <div class="col-md-4 mb-4">
                     <div class="feature-icon">
@@ -828,9 +894,8 @@
                             <path d="M16 3.13a4 4 0 0 1 0 7.75" />
                         </svg>
                     </div>
-                    <h3 class="fw-bold" data-i18n="howItWorks.step3.title">¡Conéctate e Intercambia!</h3>
-                    <p class="text-muted" data-i18n="howItWorks.step3.desc">Programa una sesión virtual o presencial. Tu
-                        conocimiento es tu moneda de cambio.</p>
+                    <h3 class="fw-bold" data-i18n="howItWorks.step3.title">Entrevista y movilidad</h3>
+                    <p class="text-muted" data-i18n="howItWorks.step3.desc">Participa en entrevistas con líderes del área y acelera tu crecimiento dentro de SEMACKRO.</p>
                 </div>
             </div>
         </div>
@@ -838,73 +903,66 @@
 
     <section id="comunidad" class="section-padding">
         <div class="container">
-            <h2 class="text-center mb-3 fw-bold" data-i18n="community.title">Historias Reales de Intercambio</h2>
-            <p class="text-center text-muted mb-5 fs-5" data-i18n="community.subtitle">Conoce a quienes ya están
-                conectando y creciendo</p>
+            <h2 class="text-center mb-3 fw-bold" data-i18n="community.title">Crecimiento profesional</h2>
+            <p class="text-center text-muted mb-5 fs-5" data-i18n="community.subtitle">Desarrolla tu carrera dentro de la organización.</p>
         </div>
         <div class="scroller-wrapper">
             <div class="scroller-inner">
                 <div class="card comment-card shadow-sm">
                     <div class="card-body">
-                        <p class="card-text">"Le enseñé a Javier a usar Google Sheets avanzado, y a cambio, él me dio 4
-                            clases de guitarra que siempre quise tomar. ¡El intercambio es justo y divertido!"</p>
+                        <p class="card-text">"Pasé de soporte a analista de datos gracias al programa de movilidad interna. RRHH me acompañó en todo el proceso."</p>
                         <div class="comment-author">
-                            <img src="https://placehold.co/100x100/10b981/ffffff?text=A" alt="Avatar de Ana">
+                            <img src="https://placehold.co/100x100/10b981/ffffff?text=A" alt="Avatar de ana">
                             <div>
-                                <h6 class="card-title mb-0">Ana Martínez</h6>
-                                <small class="text-muted">Instructora de Data & Alumna de Música</small>
+                                <h6 class="card-title mb-0">Ana martínez</h6>
+                                <small class="text-muted">Analista de Datos Interna</small>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="card comment-card shadow-sm">
                     <div class="card-body">
-                        <p class="card-text">"Necesitaba ayuda con mi currículum profesional. Encontré a Carolina, una
-                            coach de carrera, y le enseñé fotografía básica para sus redes sociales. ¡Un win-win
-                            perfecto!"</p>
+                        <p class="card-text">"Me moví del área de diseño a product management. El proceso fue transparente y alineado con mis metas de carrera."</p>
                         <div class="comment-author">
-                            <img src="https://placehold.co/100x100/3b82f6/ffffff?text=C" alt="Avatar de Carlos">
+                            <img src="https://placehold.co/100x100/3b82f6/ffffff?text=C" alt="Avatar de carlos">
                             <div>
-                                <h6 class="card-title mb-0">Carlos Raudales</h6>
-                                <small class="text-muted">Diseñador Gráfico & Alumno de Coaching</small>
+                                <h6 class="card-title mb-0">Carlos raudales</h6>
+                                <small class="text-muted">Product Manager Interno</small>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="card comment-card shadow-sm">
                     <div class="card-body">
-                        <p class="card-text">"Aprendí Python desde cero con María, y le enseñé marketing en redes
-                            sociales. Ahora ambos tenemos nuevas habilidades para nuestras carreras."</p>
+                        <p class="card-text">"Inicié en operaciones y ahora lidero automatización en ingeniería. La vacante interna fue mi gran salto profesional."</p>
                         <div class="comment-author">
-                            <img src="https://placehold.co/100x100/f59e0b/ffffff?text=L" alt="Avatar de Luis">
+                            <img src="https://placehold.co/100x100/f59e0b/ffffff?text=L" alt="Avatar de luis">
                             <div>
-                                <h6 class="card-title mb-0">Luis Fernández</h6>
-                                <small class="text-muted">Community Manager & Dev Junior</small>
+                                <h6 class="card-title mb-0">Luis fernández</h6>
+                                <small class="text-muted">Líder de Automatización</small>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="card comment-card shadow-sm">
                     <div class="card-body">
-                        <p class="card-text">"Como jubilado quería aprender inglés. En SEMACKRO encontré a jóvenes que
-                            querían aprender carpintería. ¡Todos ganamos!"</p>
+                        <p class="card-text">"Cambié de ventas a people & cultura. Hoy construyo programas de bienestar para el equipo con impacto real."</p>
                         <div class="comment-author">
-                            <img src="https://placehold.co/100x100/8b5cf6/ffffff?text=J" alt="Avatar de Jorge">
+                            <img src="https://placehold.co/100x100/8b5cf6/ffffff?text=J" alt="Avatar de jorge">
                             <div>
-                                <h6 class="card-title mb-0">Jorge Reyes</h6>
-                                <small class="text-muted">Carpintero & Estudiante de Inglés</small>
+                                <h6 class="card-title mb-0">Jorge reyes</h6>
+                                <small class="text-muted">Especialista People & Cultura</small>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="card comment-card shadow-sm">
                     <div class="card-body">
-                        <p class="card-text">"Estoy mejorando mi español conversacional mientras enseño diseño UX. La
-                            plataforma hace que los intercambios sean súper fáciles de coordinar."</p>
+                        <p class="card-text">"Entré como QA y ahora trabajo en seguridad. La movilidad interna me permitió crecer sin salir de SEMACKRO."</p>
                         <div class="comment-author">
-                            <img src="https://placehold.co/100x100/ef4444/ffffff?text=S" alt="Avatar de Sarah">
+                            <img src="https://placehold.co/100x100/ef4444/ffffff?text=S" alt="Avatar de sarah">
                             <div>
-                                <h6 class="card-title mb-0">Sarah Johnson</h6>
+                                <h6 class="card-title mb-0">Sarah johnson</h6>
                                 <small class="text-muted">UX Designer & Spanish Learner</small>
                             </div>
                         </div>
@@ -916,13 +974,13 @@
 
     <footer class="bg-gray-800 text-white py-8">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-sm">
-            <p data-i18n="footer.rights">&copy; 2025 SEMACKRO. Todos los derechos reservados.</p>
+            <p data-i18n="footer.rights">&Copy; 2025 SEMACKRO. todos los derechos reservados.</p>
             <div class="mt-2 space-x-4">
                 <a href="terminos_de_servicio.html" class="hover:text-blue-400" data-i18n="footer.terms">Términos de
-                    Servicio</a>
+                    servicio</a>
                 <span class="text-gray-600">|</span>
                 <a href="politica_de_privacidad.html" class="hover:text-blue-400" data-i18n="footer.privacy">Política de
-                    Privacidad</a>
+                    privacidad</a>
             </div>
         </div>
     </footer>
@@ -1033,95 +1091,95 @@
         const translations = {
             es: {
                 // Navegación
-                'nav.howItWorks': 'Cómo Funciona',
-                'nav.skills': 'Habilidades',
-                'nav.community': 'Comunidad',
-                'nav.login': 'Iniciar Sesión',
-                'nav.register': 'Crear Cuenta',
+                'nav.howItWorks': 'Proceso de selección',
+                'nav.skills': 'Vacantes internas',
+                'nav.community': 'Equipo SEMACKRO',
+                'nav.login': 'Iniciar sesión',
+                'nav.register': 'Crear perfil',
 
                 // Hero
-                'hero.title': 'Intercambia Habilidades<br>Desbloquea Oportunidades',
-                'hero.subtitle': 'SEMACKRO te conecta con una comunidad global dispuesta a enseñar y aprender.<br>¿Qué sabes hacer? ¿Qué quieres aprender?',
-                'hero.cta': 'Empieza Gratis Hoy',
-                'hero.nopayments': 'Sin Pagos. ¡Solo ganas conocimientos!',
+                'hero.title': 'Talento Interno SEMACKRO',
+                'hero.subtitle': '<span class="hero-sub-main">Postúlate a vacantes internas y crece con nosotros.</span>',
+                'hero.cta': 'Ver vacantes',
+                'hero.nopayments': 'Movilidad interna real.',
 
                 // Sección de habilidades
-                'skills.title': 'Un Universo de Habilidades',
-                'skills.subtitle': 'Desde lo profesional hasta tus hobbies más queridos',
-                'skills.uxui': 'Diseño UX/UI',
-                'skills.uxui.desc': 'Aprende a crear interfaces intuitivas y experiencias de usuario excepcionales con diseñadores profesionales.',
-                'skills.programming': 'Programación Web',
-                'skills.programming.desc': 'Domina JavaScript, React, Node.js y más. Conecta con desarrolladores que comparten tu pasión por el código.',
-                'skills.marketing': 'Marketing Digital',
-                'skills.marketing.desc': 'SEO, redes sociales, email marketing y estrategias de contenido. Impulsa tu marca con expertos.',
-                'skills.languages': 'Idiomas',
-                'skills.languages.desc': 'Inglés, español, francés, mandarín y más. Practica conversación con hablantes nativos de todo el mundo.',
-                'skills.explore': 'Explorar',
+                'skills.title': 'Vacantes y áreas estratégicas',
+                'skills.subtitle': 'Explora dónde puedes aportar más valor dentro de SEMACKRO',
+                'skills.uxui': 'Diseño de Producto',
+                'skills.uxui.desc': 'Buscamos talento para crear experiencias claras, accesibles y centradas en el usuario interno y externo.',
+                'skills.programming': 'Ingeniería de Software',
+                'skills.programming.desc': 'Únete al equipo que construye plataformas escalables, seguras y de alto impacto para SEMACKRO.',
+                'skills.marketing': 'People & Cultura',
+                'skills.marketing.desc': 'Impulsa marca empleadora, comunicación interna y programas de bienestar para fortalecer el talento.',
+                'skills.languages': 'Datos y Operaciones',
+                'skills.languages.desc': 'Convierte métricas en decisiones y mejora procesos clave para acelerar resultados del negocio.',
+                'skills.explore': 'Ver perfil requerido',
 
                 // Cómo funciona
-                'howItWorks.title': 'La Conexión es Simple',
-                'howItWorks.subtitle': 'Solo tres pasos para comenzar tu viaje de aprendizaje mutuo',
-                'howItWorks.step1.title': 'Ofrece tu Talento',
-                'howItWorks.step1.desc': 'Publica las habilidades que estás dispuesto a enseñar (ej. Excel, Yoga, Idiomas).',
-                'howItWorks.step2.title': 'Encuentra tu Maestro',
-                'howItWorks.step2.desc': 'Busca entre perfiles por la habilidad que quieres dominar (ej. Diseño Web, Cocina).',
-                'howItWorks.step3.title': '¡Conéctate e Intercambia!',
-                'howItWorks.step3.desc': 'Programa una sesión virtual o presencial. Tu conocimiento es tu moneda de cambio.',
+                'howItWorks.title': 'Reclutamiento interno en 3 pasos',
+                'howItWorks.subtitle': 'Un proceso claro para mover talento dentro de SEMACKRO',
+                'howItWorks.step1.title': 'Comparte tu perfil',
+                'howItWorks.step1.desc': 'Completa tu experiencia, logros y habilidades clave para que RRHH te evalúe con contexto.',
+                'howItWorks.step2.title': 'Aplica a una vacante',
+                'howItWorks.step2.desc': 'Elige la posición interna que mejor se alinea con tu plan de carrera y tus fortalezas.',
+                'howItWorks.step3.title': 'Entrevista y movilidad',
+                'howItWorks.step3.desc': 'Participa en entrevistas con líderes del área y acelera tu crecimiento dentro de SEMACKRO.',
 
                 // Comunidad
-                'community.title': 'Historias Reales de Intercambio',
-                'community.subtitle': 'Conoce a quienes ya están conectando y creciendo',
+                'community.title': 'Crecimiento profesional',
+                'community.subtitle': 'Desarrolla tu carrera dentro de la organización.',
 
                 // Footer
-                'footer.rights': '© 2025 SEMACKRO. Todos los derechos reservados.',
-                'footer.terms': 'Términos de Servicio',
-                'footer.privacy': 'Política de Privacidad'
+                'footer.rights': '© 2025 SEMACKRO. todos los derechos reservados.',
+                'footer.terms': 'Términos de servicio',
+                'footer.privacy': 'Política de privacidad'
             },
             en: {
                 // Navigation
-                'nav.howItWorks': 'How It Works',
-                'nav.skills': 'Skills',
-                'nav.community': 'Community',
+                'nav.howItWorks': 'Hiring process',
+                'nav.skills': 'Internal openings',
+                'nav.community': 'SEMACKRO team',
                 'nav.login': 'Login',
-                'nav.register': 'Sign Up',
+                'nav.register': 'Create profile',
 
                 // Hero
-                'hero.title': 'Exchange Skills<br>Unlock Opportunities',
-                'hero.subtitle': 'SEMACKRO connects you with a global community ready to teach and learn.<br>What can you do? What do you want to learn?',
-                'hero.cta': 'Start Free Today',
-                'hero.nopayments': 'No Payments. Just knowledge!',
+                'hero.title': 'SEMACKRO Internal Talent',
+                'hero.subtitle': '<span class="hero-sub-main">Apply to internal openings and grow with us.</span>',
+                'hero.cta': 'See openings',
+                'hero.nopayments': 'Real internal mobility.',
 
                 // Skills section
-                'skills.title': 'A Universe of Skills',
-                'skills.subtitle': 'From professional to your most beloved hobbies',
-                'skills.uxui': 'UX/UI Design',
-                'skills.uxui.desc': 'Learn to create intuitive interfaces and exceptional user experiences with professional designers.',
-                'skills.programming': 'Web Programming',
-                'skills.programming.desc': 'Master JavaScript, React, Node.js and more. Connect with developers who share your passion for code.',
-                'skills.marketing': 'Digital Marketing',
-                'skills.marketing.desc': 'SEO, social media, email marketing and content strategies. Boost your brand with experts.',
-                'skills.languages': 'Languages',
-                'skills.languages.desc': 'English, Spanish, French, Mandarin and more. Practice conversation with native speakers from around the world.',
-                'skills.explore': 'Explore',
+                'skills.title': 'Strategic roles and openings',
+                'skills.subtitle': 'Discover where you can create more value inside SEMACKRO',
+                'skills.uxui': 'Product Design',
+                'skills.uxui.desc': 'We seek talent to build clear, accessible experiences centered on internal and external users.',
+                'skills.programming': 'Software Engineering',
+                'skills.programming.desc': 'Join the team building scalable, secure, high-impact platforms for SEMACKRO.',
+                'skills.marketing': 'People & Culture',
+                'skills.marketing.desc': 'Drive employer brand, internal communication, and well-being programs to strengthen talent.',
+                'skills.languages': 'Data & Operations',
+                'skills.languages.desc': 'Turn metrics into decisions and improve core processes to accelerate business outcomes.',
+                'skills.explore': 'View role profile',
 
                 // How it works
-                'howItWorks.title': 'The Connection is Simple',
-                'howItWorks.subtitle': 'Just three steps to start your mutual learning journey',
-                'howItWorks.step1.title': 'Offer Your Talent',
-                'howItWorks.step1.desc': 'Post the skills you are willing to teach (e.g. Excel, Yoga, Languages).',
-                'howItWorks.step2.title': 'Find Your Teacher',
-                'howItWorks.step2.desc': 'Search through profiles for the skill you want to master (e.g. Web Design, Cooking).',
-                'howItWorks.step3.title': 'Connect & Exchange!',
-                'howItWorks.step3.desc': 'Schedule a virtual or in-person session. Your knowledge is your currency.',
+                'howItWorks.title': 'Internal hiring in 3 steps',
+                'howItWorks.subtitle': 'A clear process to move talent within SEMACKRO',
+                'howItWorks.step1.title': 'Share your profile',
+                'howItWorks.step1.desc': 'Add your experience, achievements, and key skills so HR can assess your fit with context.',
+                'howItWorks.step2.title': 'Apply to an opening',
+                'howItWorks.step2.desc': 'Choose the internal role that best matches your career plan and strengths.',
+                'howItWorks.step3.title': 'Interview and mobility',
+                'howItWorks.step3.desc': 'Interview with team leaders and accelerate your growth inside SEMACKRO.',
 
                 // Community
-                'community.title': 'Real Exchange Stories',
-                'community.subtitle': 'Meet those who are already connecting and growing',
+                'community.title': 'Professional growth',
+                'community.subtitle': 'Develop your career within the organization.',
 
                 // Footer
-                'footer.rights': '© 2025 SEMACKRO. All rights reserved.',
-                'footer.terms': 'Terms of Service',
-                'footer.privacy': 'Privacy Policy'
+                'footer.rights': '© 2025 SEMACKRO. all rights reserved.',
+                'footer.terms': 'Terms of service',
+                'footer.privacy': 'Privacy policy'
             }
         };
 
@@ -1136,7 +1194,7 @@
             // Actualizar texto del idioma en el botón
             const langSpan = document.getElementById('currentLang');
             if (langSpan) {
-                langSpan.textContent = lang === 'es' ? 'ES' : 'EN';
+                langSpan.textContent = lang === 'es' ? 'ES' : 'En';
             }
 
             // Cerrar dropdown
@@ -1170,7 +1228,7 @@
         document.getElementById('languageBtn')?.addEventListener('click', function (e) {
             e.stopPropagation();
             const dropdown = document.getElementById('languageDropdown');
-            dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+            dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'None';
         });
 
         // Cerrar dropdown al hacer clic fuera
@@ -1187,7 +1245,7 @@
             // Actualizar texto del idioma según idioma guardado
             const langSpan = document.getElementById('currentLang');
             if (langSpan) {
-                langSpan.textContent = currentLanguage === 'en' ? 'EN' : 'ES';
+                langSpan.textContent = currentLanguage === 'en' ? 'EN' : 'Es';
             }
 
             // Aplicar traducciones

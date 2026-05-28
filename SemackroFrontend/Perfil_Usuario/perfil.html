@@ -4,12 +4,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Perfil de Usuario - TruequeHub</title>
+    <title>Perfil de Usuario - SEMACKRO</title>
     <script src="../config.js"></script>
 
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="../css/toast.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@1.3.6/dist/driver.css" />
     <style>
         * {
             margin: 0;
@@ -22,6 +23,205 @@
             background: rgb(255, 255, 255);
             color: #000000;
             padding: 20px 20px 0;
+        }
+
+        .tour-inline-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .tour-inline-mascot {
+            width: 58px;
+            min-width: 58px;
+            height: 58px;
+            border-radius: 14px;
+            background: #dbeafe;
+            border: 1px solid #bfdbfe;
+            box-shadow: 0 8px 18px rgba(37, 99, 235, 0.22);
+            position: relative;
+            overflow: hidden;
+            animation: none;
+            margin-top: 2px;
+        }
+
+        .tour-inline-mascot-img {
+            width: 100%;
+            height: 100%;
+            display: block;
+            object-fit: cover;
+        }
+
+        .tour-mascot-eye {
+            transform-box: fill-box;
+            transform-origin: center;
+            animation: mascotBlink 4.8s infinite;
+        }
+
+        .tour-mascot-hand {
+            transform-box: fill-box;
+            transform-origin: 76% 64%;
+            animation: mascotWave 1.5s ease-in-out infinite;
+        }
+
+        .tour-mascot-cheek {
+            animation: mascotCheek 1.7s ease-in-out infinite;
+        }
+
+        .tour-inline-mascot-spark {
+            position: absolute;
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #ffffff;
+            opacity: 0.8;
+            top: 7px;
+            right: 8px;
+            animation: mascotSpark 1.9s ease-in-out infinite;
+        }
+
+        .tour-inline-mascot-spark.s2 {
+            width: 5px;
+            height: 5px;
+            top: 16px;
+            right: 16px;
+            animation-delay: 0.45s;
+        }
+
+        .tour-mascot-bubble {
+            max-width: 250px;
+            background: #ffffff;
+            border: 1px solid #dbeafe;
+            color: #1f2937;
+            border-radius: 12px;
+            padding: 10px 12px;
+            font-size: 13px;
+            line-height: 1.35;
+            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
+        }
+
+        @keyframes mascotFloat {
+            0% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-5px);
+            }
+
+            100% {
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes mascotBlink {
+            0%, 44%, 48%, 100% {
+                transform: scaleY(1);
+            }
+
+            46% {
+                transform: scaleY(0.14);
+            }
+        }
+
+        @keyframes mascotWave {
+            0%, 100% {
+                transform: rotate(0deg);
+            }
+
+            35% {
+                transform: rotate(-12deg);
+            }
+
+            65% {
+                transform: rotate(9deg);
+            }
+        }
+
+        @keyframes mascotCheek {
+            0%, 100% {
+                opacity: 0.45;
+            }
+
+            50% {
+                opacity: 0.8;
+            }
+        }
+
+        @keyframes mascotSpark {
+            0%, 100% {
+                transform: scale(0.85);
+                opacity: 0.35;
+            }
+
+            50% {
+                transform: scale(1.35);
+                opacity: 1;
+            }
+        }
+
+        .profile-tour-popover .driver-popover-title {
+            color: #0f172a;
+            font-weight: 700;
+        }
+
+        .profile-tour-popover .driver-popover-description {
+            color: #374151;
+        }
+
+        .profile-tour-popover .driver-popover-description {
+            margin: 0;
+        }
+
+        @media (max-width: 768px) {
+            .tour-inline-row {
+                gap: 12px;
+            }
+
+            .tour-inline-mascot {
+                width: 64px;
+                min-width: 64px;
+                height: 64px;
+                border-radius: 16px;
+            }
+
+            .profile-tour-popover.driver-popover {
+                max-width: min(94vw, 430px) !important;
+                padding: 16px 16px 14px !important;
+                border-radius: 14px !important;
+            }
+
+            .profile-tour-popover .driver-popover-title {
+                font-size: clamp(1.6rem, 4.8vw, 2rem) !important;
+                line-height: 1.12 !important;
+                margin-bottom: 8px !important;
+            }
+
+            .profile-tour-popover .driver-popover-description {
+                font-size: clamp(1.15rem, 3.8vw, 1.35rem) !important;
+                line-height: 1.35 !important;
+            }
+
+            .profile-tour-popover .driver-popover-progress-text {
+                font-size: clamp(1rem, 3.4vw, 1.15rem) !important;
+            }
+
+            .profile-tour-popover .driver-popover-navigation-btns {
+                gap: 8px !important;
+            }
+
+            .profile-tour-popover .driver-popover-navigation-btns button {
+                min-height: 46px !important;
+                padding: 10px 16px !important;
+                font-size: clamp(1rem, 3.5vw, 1.15rem) !important;
+                border-radius: 10px !important;
+            }
+
+            .profile-tour-popover .driver-popover-close-btn {
+                font-size: 28px !important;
+                width: 40px !important;
+                height: 40px !important;
+            }
         }
 
         .app-container {
@@ -209,6 +409,151 @@
             box-shadow: 0 6px 16px rgba(239, 68, 68, 0.4);
         }
 
+        /* Variante visual premium para logout */
+        #logoutModal.custom-modal-overlay {
+            background:
+                radial-gradient(circle at 14% 18%, rgba(14, 165, 233, 0.2), transparent 42%),
+                radial-gradient(circle at 84% 86%, rgba(239, 68, 68, 0.24), transparent 40%),
+                rgba(10, 14, 26, 0.62);
+            backdrop-filter: blur(10px) saturate(120%);
+        }
+
+        #logoutModal .custom-modal.custom-modal-logout {
+            position: relative;
+            overflow: hidden;
+            width: min(92vw, 470px);
+            border-radius: 22px;
+            padding: 30px;
+            border: 1px solid rgba(148, 163, 184, 0.3);
+            box-shadow:
+                0 30px 60px rgba(2, 6, 23, 0.34),
+                0 14px 26px rgba(239, 68, 68, 0.16);
+            animation: slideUp 0.34s cubic-bezier(0.2, 0.9, 0.2, 1);
+        }
+
+        #logoutModal .custom-modal.custom-modal-logout::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #0ea5e9 0%, #f97316 45%, #ef4444 100%);
+        }
+
+        #logoutModal .modal-header {
+            gap: 14px;
+            margin-bottom: 14px;
+            align-items: center;
+        }
+
+        #logoutModal .modal-icon.modal-icon-logout {
+            width: auto;
+            height: auto;
+            border-radius: 0;
+            background: transparent;
+            box-shadow: none;
+            font-size: 0;
+            padding: 0;
+            position: relative;
+        }
+
+        #logoutModal .modal-icon.modal-icon-logout::after {
+            display: none;
+        }
+
+        #logoutModal .logout-title-svg {
+            width: 54px;
+            height: 54px;
+            display: block;
+            filter: drop-shadow(0 8px 16px rgba(194, 65, 12, 0.28));
+            flex-shrink: 0;
+        }
+
+        #logoutModal .modal-title {
+            font-size: clamp(1.45rem, 1.8vw, 1.75rem);
+            letter-spacing: -0.02em;
+            color: #0f172a;
+            margin: 0;
+            line-height: 1.15;
+        }
+
+        #logoutModal .modal-message {
+            margin-bottom: 22px;
+            border: 1px solid #e2e8f0;
+            background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+            border-radius: 14px;
+            padding: 14px 16px;
+            color: #475569;
+            font-size: 0.96rem;
+            line-height: 1.62;
+        }
+
+        #logoutModal .modal-actions {
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        #logoutModal .modal-btn {
+            min-width: 140px;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            padding: 11px 18px;
+            border: 1px solid transparent;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.25s ease;
+        }
+
+        #logoutModal .modal-btn:active {
+            transform: translateY(1px);
+        }
+
+        #logoutModal .modal-btn-cancel {
+            background: linear-gradient(180deg, #f8fafc 0%, #eef2f7 100%);
+            border-color: #dbe4ee;
+            color: #334155;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85);
+        }
+
+        #logoutModal .modal-btn-cancel:hover {
+            background: linear-gradient(180deg, #f1f5f9 0%, #e2e8f0 100%);
+            transform: translateY(-1px);
+        }
+
+        #logoutModal .modal-btn-confirm {
+            background: linear-gradient(135deg, #f97316 0%, #ef4444 48%, #dc2626 100%);
+            border-color: rgba(220, 38, 38, 0.35);
+            color: #fff;
+            box-shadow: 0 10px 22px rgba(220, 38, 38, 0.32);
+        }
+
+        #logoutModal .modal-btn-confirm:hover {
+            background: linear-gradient(135deg, #ea580c 0%, #dc2626 52%, #b91c1c 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 14px 24px rgba(220, 38, 38, 0.38);
+        }
+
+        @media (max-width: 520px) {
+            #logoutModal .custom-modal.custom-modal-logout {
+                width: min(94vw, 440px);
+                padding: 25px 20px 20px;
+                border-radius: 20px;
+            }
+
+            #logoutModal .logout-title-svg {
+                width: 48px;
+                height: 48px;
+            }
+
+            #logoutModal .modal-actions {
+                flex-direction: column-reverse;
+            }
+
+            #logoutModal .modal-btn {
+                width: 100%;
+            }
+        }
+
         .profile-content {
             display: flex;
             align-items: flex-start;
@@ -273,6 +618,17 @@
             color: #4b5563;
             margin-bottom: 16px;
             max-width: 600px;
+        }
+
+        .profile-bio #descripcion.editable {
+            display: block;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .profile-bio #descripcion.editable.editing {
+            min-width: 0;
+            width: 100%;
         }
 
         .verified-badge {
@@ -1301,8 +1657,43 @@
         }
     </style>
 </head>
-
-<body>
+<body class="bg-gray-50">
+    <script>
+        // SCRUM-25: Modo Minimalista para vista desde el Dashboard
+        (function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('minimal') === 'true') {
+                document.body.classList.add('mode-minimal');
+                const style = document.createElement('style');
+                style.innerHTML = `
+                    .mode-minimal .logout-button, 
+                    .mode-minimal .action-buttons,
+                    .mode-minimal .tour-start-button,
+                    .mode-minimal .camera-icon,
+                    .mode-minimal .add-skill-button-primary,
+                    .mode-minimal .add-skill-button-secondary,
+                    .mode-minimal .file-upload-area {
+                        display: none !important;
+                    }
+                    .mode-minimal .editable:hover::after {
+                        display: none !important;
+                    }
+                    .mode-minimal .editable {
+                        cursor: default !important;
+                        pointer-events: none !important;
+                        background: transparent !important;
+                    }
+                    .mode-minimal .profile-pic-container {
+                        cursor: default !important;
+                    }
+                    .mode-minimal body {
+                        padding: 10px !important;
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+        })();
+    </script>
     <div class="app-container">
         <!-- Loading State -->
         <div id="loadingState" class="loading-container" style="display: none;">
@@ -1318,9 +1709,7 @@
                 <h2 style="color: #ef4444;">Error al cargar datos</h2>
                 <p id="errorMessage"></p>
                 <button onclick="cargarUsuario()"
-                    style="margin-top: 20px; padding: 10px 20px; background: #2563eb; color: white; border: none; border-radius: 8px; cursor: pointer;">
-                    Reintentar
-                </button>
+                    style="margin-top: 20px; padding: 10px 20px; background: #2563eb; color: white; border: none; border-radius: 8px; cursor: pointer;">Reintentar</button>
             </div>
         </div>
 
@@ -1336,13 +1725,22 @@
         <!-- Profile Header -->
         <div class="profile-header glass-card">
             <div class="action-buttons action-buttons-desktop">
-                <button class="logout-button" onclick="showLogoutModal()" title="Cerrar Sesión">
+                <button class="logout-button tour-start-button" onclick="iniciarTourPerfil()" title="Ver guia de perfil"
+                    style="background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon-sm" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd"
+                            d="M18 10A8 8 0 11.002 9.998 8 8 0 0118 10zm-8-4a1 1 0 00-.867 1.498L10.382 10l-1.25 2.502A1 1 0 0010 14h.007a1 1 0 00.9-.553l1.8-3.6a1 1 0 000-.894l-1.8-3.6A1 1 0 0010 5z"
+                            clip-rule="evenodd" />
+                    </svg>
+                    <span>Repetir tour</span>
+                </button>
+                <button class="logout-button" onclick="showLogoutModal()" title="Cerrar sesión">
                     <svg xmlns="http://www.w3.org/2000/svg" class="icon-sm" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd"
                             d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z"
                             clip-rule="evenodd" />
                     </svg>
-                    <span data-i18n="logout">Cerrar Sesión</span>
+                    <span data-i18n="logout">Cerrar sesión</span>
                 </button>
             </div>
 
@@ -1362,7 +1760,7 @@
                     <h1 class="profile-name">
                         <span class="editable" id="nombreCompleto" data-field="nombre_Usuario"></span>
                     </h1>
-                    <p class="profile-username" id="username">@usuario</p>
+                    <p class="profile-username" id="username">@Usuario</p>
                     <div class="profile-bio">
                         <div class="editable" id="descripcion" data-field="descripcion_Usuario"></div>
                     </div>
@@ -1375,7 +1773,7 @@
                                     d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
                                     clip-rule="evenodd" />
                             </svg>
-                            <span data-i18n="verifiedUser">Usuario Verificado</span>
+                            <span data-i18n="verifiedUser">Usuario verificado</span>
                         </div>
 
                         <div class="status-toggle-group"
@@ -1393,14 +1791,24 @@
                     </div>
 
                     <div class="action-buttons action-buttons-mobile">
-                        <button class="logout-button" onclick="showLogoutModal()" title="Cerrar Sesión">
+                        <button class="logout-button tour-start-button" onclick="iniciarTourPerfil()" title="Ver guia de perfil"
+                            style="background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon-sm" viewBox="0 0 20 20"
+                                fill="currentColor">
+                                <path fill-rule="evenodd"
+                                    d="M18 10A8 8 0 11.002 9.998 8 8 0 0118 10zm-8-4a1 1 0 00-.867 1.498L10.382 10l-1.25 2.502A1 1 0 0010 14h.007a1 1 0 00.9-.553l1.8-3.6a1 1 0 000-.894l-1.8-3.6A1 1 0 0010 5z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                            <span>Repetir tour</span>
+                        </button>
+                        <button class="logout-button" onclick="showLogoutModal()" title="Cerrar sesión">
                             <svg xmlns="http://www.w3.org/2000/svg" class="icon-sm" viewBox="0 0 20 20"
                                 fill="currentColor">
                                 <path fill-rule="evenodd"
                                     d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z"
                                     clip-rule="evenodd" />
                             </svg>
-                            <span data-i18n="logout">Cerrar Sesión</span>
+                            <span data-i18n="logout">Cerrar sesión</span>
                         </button>
                     </div>
                 </div>
@@ -1419,7 +1827,7 @@
                                 d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
                                 clip-rule="evenodd" />
                         </svg>
-                        <span data-i18n="personalData">Datos Personales</span>
+                        <span data-i18n="personalData">Datos personales</span>
                     </h2>
                     <ul class="data-list" id="datosPersonales">
                         <!-- Se llenará dinámicamente -->
@@ -1437,7 +1845,7 @@
                                 <line x1="8" y1="2" x2="8" y2="6"></line>
                                 <line x1="3" y1="10" x2="21" y2="10"></line>
                             </svg>
-                            <span>Tarjeta de Identidad</span>
+                            <span>Tarjeta de identidad</span>
                         </h3>
 
                         <div class="file-upload-area" id="idCardUploadArea"
@@ -1457,8 +1865,8 @@
                                         </svg>
                                     </div>
                                     <p style="font-weight: 500; color: #374151; margin-bottom: 4px;">Sube una foto
-                                        de tu DNI</p>
-                                    <p style="font-size: 12px; color: #6b7280;">PNG, JPG hasta 5MB</p>
+                                        de tu dni</p>
+                                    <p style="font-size: 12px; color: #6b7280;">Png, jpg hasta 5mb</p>
                                 </div>
                                 <div id="idCardPreview" style="display: none; position: relative;">
                                     <img id="idCardImage" src="" alt="Vista previa"
@@ -1541,7 +1949,7 @@
                                         loadingEl.className = 'upload-loading';
                                         loadingEl.innerHTML = `
                                                 <div class="spinner" style="border: 4px solid rgba(0, 0, 0, 0.1); width: 36px; height: 36px; border-radius: 50%; border-left-color: #2563eb; animation: spin 1s linear infinite; margin: 0 auto 12px;"></div>
-                                                <p style="font-size: 14px; color: #4b5563;">Subiendo a Cloudflare...</p>
+                                                <p style="font-size: 14px; color: #4b5563;">Subiendo a cloudflare...</p>
                                                 <style>@keyframes spin { to { transform: rotate(360deg); } }</style>
                                             `;
                                         idCardUploadArea.appendChild(loadingEl);
@@ -1631,15 +2039,15 @@
                     <div class="stats-grid">
                         <div class="stat">
                             <p class="stat-number-primary" id="statIntercambios">0</p>
-                            <p class="stat-label" data-i18n="exchanges">Intercambios (HU 13)</p>
+                            <p class="stat-label" data-i18n="exchanges">Intercambios (hu 13)</p>
                         </div>
                         <div class="stat">
                             <p class="stat-number-secondary" id="statFavoritos">0</p>
-                            <p class="stat-label" data-i18n="favorites">Favoritos (HU 10)</p>
+                            <p class="stat-label" data-i18n="favorites">Favoritos (hu 10)</p>
                         </div>
                         <div class="stat">
                             <p class="stat-number-primary" id="statOfferedSkills">0</p>
-                            <p class="stat-label" data-i18n="offeredSkills">Habilidades Ofrecidas</p>
+                            <p class="stat-label" data-i18n="offeredSkills">Habilidades ofrecidas</p>
                         </div>
                     </div>
 
@@ -1675,8 +2083,7 @@
                         </button>
 
                         <div id="locationMessage"
-                            style="display: none; padding: 10px 12px; border-radius: 6px; font-size: 13px; margin-bottom: 12px;">
-                        </div>
+                            style="display: none; padding: 10px 12px; border-radius: 6px; font-size: 13px; margin-bottom: 12px;"></div>
 
                         <div id="map"></div>
                     </div>
@@ -1685,7 +2092,7 @@
 
             <!-- Especialidades Técnicas (antes Habilidades que Ofrezco) -->
             <div class="glass-card skills-offered-section">
-                <h2 class="section-title-secondary" data-i18n="technicalSpecialties">Especialidades Técnicas</h2>
+                <h2 class="section-title-secondary" data-i18n="technicalSpecialties">Especialidades técnicas</h2>
                 <p class="section-description" data-i18n="technicalSpecialtiesDesc">Estas son las especialidades
                     técnicas que domino.</p>
                 <div class="skills-container" id="offeredSkillsContainer">
@@ -1726,9 +2133,9 @@
                     <div style="display: grid; gap: 12px;">
                         <div>
                             <label style="display: block; font-size: 12px; color: #6b7280; margin-bottom: 4px;">Título
-                                de la Certificación *</label>
+                                de la certificación *</label>
                             <input type="text" id="tituloCertificacion"
-                                placeholder="Ej: Electricista Industrial Certificado"
+                                placeholder="Ej: electricista industrial certificado"
                                 style="width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid #d1d5db; font-size: 14px;">
                         </div>
 
@@ -1736,14 +2143,14 @@
                             <label
                                 style="display: block; font-size: 12px; color: #6b7280; margin-bottom: 4px;">Institución</label>
                             <input type="text" id="institucionCertificacion"
-                                placeholder="Ej: SENA, Universidad Nacional, etc."
+                                placeholder="Ej: sena, universidad nacional, etc."
                                 style="width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid #d1d5db; font-size: 14px;">
                         </div>
 
                         <div>
                             <label
                                 style="display: block; font-size: 12px; color: #6b7280; margin-bottom: 4px;">Documento
-                                (PDF o Imagen)</label>
+                                (pdf o imagen)</label>
                             <input type="file" id="documentoCertificacion" accept=".pdf,image/jpeg,image/png,image/gif"
                                 style="width: 100%; padding: 8px; border-radius: 8px; border: 1px solid #d1d5db; font-size: 13px; background: white;">
                         </div>
@@ -1772,7 +2179,7 @@
                             d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"
                             clip-rule="evenodd" />
                     </svg>
-                    <span data-i18n="imageGallery">Galería de Imágenes</span>
+                    <span data-i18n="imageGallery">Galería de imágenes</span>
                 </h2>
                 <div class="gallery-grid" id="galleryGrid">
                     <!-- Se llenará dinámicamente -->
@@ -1781,13 +2188,13 @@
             </div>
 
             <!-- Reviews -->
-            <div class="glass-card reviews-section">
+            <div class="glass-card reviews-section" id="reviewsSection">
                 <h2 class="section-title-white">
                     <svg xmlns="http://www.w3.org/2000/svg" class="icon-md" viewBox="0 0 20 20" fill="currentColor">
                         <path
                             d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.91 8.724c-.783-.57-.381-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                     </svg>
-                    <span data-i18n="ratingsReviews">Calificaciones y Reseñas</span>
+                    <span data-i18n="ratingsReviews">Calificaciones y reseñas</span>
                 </h2>
 
                 <div class="rating-summary">
@@ -1831,7 +2238,7 @@
                                 src="https://ui-avatars.com/api/?name=JP&background=10B981&color=ffffff&size=40&bold=true&rounded=true"
                                 alt="Usuario">
                             <div>
-                                <p class="review-name">JuanPerez</p>
+                                <p class="review-name">Juanperez</p>
                                 <div class="review-rating">
                                     <span>5.0</span>
                                     <svg class="star-small" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
@@ -1842,10 +2249,10 @@
                                 </div>
                             </div>
                         </div>
-                        <p class="review-text">"Ana me dio una tutoría de inglés excelente. Muy paciente y con
+                        <p class="review-text">"Ana me dio una tutoría de inglés excelente. muy paciente y con
                             material de apoyo
-                            de calidad. ¡Definitivamente la recomiendo!"</p>
-                        <p class="review-date">Hace 2 días - Intercambio por Clases de Guitarra</p>
+                            de calidad. ¡definitivamente la recomiendo!"</p>
+                        <p class="review-date">Hace 2 días - intercambio por clases de guitarra</p>
                     </div>
 
                     <div class="review-card">
@@ -1854,7 +2261,7 @@
                                 src="https://ui-avatars.com/api/?name=MC&background=4F46E5&color=ffffff&size=40&bold=true&rounded=true"
                                 alt="Usuario">
                             <div>
-                                <p class="review-name">Manuel_C</p>
+                                <p class="review-name">Manuel_c</p>
                                 <div class="review-rating">
                                     <span>4.0</span>
                                     <svg class="star-small" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
@@ -1867,8 +2274,8 @@
                         </div>
                         <p class="review-text">"La sesión de diseño gráfico fue útil, aunque tardó un poco en
                             responder al inicio.
-                            El resultado final fue bueno."</p>
-                        <p class="review-date">Hace 1 semana - Intercambio por Reparación de Scooter</p>
+                            el resultado final fue bueno."</p>
+                        <p class="review-date">Hace 1 semana - intercambio por reparación de scooter</p>
                     </div>
 
                     <div class="review-card">
@@ -1877,7 +2284,7 @@
                                 src="https://ui-avatars.com/api/?name=DR&background=14B8A6&color=ffffff&size=40&bold=true&rounded=true"
                                 alt="Usuario">
                             <div>
-                                <p class="review-name">DianaR</p>
+                                <p class="review-name">Dianar</p>
                                 <div class="review-rating">
                                     <span>5.0</span>
                                     <svg class="star-small" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
@@ -1888,10 +2295,10 @@
                                 </div>
                             </div>
                         </div>
-                        <p class="review-text">"¡Un trabajo de SEO excelente! Me ayudó a posicionar mi pequeño
+                        <p class="review-text">"¡Un trabajo de seo excelente! me ayudó a posicionar mi pequeño
                             negocio en tiempo
-                            récord. La mejor opción."</p>
-                        <p class="review-date">Hace 3 semanas - Intercambio por Tutoría de Álgebra</p>
+                            récord. la mejor opción."</p>
+                        <p class="review-date">Hace 3 semanas - intercambio por tutoría de álgebra</p>
                     </div>
                 </div>
 
@@ -1906,12 +2313,12 @@
     <!-- Modal for Skills -->
     <div id="skillModal" class="modal-overlay" style="display: none;">
         <div class="modal-content glass-card">
-            <h3 class="modal-title" id="modalTitle" data-i18n="addSkillTitle">Añadir Habilidad</h3>
+            <h3 class="modal-title" id="modalTitle" data-i18n="addSkillTitle">Añadir habilidad</h3>
             <select id="skillCategory" class="modal-input">
                 <option value="" data-i18n="selectCategory">Seleccione una categoría (opcional)</option>
             </select>
             <input type="text" id="skillInput" class="modal-input" data-i18n-placeholder="skillExample"
-                placeholder="Ej: Programación en Python">
+                placeholder="Ej: programación en python">
 
             <!-- Descripción con botón de generar -->
             <div class="skill-description-wrapper">
@@ -2011,6 +2418,7 @@
     <script src="js/BlurFade.js"></script>
     <script src="js/GaleriaUniforme.js"></script>
     <script src="js/PixelBarChart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/driver.js@1.3.6/dist/driver.js.iife.js"></script>
 
     <script>
         // ======================
@@ -2044,6 +2452,584 @@
         // API BASE URL
         // ======================
         const API_BASE = window.API_BASE;
+        const PROFILE_TOUR_STORAGE_KEY = 'semackro_profile_tour_v1';
+        const PROFILE_TOUR_DRIVER_KEY = 'perfil_onboarding_v1';
+        const TOUR_REQUIRED_PERSONAL_FIELDS = [
+            'pais',
+            'departamento',
+            'ciudad',
+            'codigoPostal',
+            'estadoCivil_Usuario',
+            'genero_Usuario',
+            'tipoIdentificacion_Usuario',
+            'identificacion_usuario',
+            'fechaNacimiento',
+            'anios_experiencia'
+        ];
+        const TOUR_MASCOT_GIF_CANDIDATES = [
+            '../MascotaTour.gif',
+            './MascotaTour.gif',
+            '/MascotaTour.gif',
+            '/SemackroFrontend/MascotaTour.gif',
+            'MascotaTour.gif'
+        ];
+        const TOUR_EVENT_OFFERED_SKILL_MODAL_CLOSED = 'tour-offered-skill-modal-closed';
+        const TOUR_EVENT_EDITABLE_SAVED = 'tour-editable-saved';
+        const TOUR_OFFERED_SKILL_CONTAINER_SELECTOR = '#offeredSkillsContainer';
+        const TOUR_OFFERED_SKILL_MODAL_SELECTOR = '#skillModal .modal-content';
+        const TOUR_OFFERED_SKILL_ADD_BTN_SELECTOR = '#offeredSkillsContainer .add-skill-button-primary';
+        const TOUR_CONTACT_EMAIL_SELECTOR = '#solicitudVerificacionForm .verification-pill, #correoVerificacion';
+        let profileTourHasStarted = false;
+        let profileTourInstance = null;
+        let tourAutoAdvanceCleanup = null;
+        let tourWaitingOfferedSkillModalClose = false;
+        let tourOfferedSkillModalOpened = false;
+
+        function getDriverFactory() {
+            if (window.driver && typeof window.driver === 'function') return window.driver;
+            if (window.driver && typeof window.driver.driver === 'function') return window.driver.driver;
+            if (window.driver && window.driver.js && typeof window.driver.js.driver === 'function') return window.driver.js.driver;
+            return null;
+        }
+
+        function setTourMascotGifSource(imgElement) {
+            if (!imgElement) return;
+            let index = 0;
+
+            const tryNextSource = () => {
+                if (index >= TOUR_MASCOT_GIF_CANDIDATES.length) {
+                    imgElement.onerror = null;
+                    imgElement.src = 'https://ui-avatars.com/api/?name=S&background=dbeafe&color=1d4ed8&size=128&rounded=true&bold=true';
+                    return;
+                }
+
+                const src = TOUR_MASCOT_GIF_CANDIDATES[index++];
+                imgElement.src = src;
+            };
+
+            imgElement.onerror = tryNextSource;
+            tryNextSource();
+        }
+
+        function createTourInlineMascot() {
+            const mascot = document.createElement('div');
+            mascot.className = 'tour-inline-mascot';
+            mascot.setAttribute('aria-hidden', 'true');
+            mascot.innerHTML = `
+                <img class="tour-inline-mascot-img" src="" alt="Mascota del tour" loading="eager" decoding="async">
+                <span class="tour-inline-mascot-spark"></span>
+                <span class="tour-inline-mascot-spark s2"></span>
+            `;
+            const mascotImg = mascot.querySelector('.tour-inline-mascot-img');
+            setTourMascotGifSource(mascotImg);
+            return mascot;
+        }
+
+        function attachMascotToPopover(popoverDom) {
+            if (!popoverDom) return;
+            const descriptionEl = popoverDom.description || document.querySelector('.driver-popover-description');
+            if (!descriptionEl || !descriptionEl.parentNode) return;
+            if (descriptionEl.parentNode.classList && descriptionEl.parentNode.classList.contains('tour-inline-row')) return;
+
+            const row = document.createElement('div');
+            row.className = 'tour-inline-row';
+            const mascot = createTourInlineMascot();
+            descriptionEl.parentNode.insertBefore(row, descriptionEl);
+            row.appendChild(mascot);
+            row.appendChild(descriptionEl);
+        }
+
+        function removeTourMascot() {
+            const legacyMascot = document.getElementById('profileTourMascot');
+            if (legacyMascot) legacyMascot.remove();
+        }
+
+        function clearTourQueryParam() {
+            const url = new URL(window.location.href);
+            if (!url.searchParams.has('tour')) return;
+            url.searchParams.delete('tour');
+            const nextUrl = `${url.pathname}${url.search}${url.hash}`;
+            window.history.replaceState({}, '', nextUrl);
+        }
+
+        function isFilledTourValue(value) {
+            if (value === null || value === undefined) return false;
+            if (typeof value === 'number') return Number.isFinite(value);
+            return String(value).trim() !== '';
+        }
+
+        function isDatosPersonalesCompletos() {
+            return TOUR_REQUIRED_PERSONAL_FIELDS.every(field => isFilledTourValue(usuario[field]));
+        }
+
+        function isCorreoVerificacionCompleto() {
+            const correoInput = document.getElementById('correoVerificacion');
+            if (!correoInput) return false;
+
+            const correo = correoInput.value.trim();
+            if (!correo) return false;
+
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo);
+        }
+
+        function isNombreCompletoValido() {
+            const inputActivo = document.querySelector('#nombreCompleto input, #nombreCompleto textarea');
+            const nombreActual = inputActivo
+                ? inputActivo.value
+                : ((usuario && usuario.nombre_Usuario) || (document.getElementById('nombreCompleto')?.textContent || ''));
+
+            const nombre = String(nombreActual || '').trim();
+            if (!nombre) return false;
+            return !/^haz clic/i.test(nombre);
+        }
+
+        function isDescripcionPerfilCompleta() {
+            const inputActivo = document.querySelector('#descripcion textarea, #descripcion input');
+            const descripcionActual = inputActivo
+                ? inputActivo.value
+                : ((usuario && usuario.descripcion_Usuario) || (document.getElementById('descripcion')?.textContent || ''));
+
+            const descripcion = String(descripcionActual || '').trim();
+            if (!descripcion) return false;
+
+            return !/^haz clic/i.test(descripcion) && !/a[nñ]adir una descripcion personal/i.test(descripcion);
+        }
+
+        function evaluateTourCompletionCheck(checkName) {
+            if (!checkName) return true;
+            if (checkName === 'datosPersonales') return isDatosPersonalesCompletos();
+            if (checkName === 'correoVerificacion') return isCorreoVerificacionCompleto();
+            if (checkName === 'nombreCompleto') return isNombreCompletoValido();
+            if (checkName === 'descripcionPerfil') return isDescripcionPerfilCompleta();
+            return true;
+        }
+
+        function notifyTourOfferedSkillModalClosed() {
+            const offeredContainer = document.getElementById('offeredSkillsContainer');
+            if (!offeredContainer) return;
+            offeredContainer.dispatchEvent(new CustomEvent(TOUR_EVENT_OFFERED_SKILL_MODAL_CLOSED, { bubbles: true }));
+        }
+
+        async function obtenerEstadoDriverServidor(driverKey) {
+            if (!driverKey || !perfilPersonaId || !API_BASE) return false;
+
+            try {
+                const response = await fetch(
+                    `${API_BASE}/onboarding-drivers/${encodeURIComponent(perfilPersonaId)}/${encodeURIComponent(driverKey)}`
+                );
+
+                if (!response.ok) return false;
+                const data = await response.json();
+                return !!(data && data.success && data.data && data.data.ejecutado === true);
+            } catch (error) {
+                console.warn('[TOUR] No se pudo leer estado de driver en servidor:', error);
+                return false;
+            }
+        }
+
+        async function marcarDriverEjecutadoServidor(driverKey) {
+            if (!driverKey || !perfilPersonaId || !API_BASE) return;
+
+            try {
+                await fetch(
+                    `${API_BASE}/onboarding-drivers/${encodeURIComponent(perfilPersonaId)}/${encodeURIComponent(driverKey)}`,
+                    {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ ejecutado: true })
+                    }
+                );
+            } catch (error) {
+                console.warn('[TOUR] No se pudo guardar estado de driver en servidor:', error);
+            }
+        }
+
+        function isSkillModalVisible() {
+            const skillModal = document.getElementById('skillModal');
+            if (!skillModal) return false;
+            const inlineDisplay = skillModal.style.display;
+            const computedDisplay = window.getComputedStyle ? window.getComputedStyle(skillModal).display : inlineDisplay;
+            return inlineDisplay !== 'none' && computedDisplay !== 'none';
+        }
+
+        function buildProfileTourSteps() {
+            const steps = [
+                {
+                    element: '#profilePicContainer',
+                    title: 'Sube tu foto',
+                    description: 'Haz clic para agregar una foto clara y profesional.',
+                    side: 'bottom',
+                    align: 'start',
+                    mascot: 'Comienza por tu foto. Da confianza al instante.',
+                    autoAdvance: { listenSelector: '#profileUpload', events: ['change'], delayMs: 220 }
+                },
+                {
+                    element: '#datosPersonales',
+                    title: 'Completa tus datos personales',
+                    description: 'Llena telefono, identidad, ciudad y demas datos para tener un perfil completo.',
+                    side: 'right',
+                    align: 'start',
+                    mascot: 'Entre mas completo tu perfil, mas facil sera que confien en ti.',
+                    autoAdvance: {
+                        listenSelector: '#datosPersonales',
+                        delegateSelector: 'input, textarea, select',
+                        completeCheck: 'datosPersonales',
+                        events: ['change', 'blur'],
+                        delayMs: 320
+                    }
+                },
+                {
+                    stepKey: 'nombreCompleto',
+                    element: '#nombreCompleto',
+                    title: 'Completa tu nombre',
+                    description: 'Presiona sobre tu nombre para editarlo.',
+                    side: 'bottom',
+                    align: 'start',
+                    mascot: 'Asegura que tu nombre se vea como quieres que te contacten.',
+                    autoAdvance: {
+                        listenSelector: '#nombreCompleto',
+                        completeCheck: 'nombreCompleto',
+                        events: [TOUR_EVENT_EDITABLE_SAVED],
+                        delayMs: 140
+                    }
+                },
+                {
+                    stepKey: 'descripcionPerfil',
+                    element: '#descripcion',
+                    title: 'Describe tu perfil',
+                    description: 'Explica en pocas lineas que haces y en que destacas.',
+                    side: 'top',
+                    align: 'start',
+                    mascot: 'Una buena descripcion te trae mejores oportunidades.',
+                    autoAdvance: {
+                        listenSelector: '#descripcion',
+                        completeCheck: 'descripcionPerfil',
+                        events: [TOUR_EVENT_EDITABLE_SAVED],
+                        delayMs: 140
+                    }
+                },
+                {
+                    stepKey: 'contactVerificationEmail',
+                    element: TOUR_CONTACT_EMAIL_SELECTOR,
+                    title: 'Correo para contacto',
+                    description: 'Llena este correo para poder verificar tu perfil.',
+                    side: 'bottom',
+                    align: 'start',
+                    mascot: 'Este correo nos ayuda a iniciar tu proceso de verificacion.',
+                    autoAdvance: {
+                        listenSelector: '#solicitudVerificacionForm',
+                        delegateSelector: '#correoVerificacion',
+                        completeCheck: 'correoVerificacion',
+                        events: ['change', 'blur'],
+                        delayMs: 260
+                    }
+                },
+                {
+                    stepKey: 'offeredSkillsPlus',
+                    element: TOUR_OFFERED_SKILL_ADD_BTN_SELECTOR,
+                    title: 'Agrega habilidades',
+                    description: 'Toca el boton + para abrir el formulario de habilidad.',
+                    side: 'left',
+                    align: 'start',
+                    mascot: 'Tus habilidades son la clave para que te encuentren.',
+                    autoAdvance: {
+                        listenSelector: TOUR_OFFERED_SKILL_CONTAINER_SELECTOR,
+                        delegateSelector: '.add-skill-button-primary',
+                        events: ['click'],
+                        delayMs: 240
+                    }
+                },
+                {
+                    stepKey: 'offeredSkillsModal',
+                    element: TOUR_OFFERED_SKILL_MODAL_SELECTOR,
+                    title: 'Completa la habilidad',
+                    description: 'Completa los datos y luego pulsa Agregar o Cancelar para continuar el tour.',
+                    side: 'left',
+                    align: 'start',
+                    mascot: 'Perfecto. Completa este modal para dejar tu habilidad lista.',
+                    autoAdvance: { listenSelector: TOUR_OFFERED_SKILL_CONTAINER_SELECTOR, events: [TOUR_EVENT_OFFERED_SKILL_MODAL_CLOSED], delayMs: 120 }
+                },
+                {
+                    element: '#locationBtn',
+                    title: 'Usa obtener mi ubicacion',
+                    description: 'Pulsa este boton, acepta permisos y asi se guarda tu ubicacion en el mapa para mejorar coincidencias cercanas.',
+                    side: 'left',
+                    align: 'center',
+                    mascot: 'La ubicacion ayuda a mostrarte oportunidades reales cerca de ti.',
+                    autoAdvance: { listenSelector: '#locationBtn', events: ['click'], delayMs: 220 }
+                },
+                {
+                    element: '#reviewsSection',
+                    title: 'Como se actualizan tus resenas',
+                    description: 'Tus calificaciones y resenas se actualizan cuando cierras intercambios y el otro usuario te evalua.',
+                    side: 'top',
+                    align: 'start',
+                    mascot: 'Las resenas crecen con cada trabajo finalizado. Cuida cada experiencia.'
+                },
+                {
+                    element: '.status-toggle-group',
+                    title: 'Activa disponibilidad',
+                    description: 'Si estas listo para trabajar o intercambiar, dejalo activo. Puedes mover el switch ahora mismo.',
+                    side: 'bottom',
+                    align: 'start',
+                    mascot: 'Listo. Con esto tu perfil queda preparado para conectar.',
+                    autoAdvance: { listenSelector: '#availabilityToggle', events: ['change'], delayMs: 180 }
+                }
+            ];
+
+            return steps
+                .filter(step => document.querySelector(step.element))
+                .map(step => ({
+                    stepKey: step.stepKey || null,
+                    element: step.element,
+                    mascot: step.mascot,
+                    autoAdvance: step.autoAdvance || null,
+                    disableActiveInteraction: false,
+                    popover: {
+                        title: step.title,
+                        description: step.description,
+                        side: step.side,
+                        align: step.align
+                    }
+                }));
+        }
+
+        async function startProfileTourIfNeeded(options = {}) {
+            const { readOnlyMode = false, force = false } = options;
+            if (profileTourHasStarted) return;
+            if (readOnlyMode && !force) return;
+
+            const searchParams = new URLSearchParams(window.location.search);
+            const forceByQuery = searchParams.get('tour') === 'onboarding';
+            const wasSeenLocal = localStorage.getItem(PROFILE_TOUR_STORAGE_KEY) === '1';
+            const wasSeenServer = (!force && !forceByQuery)
+                ? await obtenerEstadoDriverServidor(PROFILE_TOUR_DRIVER_KEY)
+                : false;
+
+            if (wasSeenServer && !wasSeenLocal) {
+                localStorage.setItem(PROFILE_TOUR_STORAGE_KEY, '1');
+            }
+
+            const shouldStart = force || forceByQuery || (!wasSeenLocal && !wasSeenServer);
+            if (!shouldStart) return;
+
+            const createDriver = getDriverFactory();
+            if (!createDriver) {
+                console.warn('[TOUR] Driver.js no disponible, se omite tour.');
+                return;
+            }
+
+            const steps = buildProfileTourSteps();
+            if (steps.length < 2) return;
+
+            profileTourHasStarted = true;
+            let tourClosed = false;
+
+            const clearAutoAdvanceBinding = () => {
+                if (typeof tourAutoAdvanceCleanup === 'function') {
+                    tourAutoAdvanceCleanup();
+                }
+                tourAutoAdvanceCleanup = null;
+                tourWaitingOfferedSkillModalClose = false;
+                tourOfferedSkillModalOpened = false;
+            };
+
+            const focusEditableStepInput = (step) => {
+                if (!step || !step.stepKey) return;
+                if (step.stepKey !== 'nombreCompleto' && step.stepKey !== 'descripcionPerfil') return;
+
+                const container = typeof step.element === 'string'
+                    ? document.querySelector(step.element)
+                    : step.element;
+
+                if (!container) return;
+
+                if (typeof container.scrollIntoView === 'function') {
+                    try {
+                        container.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+                    } catch (_) {
+                        container.scrollIntoView();
+                    }
+                }
+
+                window.setTimeout(() => {
+                    let input = container.querySelector('input, textarea');
+
+                    if (!input && !container.classList.contains('editing')) {
+                        container.click();
+                        input = container.querySelector('input, textarea');
+
+                        if (profileTourInstance && typeof profileTourInstance.refresh === 'function') {
+                            profileTourInstance.refresh();
+                        }
+                    }
+
+                    if (!input) return;
+
+                    try {
+                        input.focus({ preventScroll: true });
+                    } catch (_) {
+                        input.focus();
+                    }
+
+                    if (input.tagName === 'TEXTAREA') {
+                        const len = input.value.length;
+                        if (typeof input.setSelectionRange === 'function') {
+                            input.setSelectionRange(len, len);
+                        }
+                    } else if (typeof input.select === 'function') {
+                        input.select();
+                    }
+
+                    if (profileTourInstance && typeof profileTourInstance.refresh === 'function') {
+                        profileTourInstance.refresh();
+                    }
+                }, 80);
+            };
+
+            const bindAutoAdvance = (step) => {
+                clearAutoAdvanceBinding();
+                if (!step || !step.autoAdvance) return;
+
+                const cfg = step.autoAdvance;
+                tourWaitingOfferedSkillModalClose = step.stepKey === 'offeredSkillsModal';
+                if (tourWaitingOfferedSkillModalClose) {
+                    const skillModal = document.getElementById('skillModal');
+                    tourOfferedSkillModalOpened = !!(skillModal && skillModal.style.display !== 'none');
+                }
+                const root = cfg.listenSelector
+                    ? document.querySelector(cfg.listenSelector)
+                    : (typeof step.element === 'string' ? document.querySelector(step.element) : step.element);
+
+                if (!root) return;
+
+                const events = Array.isArray(cfg.events) && cfg.events.length ? cfg.events : ['click'];
+                let triggered = false;
+
+                const handler = (event) => {
+                    if (triggered || !profileTourInstance) return;
+
+                    if (cfg.delegateSelector) {
+                        const matched = event.target && event.target.closest
+                            ? event.target.closest(cfg.delegateSelector)
+                            : null;
+                        if (!matched || !root.contains(matched)) return;
+                    }
+
+                    window.setTimeout(() => {
+                        if (!evaluateTourCompletionCheck(cfg.completeCheck)) {
+                            return;
+                        }
+
+                        triggered = true;
+                        if (!profileTourInstance || typeof profileTourInstance.getState !== 'function') return;
+                        const state = profileTourInstance.getState();
+                        const activeIndex = typeof state.activeIndex === 'number' ? state.activeIndex : -1;
+                        if (activeIndex >= 0 && activeIndex < (steps.length - 1)) {
+                            profileTourInstance.moveNext();
+                        }
+                    }, cfg.delayMs || 250);
+                };
+
+                events.forEach(evt => root.addEventListener(evt, handler, true));
+                tourAutoAdvanceCleanup = () => {
+                    events.forEach(evt => root.removeEventListener(evt, handler, true));
+                };
+            };
+
+            const handleStepChange = (_, step) => {
+                bindAutoAdvance(step);
+                focusEditableStepInput(step);
+            };
+
+            const handleTourClose = () => {
+                if (tourClosed) return;
+                tourClosed = true;
+                clearAutoAdvanceBinding();
+                localStorage.setItem(PROFILE_TOUR_STORAGE_KEY, '1');
+                void marcarDriverEjecutadoServidor(PROFILE_TOUR_DRIVER_KEY);
+                removeTourMascot();
+                clearTourQueryParam();
+                profileTourInstance = null;
+                profileTourHasStarted = false;
+            };
+
+            const tour = createDriver({
+                steps,
+                showProgress: true,
+                allowClose: true,
+                overlayClickBehavior: 'close',
+                disableActiveInteraction: false,
+                overlayOpacity: 0.55,
+                stagePadding: 14,
+                popoverOffset: 18,
+                popoverClass: 'profile-tour-popover',
+                nextBtnText: 'Siguiente',
+                prevBtnText: 'Atras',
+                doneBtnText: 'Listo',
+                showButtons: ['previous', 'next', 'close'],
+                onPopoverRender: (popover, options) => {
+                    attachMascotToPopover(popover);
+                    if (options && options.state && options.state.activeStep) {
+                        bindAutoAdvance(options.state.activeStep);
+                    }
+                },
+                onNextClick: (_, __, options) => {
+                    clearAutoAdvanceBinding();
+                    const configuredSteps = options.config.steps || [];
+                    const total = configuredSteps.length;
+                    const index = options.state.activeIndex || 0;
+                    if (index >= total - 1) {
+                        options.driver.destroy();
+                        return;
+                    }
+
+                    const currentStep = configuredSteps[index] || null;
+                    const nextStep = configuredSteps[index + 1] || null;
+
+                    // Si el usuario pulsa "Siguiente" sin tocar +, abrimos el modal y luego avanzamos al paso del modal.
+                    if (
+                        currentStep && nextStep &&
+                        currentStep.stepKey === 'offeredSkillsPlus' &&
+                        nextStep.stepKey === 'offeredSkillsModal' &&
+                        !isSkillModalVisible()
+                    ) {
+                        showSkillModal('offered');
+                        window.requestAnimationFrame(() => {
+                            options.driver.moveNext();
+                        });
+                        return;
+                    }
+
+                    options.driver.moveNext();
+                },
+                onPrevClick: (_, __, options) => {
+                    clearAutoAdvanceBinding();
+                    options.driver.movePrevious();
+                },
+                onCloseClick: (_, __, options) => {
+                    clearAutoAdvanceBinding();
+                    options.driver.destroy();
+                },
+                onHighlightStarted: handleStepChange,
+                onHighlighted: handleStepChange,
+                onDestroyStarted: handleTourClose,
+                onDestroyed: handleTourClose
+            });
+            profileTourInstance = tour;
+
+            if (typeof tour.drive === 'function') {
+                setTimeout(() => tour.drive(), 240);
+            }
+        }
+
+        window.iniciarTourPerfil = function () {
+            localStorage.removeItem(PROFILE_TOUR_STORAGE_KEY);
+            if (profileTourInstance && typeof profileTourInstance.destroy === 'function') {
+                profileTourInstance.destroy();
+            }
+            startProfileTourIfNeeded({ force: true, readOnlyMode: false });
+        };
 
         // ======================
         // INICIALIZACIÓN
@@ -2055,7 +3041,14 @@
 
             // Obtener usuario ID desde localStorage
             const usuarioIdFromStorage = localStorage.getItem('usuarioId');
-            usuarioId = usuarioIdFromStorage ? parseInt(usuarioIdFromStorage, 10) : null;
+            const usuarioIdPropio = usuarioIdFromStorage ? parseInt(usuarioIdFromStorage, 10) : null;
+            usuarioId = usuarioIdPropio;
+            const readOnlyMode = !!(paramUserId && parseInt(paramUserId, 10) !== usuarioIdPropio);
+
+            if (paramUserId && parseInt(paramUserId, 10) !== usuarioId) {
+                // Modo solo lectura: ver perfil de otro usuario
+                usuarioId = parseInt(paramUserId, 10);
+            }
 
             if (paramUserId && parseInt(paramUserId, 10) !== usuarioId) {
                 // Modo solo lectura: ver perfil de otro usuario
@@ -2068,8 +3061,10 @@
                 return;
             }
 
-            // Cargar datos
-            cargarUsuario();
+            // Cargar datos y luego iniciar tour de primer ingreso
+            cargarUsuario().finally(() => {
+                startProfileTourIfNeeded({ readOnlyMode });
+            });
 
             // Event listeners
             setupEventListeners();
@@ -2338,7 +3333,7 @@
                             form.innerHTML = `
                       <div class="verification-pill" style="display: flex; align-items: center; gap: 8px; background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border-radius: 20px; padding: 0 6px 0 18px; border: 1px solid #bae6fd; height: 40px; box-sizing: border-box; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
                         <span style="font-size: 13px; font-weight: 700; color: #0c4a6e; white-space: nowrap;">${t('contactEmail')}:</span>
-                        <input type="email" id="correoVerificacion" required placeholder="tu@email.com" style="background: transparent; border: none; font-size: 13px; color: #0c4a6e; width: 140px; outline: none; padding: 0; font-family: inherit;">
+                        <input type="email" id="correoVerificacion" required placeholder="Tu@email.com" style="background: transparent; border: none; font-size: 13px; color: #0c4a6e; width: 140px; outline: none; padding: 0; font-family: inherit;">
                         <button type="submit" style="background: #2563eb; color: white; padding: 0 14px; border-radius: 20px; font-weight: 700; font-size: 12px; border: none; cursor: pointer; transition: all 0.2s; height: 30px; white-space: nowrap; box-shadow: 0 2px 6px rgba(37, 99, 235, 0.2);">${t('requestVerification')}</button>
                       </div>
                       <div id="mensajeVerificacion" style="position: fixed; bottom: 20px; right: 20px; z-index: 9999; font-size: 13px; font-weight: 500; padding: 12px 20px; border-radius: 10px; display: none; box-shadow: 0 4px 12px rgba(0,0,0,0.15);"></div>
@@ -2712,7 +3707,7 @@
           <div class="review-header">
             <img class="review-avatar" 
                  src="${cal.imagen_calificador || `https://ui-avatars.com/api/?name=${iniciales}&background=10B981&color=ffffff&size=40&bold=true&rounded=true`}" 
-                 alt="${nombreCompleto}"
+                                 alt="${nombreCompleto}"
                  onerror="this.src='https://ui-avatars.com/api/?name=${iniciales}&background=10B981&color=ffffff&size=40&bold=true&rounded=true'">
             <div>
               <p class="review-name">${nombreCompleto}</p>
@@ -2851,7 +3846,7 @@
             // Insertar editor inline
             const editorHtml = `
         <div style="margin-top:8px;">
-          <textarea id="inlineReply_${reviewId}" style="width:100%; min-height:90px; padding:10px; font-family:inherit; border:2px solid #2563eb; border-radius:6px;" placeholder="${t('description')}..."></textarea>
+                    <textarea id="inlineReply_${reviewId}" style="width:100%; min-height:90px; padding:10px; font-family:inherit; border:2px solid #2563eb; border-radius:6px;" placeholder="${t('description')}..."></textarea>
           <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:8px;">
             <button class="modal-button-cancel" onclick="cancelInlineReply(${reviewId})">${t('cancel')}</button>
             <button class="modal-button-submit" onclick="submitReviewReplyInline(${reviewId})">${t('reply')}</button>
@@ -3472,10 +4467,30 @@
                 }
 
                 const input = element.querySelector(multiline ? 'textarea' : 'input');
-                input.focus();
-                if (inputType !== 'date') {
-                    input.select();
-                }
+                const focusEditableInput = () => {
+                    try {
+                        input.focus({ preventScroll: true });
+                    } catch (_) {
+                        input.focus();
+                    }
+
+                    if (inputType === 'date') return;
+
+                    if (multiline) {
+                        const len = input.value.length;
+                        if (typeof input.setSelectionRange === 'function') {
+                            input.setSelectionRange(len, len);
+                        }
+                        return;
+                    }
+
+                    if (typeof input.select === 'function') {
+                        input.select();
+                    }
+                };
+
+                window.requestAnimationFrame(focusEditableInput);
+                window.setTimeout(focusEditableInput, 30);
 
                 let guardado = false;
                 const save = async () => {
@@ -3583,6 +4598,13 @@
 
                     if (newValue !== currentValue) {
                         onSave(newValue);
+                        element.dispatchEvent(new CustomEvent(TOUR_EVENT_EDITABLE_SAVED, {
+                            bubbles: true,
+                            detail: {
+                                field,
+                                value: newValue
+                            }
+                        }));
                     }
                 };
 
@@ -3701,7 +4723,11 @@
                         });
                         const resJson = await resultado.json();
                         if (!resultado.ok || !resJson.success) {
-                            console.error('Error al actualizar en BD:', resJson.error);
+                            const backendError = resJson.error || resJson.message || 'Error desconocido del backend';
+                            console.error('Error al actualizar en BD:', backendError);
+                            if (window.Toast) {
+                                Toast.error('No se pudo actualizar', backendError);
+                            }
                         }
                         setGuardando(false);
                     } catch (error) {
@@ -3898,6 +4924,11 @@
             currentSkillType = type;
             editSkillIndex = null;
             editSkillId = null;
+            const isTourOfferedSkillFlow = type === 'offered' && !!profileTourInstance;
+
+            if (isTourOfferedSkillFlow) {
+                tourOfferedSkillModalOpened = true;
+            }
 
             document.getElementById('modalTitle').textContent =
                 type === 'offered' ? 'Añadir Habilidad Ofrecida' : 'Añadir Habilidad Requerida';
@@ -3917,10 +4948,20 @@
             });
 
             document.getElementById('skillModal').style.display = 'flex';
+            document.getElementById('skillInput')?.focus();
         }
 
         function hideSkillModal() {
-            document.getElementById('skillModal').style.display = 'none';
+            const modal = document.getElementById('skillModal');
+            if (!modal) return;
+
+            const wasVisible = modal.style.display !== 'none';
+            modal.style.display = 'none';
+
+            if (wasVisible && tourOfferedSkillModalOpened) {
+                tourOfferedSkillModalOpened = false;
+                notifyTourOfferedSkillModalClosed();
+            }
         }
 
         // ======================
@@ -4188,7 +5229,13 @@
             const skillCategory = document.getElementById('skillCategory').value;
 
             if (!skillInput) {
-                alert('El nombre de la habilidad no puede estar vacío');
+                if (window.Toast) {
+                    Toast.warning('Campo requerido', 'El nombre de la habilidad no puede estar vacío');
+                } else {
+                    alert('El nombre de la habilidad no puede estar vacío');
+                }
+                const skillInputEl = document.getElementById('skillInput');
+                if (skillInputEl) skillInputEl.focus();
                 return;
             }
 
@@ -5210,8 +6257,8 @@
         // UI HELPERS
         // ======================
         function showLoading(show) {
-            document.getElementById('loadingState').style.display = show ? 'flex' : 'none';
-            document.getElementById('mainContent').style.display = show ? 'none' : 'block';
+            document.getElementById('loadingState').style.display = show ? 'flex' : 'None';
+            document.getElementById('mainContent').style.display = show ? 'none' : 'Block';
             document.getElementById('errorState').style.display = 'none';
         }
 
@@ -5224,7 +6271,7 @@
 
         function setGuardando(saving) {
             guardando = saving;
-            document.getElementById('savingIndicator').style.display = saving ? 'flex' : 'none';
+            document.getElementById('savingIndicator').style.display = saving ? 'flex' : 'None';
         }
 
         // ======================
@@ -5236,15 +6283,11 @@
           <div class="custom-modal" onclick="event.stopPropagation()">
             <div class="modal-header">
               <div class="modal-icon" style="background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%); color: #dc2626;">🔒</div>
-              <div class="modal-title">Sesión No Iniciada</div>
+              <div class="modal-title">Sesión no iniciada</div>
             </div>
-            <div class="modal-message">
-              No has iniciado sesión. Necesitas iniciar sesión para acceder a tu perfil.
-            </div>
+            <div class="modal-message">No has iniciado sesión. necesitas iniciar sesión para acceder a tu perfil.</div>
             <div class="modal-actions">
-              <button class="modal-btn modal-btn-confirm" onclick="redirectToLogin()" style="width: 100%;">
-                Ir al Login
-              </button>
+              <button class="modal-btn modal-btn-confirm" onclick="redirectToLogin()" style="width: 100%;">Ir al login</button>
             </div>
           </div>
         </div>
@@ -5268,9 +6311,9 @@
         function showLogoutModal() {
             const modalHTML = `
         <div class="custom-modal-overlay" id="logoutModal" onclick="closeLogoutModal(event)">
-          <div class="custom-modal" onclick="event.stopPropagation()">
+                    <div class="custom-modal custom-modal-logout" role="dialog" aria-modal="true" onclick="event.stopPropagation()">
             <div class="modal-header">
-              <div class="modal-icon">!</div>
+                                                        <div class="modal-icon modal-icon-logout" aria-hidden="true"><svg class="logout-title-svg" xmlns="http://www.w3.org/2000/svg" width="72" height="72" viewBox="0 0 72 72"><path fill="#fcea2b" d="M32.294 14.233a3.892 3.892 0 0 1 6.706 0l20.12 40.142a4.5 4.5 0 0 1 .574 1.916a3.885 3.885 0 0 1-3.832 3.88H15.528a3.803 3.803 0 0 1-3.832-3.784a3.45 3.45 0 0 1 .575-1.916z"/><path fill="#d22f27" d="M35.854 39.049c0 1.505-2.728 3.81-2.728 5.991l-.06.188s-.322 1.428-1.39 1.428a1.3 1.3 0 0 1-.772-.325c-.262-.244-.6.13-.547.458c.16 1.31 3.023 5.521 5.17 5.521c2.456 0 4.629-2.945 4.822-3.985c0-.498-.834-.187-.834-.873c0-.582.507-.964.507-1.729a.41.41 0 0 0-.424-.378c-.191 0-.46.134-.674.134c-.82 0-1.007-.746-1.007-1.51c0 0 .154.05.154-1.58a5.9 5.9 0 0 0-1.422-3.493a.55.55 0 0 0-.357-.133c-.19 0-.438.084-.438.286"/><g fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M29.548 52.622a8.3 8.3 0 0 0 5.936 2.332a8.84 8.84 0 0 0 6.02-2.332M27.69 50.224s-4.452-4.75-.212-11.025c0 0 .856 1.088 1.508 2.132c.486.56 1.367 1.515 1.833 1.515a1.004 1.004 0 0 0 1.018-1.102v-.382a15.5 15.5 0 0 1 1.526-7.293s2.969 1.611 1.697-6.191c0 0 6.763 4.558 6.509 12.106c0 .551.248.975.847.975c.59 0 2.388-.572 2.388-1.124c.042.043 2.671 5.555-1.06 10.389"/><path d="M33.079 45.118s-.298 1.641-1.488 1.527a2.7 2.7 0 0 1-.61-.245c-.328-.36-.674.084-.624.39a10.96 10.96 0 0 0 3.02 4.472s.93.685.98.685m2.609.063a12.4 12.4 0 0 0 1.547-1.048a6.84 6.84 0 0 0 1.806-2.487a.335.335 0 0 0-.297-.458a.78.78 0 0 1-.496-.458h0s-.1-.305.297-.992a1.6 1.6 0 0 0 .199-.916a.47.47 0 0 0-.645-.267a.96.96 0 0 1-1.29-.42s-.312-.153-.014-1.64a6 6 0 0 0-1.425-4.428a.55.55 0 0 0-.377-.133a.395.395 0 0 0-.417.286"/><path d="M32.294 14.233a3.892 3.892 0 0 1 6.706 0l20.12 40.142a4.5 4.5 0 0 1 .574 1.916a3.885 3.885 0 0 1-3.832 3.88H15.528a3.803 3.803 0 0 1-3.832-3.784a3.45 3.45 0 0 1 .575-1.916z"/></g></svg></div>
               <div class="modal-title">${t('logoutTitle')}</div>
             </div>
             <div class="modal-message">
@@ -5662,10 +6705,24 @@
             applyTranslations();
         });
 
-        // Escuchar cambios de idioma desde el parent (Descubrir.html)
+        // Escuchar eventos desde el parent (Descubrir.html)
         window.addEventListener('message', (event) => {
-            if (event.data.type === 'languageChange') {
-                changeLanguage(event.data.language);
+            if (event.origin !== window.location.origin) return;
+            const data = event.data || {};
+
+            if (data.type === 'languageChange') {
+                changeLanguage(data.language);
+                return;
+            }
+
+            if (data.type === 'startProfileOnboardingTour') {
+                setTimeout(() => {
+                    if (typeof window.iniciarTourPerfil === 'function') {
+                        window.iniciarTourPerfil();
+                        return;
+                    }
+                    startProfileTourIfNeeded({ force: true, readOnlyMode: false });
+                }, 180);
             }
         });
 
@@ -5705,9 +6762,7 @@
 
             if (certificacionesUsuario.length === 0) {
                 container.innerHTML = `
-          <div style="text-align: center; padding: 20px; color: #6b7280; font-style: italic;">
-            No tienes certificaciones registradas aún.
-          </div>
+          <div style="text-align: center; padding: 20px; color: #6b7280; font-style: italic;">No tienes certificaciones registradas aún.</div>
         `;
                 return;
             }
@@ -5847,9 +6902,69 @@
             }
         }
 
+        function solicitarConfirmacionEliminarCertificacion() {
+            return new Promise((resolve) => {
+                const previousModal = document.getElementById('deleteCertificationConfirmModal');
+                if (previousModal) previousModal.remove();
+
+                const modalHTML = `
+        <div class="custom-modal-overlay" id="deleteCertificationConfirmModal">
+          <div class="custom-modal" style="max-width: 450px; width: min(92vw, 450px);" onclick="event.stopPropagation()">
+            <div class="modal-header">
+              <div class="modal-icon" style="background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%); color: #dc2626;">🗑️</div>
+              <div class="modal-title">Eliminar certificación</div>
+            </div>
+            <div class="modal-message">¿Estás seguro de eliminar esta certificación? Esta acción no se puede deshacer.</div>
+            <div class="modal-actions">
+              <button class="modal-btn modal-btn-cancel" data-cert-action="cancel">Cancelar</button>
+              <button class="modal-btn modal-btn-confirm" data-cert-action="confirm" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);">Eliminar</button>
+            </div>
+          </div>
+        </div>
+      `;
+
+                document.body.insertAdjacentHTML('beforeend', modalHTML);
+
+                const modal = document.getElementById('deleteCertificationConfirmModal');
+                if (!modal) {
+                    resolve(false);
+                    return;
+                }
+
+                const cancelBtn = modal.querySelector('[data-cert-action="cancel"]');
+                const confirmBtn = modal.querySelector('[data-cert-action="confirm"]');
+
+                let settled = false;
+                const close = (confirmed) => {
+                    if (settled) return;
+                    settled = true;
+                    document.removeEventListener('keydown', onEsc, true);
+                    modal.remove();
+                    resolve(confirmed);
+                };
+
+                const onEsc = (event) => {
+                    if (event.key !== 'Escape') return;
+                    event.preventDefault();
+                    close(false);
+                };
+
+                document.addEventListener('keydown', onEsc, true);
+                modal.addEventListener('click', (event) => {
+                    if (event.target === modal) {
+                        close(false);
+                    }
+                });
+
+                if (cancelBtn) cancelBtn.addEventListener('click', () => close(false));
+                if (confirmBtn) confirmBtn.addEventListener('click', () => close(true));
+            });
+        }
+
         // Eliminar certificación
         async function eliminarCertificacion(idCertificacion) {
-            if (!confirm('¿Estás seguro de eliminar esta certificación?')) return;
+            const confirmed = await solicitarConfirmacionEliminarCertificacion();
+            if (!confirmed) return;
 
             try {
                 const res = await fetch(`${API_BASE}/certificaciones/${idCertificacion}`, {
@@ -5864,9 +6979,10 @@
 
                 // Recargar certificaciones
                 await cargarCertificaciones();
+                mostrarMensajeCertificacion('Certificación eliminada exitosamente.', 'success');
 
             } catch (error) {
-                alert('Error al eliminar: ' + error.message);
+                mostrarMensajeCertificacion('Error al eliminar: ' + error.message, 'error');
             }
         }
 

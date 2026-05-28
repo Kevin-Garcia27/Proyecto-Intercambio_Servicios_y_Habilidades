@@ -99,7 +99,7 @@ const Toast = {
                 </div>
                 <div style="flex:1;">
                     <div style="font-weight:700; color:#111827; font-size:1rem; line-height:1.2;">${callerName}</div>
-                    <div style="color:#6b7280; font-size:0.85rem;">te está llamando...</div>
+                    <div style="color:#6b7280; font-size:0.85rem;">Te está llamando...</div>
                 </div>
             </div>
             <div style="display:flex; gap:12px; width:100%; margin-top:4px;">

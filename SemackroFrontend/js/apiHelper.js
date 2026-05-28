@@ -3,7 +3,7 @@
 
 class APIHelper {
     constructor() {
-        this.baseURL = window.API_BASE || 'http://localhost:3001/api';
+        this.baseURL = window.API_BASE || 'https://serversemackro.up.railway.app/api';
         this.isSecureContext = window.location.protocol === 'https:';
         this.isLocalAPI = this.baseURL.includes('localhost') || this.baseURL.includes('127.0.0.1');
     }

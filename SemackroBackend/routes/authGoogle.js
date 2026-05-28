@@ -7,6 +7,12 @@ const jwt = require('jsonwebtoken');
 const JWT_SECRET = process.env.JWT_SECRET || 'tu_clave_secreta_super_segura_2025_SEMACKRO';
 const JWT_EXPIRES_IN = '7d';
 
+function getFrontendLoginUrl(frontendUrl) {
+  const isLocal = frontendUrl.includes('localhost') || frontendUrl.includes('127.0.0.1');
+  const loginPath = isLocal ? '/login' : '/login.html';
+  return `${frontendUrl}${loginPath}`;
+}
+
 // Ruta para iniciar autenticación con Google
 router.get('/google',
   passport.authenticate('google', { 
@@ -17,7 +23,7 @@ router.get('/google',
 // Callback de Google después de autenticación
 router.get('/google/callback',
   passport.authenticate('google', { 
-    failureRedirect: '/login.html?error=auth_failed',
+    failureRedirect: `${getFrontendLoginUrl(process.env.FRONTEND_URL || 'https://semackro.vercel.app')}?error=auth_failed`,
     session: false 
   }),
   async (req, res) => {
@@ -41,11 +47,8 @@ router.get('/google/callback',
       
       // Redirigir al frontend con el token en la URL
       // El frontend capturará estos parámetros y los guardará en localStorage
-      // Auto-detectar entorno basado en el host de la request
-      const requestHost = req.get('host') || '';
-      const isLocal = requestHost.includes('localhost') || requestHost.includes('127.0.0.1');
-      const frontendUrl = isLocal ? 'http://localhost:5050' : (process.env.FRONTEND_URL || 'https://SEMACKRO.duckdns.org');
-      const redirectUrl = `${frontendUrl}/login.html?token=${token}&userId=${user.id_usuario}&email=${encodeURIComponent(user.correo)}&source=google`;
+      const frontendUrl = process.env.FRONTEND_URL || 'https://semackro.vercel.app';
+      const redirectUrl = `${getFrontendLoginUrl(frontendUrl)}?token=${token}&userId=${user.id_usuario}&email=${encodeURIComponent(user.correo)}&source=google`;
       
       console.log(' Redirigiendo a:', redirectUrl);
       

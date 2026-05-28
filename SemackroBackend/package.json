@@ -4,7 +4,8 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "start": "nodemon server.js"
+    "start": "node server.js",
+    "db:create-onboarding-drivers": "node scripts/create_onboarding_drivers.js"
   },
   "keywords": [],
   "author": "",
