@@ -1649,8 +1649,106 @@
             }
         </script>
 
-    </div> <!-- Fin sheetReportes -->
+        <!-- Sección: Bitácora de Auditoría -->
+        <div id="bitacoraSection" class="mt-16 pt-10 border-t border-black/20 dark:border-white/10 hidden">
+            <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
+                <div>
+                    <h3 class="text-2xl font-bold text-gray-800 dark:text-gray-100">Bitácora de Auditoría</h3>
+                    <p class="text-sm text-gray-400 dark:text-gray-500">Historial inmutable de acciones del sistema.</p>
+                </div>
+                <div class="flex gap-2 flex-wrap items-center">
+                    <button onclick="cargarBitacora()" class="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-black/20 dark:border-white/10 bg-gray-50 hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 text-xs font-semibold transition-all">
+                        <span class="iconify" data-icon="mdi:refresh"></span>
+                        Actualizar
+                    </button>
+                    <div class="relative">
+                        <span class="iconify absolute left-3 top-2.5 text-gray-400" data-icon="mdi:magnify"></span>
+                        <input type="text" id="busquedaBitacoraUsuario" oninput="cargarBitacora()" placeholder="Buscar usuario..."
+                            class="pl-9 pr-3 py-2 text-xs border border-black/20 dark:border-white/10 rounded-xl bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all w-48">
+                    </div>
+                    <select id="filtroBitacoraModulo" onchange="cargarBitacora()"
+                        class="border border-black/20 dark:border-white/10 rounded-xl px-3 py-2 text-xs bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="">Todos los módulos</option>
+                        <option value="Seguridad">Seguridad (Login)</option>
+                        <option value="Directorio">Directorio</option>
+                        <option value="Configuraciones">Configuraciones</option>
+                    </select>
+                </div>
+            </div>
 
+            <div class="rounded-2xl border border-black/10 dark:border-white/10 overflow-hidden shadow-sm">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="text-[10px] font-bold text-black dark:text-white uppercase tracking-widest bg-gray-50/50 dark:bg-gray-800/50 border-b border-black/20 dark:border-white/10">
+                                <th class="py-4 px-4 text-center">ID</th>
+                                <th class="py-4 px-4">Usuario</th>
+                                <th class="py-4 px-4">Acción</th>
+                                <th class="py-4 px-4">Módulo</th>
+                                <th class="py-4 px-4">Detalle</th>
+                                <th class="py-4 px-4 text-center">Fecha y Hora</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablaBitacora">
+                            <tr>
+                                <td colspan="6" class="py-12 text-center text-gray-300 italic">Cargando bitácora...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <script>
+                async function cargarBitacora() {
+                    const usuario = document.getElementById('busquedaBitacoraUsuario')?.value || '';
+                    const modulo = document.getElementById('filtroBitacoraModulo')?.value || '';
+                    const tbody = document.getElementById('tablaBitacora');
+                    if(tbody) tbody.innerHTML = '<tr><td colspan="6" class="py-12 text-center text-gray-300 italic">Cargando bitácora...</td></tr>';
+                    
+                    try {
+                        const token = localStorage.getItem('token') || sessionStorage.getItem('token') || sessionStorage.getItem('authToken');
+                        if(!token) return;
+                        
+                        const API_BASE = window.APP_CONFIG ? window.APP_CONFIG.BACKEND_URL : '';
+                        let url = `${API_BASE}/api/admin/bitacora?usuario=${encodeURIComponent(usuario)}&modulo=${encodeURIComponent(modulo)}`;
+                        const response = await fetch(url, {
+                            headers: { 'Authorization': 'Bearer ' + token }
+                        });
+                        const data = await response.json();
+                        
+                        if(data.success) {
+                            if(data.data.length === 0) {
+                                tbody.innerHTML = '<tr><td colspan="6" class="py-12 text-center text-gray-500 italic">No hay registros en la bitácora</td></tr>';
+                                return;
+                            }
+                            tbody.innerHTML = '';
+                            data.data.forEach(log => {
+                                tbody.innerHTML += `
+                                    <tr class="border-b border-black/5 dark:border-white/5 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+                                        <td class="py-3 px-4 text-center text-xs text-gray-500">#${log.ID_Bitacora}</td>
+                                        <td class="py-3 px-4 text-xs font-medium text-gray-800 dark:text-gray-200">
+                                            ${log.NombreUsuario} <br>
+                                            <span class="text-[10px] text-gray-400">ID: ${log.ID_Usuario || 'N/A'} - IP: ${log.IP || 'Local'}</span>
+                                        </td>
+                                        <td class="py-3 px-4">
+                                            <span class="inline-block px-2 py-1 rounded bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-[10px] font-bold tracking-wide">${log.Accion}</span>
+                                        </td>
+                                        <td class="py-3 px-4 text-xs text-gray-600 dark:text-gray-400">${log.Modulo}</td>
+                                        <td class="py-3 px-4 text-xs text-gray-600 dark:text-gray-400">${log.Detalles}</td>
+                                        <td class="py-3 px-4 text-center text-xs text-gray-500">${new Date(log.Fecha).toLocaleString()}</td>
+                                    </tr>
+                                `;
+                            });
+                        }
+                    } catch(e) {
+                        console.error("Error cargando bitácora", e);
+                        if(tbody) tbody.innerHTML = '<tr><td colspan="6" class="py-12 text-center text-red-500 italic">Error al cargar bitácora</td></tr>';
+                    }
+                }
+            </script>
+        </div>
+
+    </div> <!-- Fin sheetReportes -->
 
 
     <!-- ════ HOJA 4 – Configuraciones ════ -->
@@ -2670,6 +2768,19 @@
                     } else {
                         secDirectorio.style.display = '';
                         cargarTecnicosDirectorio();
+                    }
+                }
+                
+                // 2.5 Mostrar/Ocultar sección Bitácora
+                const secBitacora = document.getElementById('bitacoraSection');
+                if (secBitacora && window.Permisos && window.Permisos.puedeVerBitacora) {
+                    if (!window.Permisos.puedeVerBitacora()) {
+                        secBitacora.classList.add('hidden');
+                        secBitacora.style.display = 'none';
+                    } else {
+                        secBitacora.classList.remove('hidden');
+                        secBitacora.style.display = '';
+                        cargarBitacora();
                     }
                 }
                 
@@ -7653,6 +7764,8 @@ async function cargarYRenderizarRolesConfig() {
                 'CREAR_CUENTAS': { master: 'Administrador', sub: 'Panel de Administración', subsub: 'Directorio General', nombre: 'Crear nuevas cuentas', icon: 'mdi:account-plus-outline', badgeText: 'CREAR', badgeColor: 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-500 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 rounded-md' },
                 'EDITAR_USUARIOS': { master: 'Administrador', sub: 'Panel de Administración', subsub: 'Directorio General', nombre: 'Editar perfiles de usuarios', icon: 'mdi:account-edit-outline', badgeText: 'EDITAR', badgeColor: 'bg-amber-50 dark:bg-amber-900/30 text-amber-500 dark:text-amber-400 border border-amber-200 dark:border-amber-800 rounded-md' },
                 'MODERAR_USUARIOS': { master: 'Administrador', sub: 'Panel de Administración', subsub: 'Directorio General', nombre: 'Moderar usuarios (Admin)', icon: 'mdi:shield-account-outline', badgeText: 'BLOQUEAR', badgeColor: 'bg-red-50 dark:bg-red-900/30 text-red-500 dark:text-red-400 border border-red-200 dark:border-red-800 rounded-md' },
+                
+                'VER_BITACORA': { master: 'Administrador', sub: 'Panel de Administración', subsub: 'Bitácora de Auditoría', nombre: 'Ver bitácora del sistema', icon: 'mdi:format-list-bulleted-type', badgeText: 'VER', badgeColor: 'bg-slate-50 dark:bg-gray-800 text-slate-600 dark:text-gray-300 border border-slate-200 dark:border-gray-700 rounded-md' },
                 
                 // -> 2. CONFIGURACIONES
                 // AJUSTES GLOBALES

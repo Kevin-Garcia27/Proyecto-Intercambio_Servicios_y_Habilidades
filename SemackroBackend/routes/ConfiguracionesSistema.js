@@ -3,6 +3,7 @@ const router = express.Router();
 
 const db = require('../db');
 const verificarPermiso = require('../middlewares/verificarPermiso');
+const registrarAuditoria = require('../middlewares/auditLogger');
 
 // ----------------------------------------------------
 // ENDPOINT: Obtener todas las configuraciones (GET /configuraciones)
@@ -63,6 +64,10 @@ router.put('/', verificarPermiso('configGenerales:editar'), async (req, res) => 
             await db.execute('INSERT INTO Configuraciones_Sistema (clave, valor, tipo) VALUES (?, ?, ?)', [clave, String(valor), 'general']);
         }
         
+        // ── BITÁCORA ────────────────────────────────────────────────────────────
+        registrarAuditoria(req.user?.usuarioId || null, 'EDITAR_CONFIG_GENERAL', 'Configuraciones', 
+            `Se actualizó la configuración general "${clave}"`, req.ip || '127.0.0.1');
+        // ────────────────────────────────────────────────────────────────────────
         res.json({
             success: true,
             message: 'Configuración actualizada correctamente'
@@ -112,6 +117,10 @@ router.post('/modalidades', verificarPermiso('modalidades:crear'), async (req, r
     try {
         await db.execute('INSERT INTO Modalidades_Intercambio (nombre, activo) VALUES (?, 1)', [nombre.trim()]);
         
+        // ── BITÁCORA ────────────────────────────────────────────────────────────
+        registrarAuditoria(req.user?.usuarioId || null, 'CREAR_MODALIDAD', 'Configuraciones', 
+            `Se creó la modalidad de intercambio "${nombre.trim()}"`, req.ip || '127.0.0.1');
+        // ────────────────────────────────────────────────────────────────────────
         res.json({
             success: true,
             message: 'Modalidad agregada correctamente'
@@ -149,6 +158,10 @@ router.put('/modalidades/:id', verificarPermiso('modalidades:editar'), async (re
     try {
         await db.execute('UPDATE Modalidades_Intercambio SET nombre = ?, activo = ? WHERE id_modalidad = ?', [nombre.trim(), activo ? 1 : 0, id]);
         
+        // ── BITÁCORA ────────────────────────────────────────────────────────────
+        registrarAuditoria(req.user?.usuarioId || null, 'EDITAR_MODALIDAD', 'Configuraciones', 
+            `Se editó la modalidad de intercambio ID ${id} (nombre: "${nombre.trim()}", activo: ${activo ? 1 : 0})`, req.ip || '127.0.0.1');
+        // ────────────────────────────────────────────────────────────────────────
         res.json({
             success: true,
             message: 'Modalidad actualizada correctamente'
@@ -178,6 +191,10 @@ router.delete('/modalidades/:id', verificarPermiso('modalidades:eliminar'), asyn
     try {
         await db.execute('DELETE FROM Modalidades_Intercambio WHERE id_modalidad = ?', [id]);
         
+        // ── BITÁCORA ────────────────────────────────────────────────────────────
+        registrarAuditoria(req.user?.usuarioId || null, 'ELIMINAR_MODALIDAD', 'Configuraciones', 
+            `Se eliminó la modalidad de intercambio con ID ${id}`, req.ip || '127.0.0.1');
+        // ────────────────────────────────────────────────────────────────────────
         res.json({
             success: true,
             message: 'Modalidad eliminada correctamente'
@@ -214,6 +231,10 @@ router.post('/motivos-bloqueo', verificarPermiso('motivosBloqueo:crear'), async 
     }
     try {
         await db.execute('INSERT INTO Motivos_Bloqueo_Predefinidos (motivo) VALUES (?)', [motivo]);
+        // ── BITÁCORA ────────────────────────────────────────────────────────────
+        registrarAuditoria(req.user?.usuarioId || null, 'CREAR_MOTIVO_BLOQUEO', 'Configuraciones', 
+            `Se agregó un nuevo motivo de bloqueo predefinido: "${motivo}"`, req.ip || '127.0.0.1');
+        // ────────────────────────────────────────────────────────────────────────
         res.json({ success: true, message: 'Motivo agregado correctamente' });
     } catch (error) {
         console.error('Error al agregar motivo de bloqueo:', error.message);
@@ -229,6 +250,10 @@ router.put('/motivos-bloqueo/:id', verificarPermiso('motivosBloqueo:editar'), as
     if (!motivo || !motivo.trim()) return res.status(400).json({ success: false, message: 'El motivo es requerido' });
     try {
         await db.execute('UPDATE Motivos_Bloqueo_Predefinidos SET motivo = ? WHERE id_motivo = ?', [motivo.trim(), id]);
+        // ── BITÁCORA ────────────────────────────────────────────────────────────
+        registrarAuditoria(req.user?.usuarioId || null, 'EDITAR_MOTIVO_BLOQUEO', 'Configuraciones', 
+            `Se modificó el motivo de bloqueo ID ${id} a "${motivo.trim()}"`, req.ip || '127.0.0.1');
+        // ────────────────────────────────────────────────────────────────────────
         res.json({ success: true, message: 'Motivo actualizado correctamente' });
     } catch (error) {
         console.error('Error al editar motivo de bloqueo:', error.message);
@@ -244,6 +269,10 @@ router.delete('/motivos-bloqueo', verificarPermiso('motivosBloqueo:eliminar'), a
     }
     try {
         await db.execute('DELETE FROM Motivos_Bloqueo_Predefinidos WHERE motivo = ?', [motivo]);
+        // ── BITÁCORA ────────────────────────────────────────────────────────────
+        registrarAuditoria(req.user?.usuarioId || null, 'ELIMINAR_MOTIVO_BLOQUEO', 'Configuraciones', 
+            `Se eliminó el motivo de bloqueo predefinido: "${motivo}"`, req.ip || '127.0.0.1');
+        // ────────────────────────────────────────────────────────────────────────
         res.json({ success: true, message: 'Motivo eliminado correctamente' });
     } catch (error) {
         console.error('Error al eliminar motivo de bloqueo:', error.message);
@@ -279,6 +308,11 @@ router.put('/roles/reasignar-usuarios', verificarPermiso('rolesPermisos:editar')
         for (let asig of asignaciones) {
             await db.execute('UPDATE d_usuarios_roles SET rol_id = ? WHERE usuario_id = ?', [asig.nuevo_rol_id, asig.usuario_id]);
         }
+        // ── BITÁCORA ──────────────────────────────────────────────────────────────
+        registrarAuditoria(req.user?.usuarioId, 'REASIGNAR_ROL_USUARIOS', 'Configuraciones',
+            `Se reasignó el rol a ${asignaciones.length} usuario(s)`,
+            req.ip || '127.0.0.1');
+        // ─────────────────────────────────────────────────────────────────────────
         res.json({ success: true, message: 'Usuarios reasignados correctamente' });
     } catch (error) {
         console.error('Error al reasignar usuarios:', error.message);
@@ -360,6 +394,11 @@ router.post('/roles', verificarPermiso('rolesPermisos:crear'), async (req, res) 
             await db.execute('INSERT INTO d_usuarios_roles (usuario_id, rol_id) VALUES (?, ?)', [req.user.usuarioId, nuevoId]);
         }
         
+        // ── BITÁCORA ──────────────────────────────────────────────────────────────
+        registrarAuditoria(req.user?.usuarioId, 'CREAR_ROL', 'Configuraciones',
+            `Se creó el rol "${nombre_rol}" (ID: ${nuevoId})`,
+            req.ip || '127.0.0.1');
+        // ─────────────────────────────────────────────────────────────────────────
         res.json({ success: true, message: 'Rol creado correctamente', id_rol: nuevoId });
     } catch (error) {
         console.error('Error al crear rol:', error.message);
@@ -384,6 +423,11 @@ router.put('/roles/:id', verificarPermiso('rolesPermisos:editar'), async (req, r
             'UPDATE Roles SET nombre_rol = ?, descripcion_rol = ? WHERE id_rol = ?',
             [nombre_rol, descripcion_rol || '', id]
         );
+        // ── BITÁCORA ──────────────────────────────────────────────────────────────
+        registrarAuditoria(req.user?.usuarioId, 'EDITAR_ROL', 'Configuraciones',
+            `Se editó el nombre del rol ID ${id} a "${nombre_rol}"`,
+            req.ip || '127.0.0.1');
+        // ─────────────────────────────────────────────────────────────────────────
         res.json({ success: true, message: 'Rol actualizado correctamente' });
     } catch (error) {
         console.error('Error al actualizar rol:', error.message);
@@ -438,6 +482,11 @@ router.delete('/roles/:id', verificarPermiso('rolesPermisos:eliminar'), async (r
         // Eliminamos primero las asignaciones para evitar violaciones de clave foránea si no hay CASCADE
         await db.execute('DELETE FROM d_usuarios_roles WHERE rol_id = ?', [id]);
         await db.execute('DELETE FROM Roles WHERE id_rol = ?', [id]);
+        // ── BITÁCORA ──────────────────────────────────────────────────────────────
+        registrarAuditoria(req.user?.usuarioId, 'ELIMINAR_ROL', 'Configuraciones',
+            `Se eliminó el rol con ID ${id}`,
+            req.ip || '127.0.0.1');
+        // ─────────────────────────────────────────────────────────────────────────
         res.json({ success: true, message: 'Rol eliminado correctamente' });
     } catch (error) {
         console.error('Error al eliminar rol:', error.message);
@@ -484,6 +533,11 @@ router.put('/roles/:id/permisos', verificarPermiso('rolesPermisos:editar'), asyn
             );
         }
 
+        // ── BITÁCORA ──────────────────────────────────────────────────────────────
+        registrarAuditoria(req.user?.usuarioId, 'EDITAR_PERMISOS_ROL', 'Configuraciones',
+            `Se actualizaron los permisos del rol ID ${id} (${permisos.length} permisos asignados)`,
+            req.ip || '127.0.0.1');
+        // ─────────────────────────────────────────────────────────────────────────
         res.json({ success: true, message: 'Permisos actualizados correctamente' });
     } catch (error) {
         console.error('Error al actualizar permisos del rol:', error.message);
@@ -568,6 +622,10 @@ router.post('/variables', verificarPermiso('variables:crear'), async (req, res) 
             "INSERT INTO Configuraciones_Sistema (clave, valor, tipo, descripcion) VALUES (?, ?, 'variable_entorno', 'Variable de entorno del sistema')",
             [clave, String(valor)]
         );
+        // ── BITÁCORA ────────────────────────────────────────────────────────────
+        registrarAuditoria(req.user?.usuarioId || null, 'AGREGAR_VARIABLE_ENTORNO', 'Configuraciones', 
+            `Se agregó la variable de entorno "${clave}"`, req.ip || '127.0.0.1');
+        // ────────────────────────────────────────────────────────────────────────
         res.json({ success: true, message: 'Variable de entorno agregada con éxito' });
     } catch (error) {
         console.error('Error al agregar variable de entorno:', error.message);
@@ -587,6 +645,10 @@ router.put('/variables/:clave', verificarPermiso('variables:editar'), async (req
             "UPDATE Configuraciones_Sistema SET valor = ? WHERE clave = ? AND tipo = 'variable_entorno'",
             [String(valor), clave]
         );
+        // ── BITÁCORA ────────────────────────────────────────────────────────────
+        registrarAuditoria(req.user?.usuarioId || null, 'EDITAR_VARIABLE_ENTORNO', 'Configuraciones', 
+            `Se actualizó la variable de entorno "${clave}"`, req.ip || '127.0.0.1');
+        // ────────────────────────────────────────────────────────────────────────
         res.json({ success: true, message: 'Variable de entorno actualizada con éxito' });
     } catch (error) {
         console.error('Error al actualizar variable de entorno:', error.message);
@@ -599,6 +661,10 @@ router.delete('/variables/:clave', verificarPermiso('variables:eliminar'), async
     const { clave } = req.params;
     try {
         await db.execute("DELETE FROM Configuraciones_Sistema WHERE clave = ? AND tipo = 'variable_entorno'", [clave]);
+        // ── BITÁCORA ────────────────────────────────────────────────────────────
+        registrarAuditoria(req.user?.usuarioId || null, 'ELIMINAR_VARIABLE_ENTORNO', 'Configuraciones', 
+            `Se eliminó la variable de entorno "${clave}"`, req.ip || '127.0.0.1');
+        // ────────────────────────────────────────────────────────────────────────
         res.json({ success: true, message: 'Variable de entorno eliminada con éxito' });
     } catch (error) {
         console.error('Error al eliminar variable de entorno:', error.message);
@@ -665,6 +731,11 @@ router.put('/usuarios/:id/permisos', verificarPermiso('rolesPermisos:editar'), a
             );
         }
 
+        // ── BITÁCORA ──────────────────────────────────────────────────────────────
+        registrarAuditoria(req.user?.usuarioId, 'EDITAR_PERMISOS_USUARIO', 'Configuraciones',
+            `Se modificaron los permisos individuales del usuario ID ${id} (${permisos.length} excepciones guardadas)`,
+            req.ip || '127.0.0.1');
+        // ─────────────────────────────────────────────────────────────────────────
         res.json({ success: true, message: 'Permisos de usuario actualizados correctamente' });
     } catch (error) {
         console.error('Error al actualizar permisos de usuario:', error.message);

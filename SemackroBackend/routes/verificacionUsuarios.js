@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../db');
+const registrarAuditoria = require('../middlewares/auditLogger');
 
 // Crear solicitud de verificación
 router.post('/', async (req, res) => {
@@ -56,6 +57,12 @@ router.put('/:id', async (req, res) => {
             'UPDATE solicitud_verificacion SET estado = ?, fecha_revision = NOW(), revisado_por = ?, comentario_admin = ? WHERE id = ?',
             [estado, revisado_por || null, comentario_admin || null, id]
         );
+        // ── BITÁCORA ────────────────────────────────────────────────────────────
+        const accion = estado === 'aprobado' ? 'APROBAR_VERIFICACION' : 'RECHAZAR_VERIFICACION';
+        registrarAuditoria(revisado_por || null, accion, 'Verificaciones',
+            `Solicitud de verificación ID ${id} marcada como "${estado}"`,
+            req.ip || '127.0.0.1');
+        // ────────────────────────────────────────────────────────────────────────
         res.json({ ok: true, mensaje: 'Solicitud actualizada' });
     } catch (err) {
         res.status(500).json({ error: 'Error al actualizar la solicitud' });

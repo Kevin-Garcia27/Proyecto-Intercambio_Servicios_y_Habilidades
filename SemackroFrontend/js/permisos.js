@@ -114,6 +114,13 @@ window.Permisos = {
     },
 
     /** Determina si tiene acceso a cualquier sección del panel de administración */
+    puedeVerBitacora() {
+        const permisos = this._obtenerPermisos();
+        if (permisos.length === 0) return sessionStorage.getItem('usuarioRolId') === '1' || localStorage.getItem('usuarioRolId') === '1';
+        return permisos.includes('VER_BITACORA');
+    },
+
+    /** Determina si tiene acceso a cualquier sección del panel de administración */
     esAdminOPersonalAutorizado() {
         const permisos = this._obtenerPermisos();
         if (permisos.length === 0) return sessionStorage.getItem('usuarioRolId') === '1' || localStorage.getItem('usuarioRolId') === '1';
@@ -122,7 +129,8 @@ window.Permisos = {
             || permisos.includes('VER_REPORTES_USUARIOS')
             || this.puedeConfigurar()
             || permisos.includes('VER_DIRECTORIO')
-            || permisos.includes('VER_SOLICITUDES_VERIFICACION');
+            || permisos.includes('VER_SOLICITUDES_VERIFICACION')
+            || permisos.includes('VER_BITACORA');
     },
 
     /** ¿Puede crear nuevas cuentas de usuario? */

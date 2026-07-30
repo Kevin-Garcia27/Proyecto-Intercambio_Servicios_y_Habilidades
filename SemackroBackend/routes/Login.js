@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
 const pool = require('../db'); // Conexión a la base de datos
+const registrarAuditoria = require('../middlewares/auditLogger');
 
 // Endpoint: POST /api/login
 
@@ -102,6 +103,14 @@ router.post('/login', async (req, res) => {
         );
 
         // 3️⃣ Si todo está bien, responder con éxito
+        await registrarAuditoria(
+            usuario.id_usuario, 
+            'INICIO_SESION', 
+            'Seguridad', 
+            'El usuario inició sesión exitosamente', 
+            req.ip || req.connection?.remoteAddress || '127.0.0.1'
+        );
+
         res.status(200).json({
             mensaje: 'Inicio de sesión exitoso.',
             usuario: {

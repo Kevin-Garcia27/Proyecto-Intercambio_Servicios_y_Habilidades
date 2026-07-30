@@ -39,6 +39,7 @@ const ordenesTrabajoRoutes = require('./routes/ordenesTrabajo');
 const onboardingDriversRoutes = require('./routes/onboardingDrivers');
 const translateRoutes = require('./routes/translate');
 const configuracionesRoutes = require('./routes/ConfiguracionesSistema');
+const bitacoraRoutes = require('./routes/bitacora');
 
 // 2. Crear instancia de Express
 const app = express();
@@ -133,6 +134,7 @@ app.use('/api/ordenes-trabajo', ordenesTrabajoRoutes); // Rutas de órdenes de t
 app.use('/api/onboarding-drivers', onboardingDriversRoutes); // Estado de drivers/onboarding por persona
 app.use('/api/translate', translateRoutes); // Rutas de traducción de DeepL
 app.use('/api/configuraciones', configuracionesRoutes); // Rutas de configuraciones del sistema
+app.use('/api/admin/bitacora', bitacoraRoutes); // Rutas de bitácora/auditoría
 
 // 8. Prueba básica de que el servidor Express funciona
 app.get('/', (req, res) => {

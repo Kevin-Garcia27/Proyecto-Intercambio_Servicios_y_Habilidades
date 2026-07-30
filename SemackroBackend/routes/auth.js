@@ -462,6 +462,18 @@ router.post('/login-jwt', async (req, res) => {
             { expiresIn: JWT_EXPIRES_IN }
         );
 
+        // Registrar en bitácora (no bloquea la respuesta si falla)
+        try {
+            const registrarAuditoria = require('../middlewares/auditLogger');
+            registrarAuditoria(
+                usuario.id_usuario,
+                'INICIO_SESION',
+                'Seguridad',
+                `El usuario ${usuario.correo} inició sesión exitosamente`,
+                req.ip || req.connection?.remoteAddress || '127.0.0.1'
+            );
+        } catch(e) { /* silencioso */ }
+
         // 4. DEVOLVER TOKEN
         res.status(200).json({ 
             mensaje: 'Inicio de sesión exitoso',
@@ -581,6 +593,18 @@ router.put('/usuarios/:id_usuario/activo', async (req, res) => {
             }
         }
 
+        // ── BITÁCORA ────────────────────────────────────────────────────────────
+        try {
+            const registrarAuditoria = require('../middlewares/auditLogger');
+            const accionAuditoria = activo === 1 ? 'DESBLOQUEAR_USUARIO' : 'BLOQUEAR_USUARIO';
+            const detalleAuditoria = activo === 1 
+                ? `Se reactivó el acceso al usuario ID ${id_usuario}` 
+                : `Se bloqueó el acceso al usuario ID ${id_usuario}. Motivo: ${motivoTexto}`;
+                
+            registrarAuditoria(req.user?.usuarioId || req.usuario?.usuarioId || null, accionAuditoria, 'Seguridad', detalleAuditoria, req.ip || '127.0.0.1');
+        } catch(e) { /* ignorar errores de auditoría */ }
+        // ────────────────────────────────────────────────────────────────────────
+
         res.status(200).json({ success: true, mensaje: 'Acceso de usuario actualizado con éxito.' });
     } catch (error) {
         console.error('Error al actualizar estado del usuario:', error);
@@ -606,6 +630,14 @@ router.put('/usuarios/:id_usuario/desbloquear', async (req, res) => {
         if (result.affectedRows === 0) {
             return res.status(404).json({ success: false, error: 'Usuario no encontrado.' });
         }
+        // ── BITÁCORA ────────────────────────────────────────────────────────────
+        try {
+            const registrarAuditoria = require('../middlewares/auditLogger');
+            registrarAuditoria(req.user?.usuarioId || req.usuario?.usuarioId || null, 'DESBLOQUEAR_INTENTOS', 'Seguridad', 
+                `Se desbloqueó la cuenta del usuario ID ${id_usuario} (reiniciando intentos fallidos)`, 
+                req.ip || '127.0.0.1');
+        } catch(e) { /* ignorar errores de auditoría */ }
+        // ────────────────────────────────────────────────────────────────────────
         res.status(200).json({ success: true, mensaje: 'Cuenta desbloqueada con éxito.' });
     } catch (error) {
         console.error('Error al desbloquear usuario:', error);
@@ -654,6 +686,15 @@ router.put('/usuarios/:id_usuario/rol', async (req, res) => {
 
         // Limpiar los permisos individuales (excepciones) anteriores para que asuma limpios los del nuevo rol
         await pool.execute('DELETE FROM d_usuarios_opciones WHERE usuario_id = ?', [id_usuario]);
+
+        // ── BITÁCORA ────────────────────────────────────────────────────────────
+        try {
+            const registrarAuditoria = require('../middlewares/auditLogger');
+            registrarAuditoria(req.user?.usuarioId || req.usuario?.usuarioId || null, 'ASIGNAR_ROL', 'Panel Admin', 
+                `Se asignó el rol "${rolNombre}" (ID: ${id_rol}) al usuario ID ${id_usuario}`, 
+                req.ip || '127.0.0.1');
+        } catch(e) { /* ignorar errores de auditoría */ }
+        // ────────────────────────────────────────────────────────────────────────
 
         res.status(200).json({ success: true, mensaje: 'Rol de usuario actualizado con éxito.' });
     } catch (error) {
