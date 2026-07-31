@@ -1757,10 +1757,11 @@
                     const pageData = window.bitacoraData.slice(startIndex, endIndex);
 
                     tbody.innerHTML = '';
-                    pageData.forEach(log => {
+                    pageData.forEach((log, index) => {
+                        const globalIndex = startIndex + index + 1;
                         tbody.innerHTML += `
                             <tr class="border-b border-black/5 dark:border-white/5 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
-                                <td class="py-3 px-4 text-center text-xs text-gray-500">#${log.ID_Bitacora}</td>
+                                <td class="py-3 px-4 text-center text-xs text-gray-500">#${globalIndex}</td>
                                 <td class="py-3 px-4 text-xs font-medium text-gray-800 dark:text-gray-200">
                                     ${log.NombreUsuario} <br>
                                     <span class="text-[10px] text-gray-400">ID: ${log.ID_Usuario || 'N/A'} - IP: ${log.IP || 'Local'}</span>
@@ -9204,10 +9205,10 @@ async function cargarYRenderizarRolesConfig() {
                                     </thead>
                                     <tbody>
                             `;
-                            logs.forEach(log => {
+                            logs.forEach((log, index) => {
                                 htmlContenido += `
                                     <tr>
-                                        <td style="border: 1px solid #e5e7eb; padding: 8px; font-size: 11px;">${log.ID_Bitacora}</td>
+                                        <td style="border: 1px solid #e5e7eb; padding: 8px; font-size: 11px;">${index + 1}</td>
                                         <td style="border: 1px solid #e5e7eb; padding: 8px; font-size: 11px;">${log.NombreUsuario} (ID: ${log.ID_Usuario})</td>
                                         <td style="border: 1px solid #e5e7eb; padding: 8px; font-size: 11px;">${log.Accion} [${log.Modulo}]</td>
                                         <td style="border: 1px solid #e5e7eb; padding: 8px; font-size: 11px; max-width: 250px;">${log.Detalles}</td>
