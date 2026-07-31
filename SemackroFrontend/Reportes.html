@@ -8894,7 +8894,7 @@ async function cargarYRenderizarRolesConfig() {
                         <legend class="text-xs font-bold text-slate-700 dark:text-gray-300 px-2">Seleccione el reporte adecuado:</legend>
                         <div class="flex items-center gap-3 mt-1">
                             <label class="text-xs font-bold text-slate-700 dark:text-gray-300 w-24 text-right">Reporte:</label>
-                            <select id="selectTipoReportePDF" class="flex-1 bg-white dark:bg-gray-900 border border-slate-400 dark:border-gray-500 rounded px-2 py-1 text-slate-800 dark:text-gray-100 text-xs focus:outline-none focus:border-blue-500">
+                            <select id="selectTipoReportePDF" onchange="cambiarFiltrosReporte()" class="flex-1 bg-white dark:bg-gray-900 border border-slate-400 dark:border-gray-500 rounded px-2 py-1 text-slate-800 dark:text-gray-100 text-xs focus:outline-none focus:border-blue-500">
                                 <option value="ordenes">Órdenes de Trabajo e Intercambios</option>
                                 <option value="bitacora">Bitácora de Auditoría</option>
                                 <option value="verificados">Listado de Usuarios Verificados</option>
@@ -8949,17 +8949,55 @@ async function cargarYRenderizarRolesConfig() {
                         </fieldset>
                     </div>
 
-                    <!-- Cuadro decorativo inferior simulando listado -->
-                    <fieldset class="border border-slate-300 dark:border-gray-600 p-2 rounded">
-                        <legend class="text-xs font-bold text-slate-500 dark:text-gray-400 px-2">Datos a incluir en impresión:</legend>
-                        <div class="w-full h-20 bg-slate-100 dark:bg-gray-900 border border-slate-300 dark:border-gray-700 flex flex-col">
-                            <div class="flex border-b border-slate-300 dark:border-gray-700 bg-slate-200 dark:bg-gray-800 text-[10px] font-bold text-slate-600 dark:text-gray-300">
-                                <div class="flex-1 p-1 border-r border-slate-300 dark:border-gray-700">Módulo/Sección</div>
-                                <div class="flex-1 p-1 border-r border-slate-300 dark:border-gray-700">Filtro</div>
-                                <div class="w-16 p-1 border-r border-slate-300 dark:border-gray-700">Año</div>
+                    <!-- Cuadro de filtros dinámicos (Datos a incluir) -->
+                    <fieldset class="border border-slate-300 dark:border-gray-600 p-3 rounded">
+                        <legend class="text-xs font-bold text-slate-500 dark:text-gray-400 px-2">Filtros Dinámicos para el Reporte:</legend>
+                        
+                        <!-- Filtros Órdenes (Por defecto activo) -->
+                        <div id="filtrosPdfOrdenes" class="flex flex-col gap-3">
+                            <div class="flex items-center justify-between">
+                                <label class="text-xs text-slate-700 dark:text-gray-300">Estado de Orden:</label>
+                                <select id="pdfFiltroOrdenEstado" class="w-2/3 bg-white dark:bg-gray-900 border border-slate-400 dark:border-gray-500 rounded px-2 py-1 text-slate-800 dark:text-gray-100 text-xs focus:outline-none">
+                                    <option value="todas">Todas</option>
+                                    <option value="completada">Completadas</option>
+                                    <option value="en_progreso">En Progreso</option>
+                                    <option value="pendiente">Pendientes</option>
+                                    <option value="cancelada">Canceladas</option>
+                                </select>
                             </div>
-                            <div class="flex-1"></div>
+                            <div class="flex items-center gap-2 mt-2">
+                                <input type="checkbox" id="pdfOcultarInfoContacto" checked class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                <label for="pdfOcultarInfoContacto" class="text-xs text-slate-600 dark:text-gray-400">Ocultar correos electrónicos e IPs por privacidad.</label>
+                            </div>
                         </div>
+
+                        <!-- Filtros Bitácora -->
+                        <div id="filtrosPdfBitacora" class="flex flex-col gap-3" style="display: none;">
+                            <div class="flex items-center justify-between">
+                                <label class="text-xs text-slate-700 dark:text-gray-300">Módulo:</label>
+                                <select id="pdfFiltroBitacoraModulo" class="w-2/3 bg-white dark:bg-gray-900 border border-slate-400 dark:border-gray-500 rounded px-2 py-1 text-slate-800 dark:text-gray-100 text-xs focus:outline-none">
+                                    <option value="">Todos los módulos</option>
+                                    <option value="Seguridad">Seguridad (Login)</option>
+                                    <option value="Directorio">Directorio</option>
+                                    <option value="Configuraciones">Configuraciones</option>
+                                    <option value="Verificaciones">Verificaciones</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Filtros Usuarios Verificados -->
+                        <div id="filtrosPdfVerificados" class="flex flex-col gap-3" style="display: none;">
+                            <div class="flex items-center justify-between">
+                                <label class="text-xs text-slate-700 dark:text-gray-300">Estado de Verificación:</label>
+                                <select id="pdfFiltroVerifEstado" class="w-2/3 bg-white dark:bg-gray-900 border border-slate-400 dark:border-gray-500 rounded px-2 py-1 text-slate-800 dark:text-gray-100 text-xs focus:outline-none">
+                                    <option value="todos">Todos (Aprobados, Rechazados, Pendientes)</option>
+                                    <option value="aprobado">Solo Aprobados</option>
+                                    <option value="rechazado">Solo Rechazados</option>
+                                    <option value="pendiente">Solo Pendientes</option>
+                                </select>
+                            </div>
+                        </div>
+
                     </fieldset>
                 </div>
 
@@ -9026,8 +9064,28 @@ async function cargarYRenderizarRolesConfig() {
             }, 200);
         };
 
+        window.cambiarFiltrosReporte = function() {
+            const tipo = document.getElementById('selectTipoReportePDF').value;
+            
+            // Ocultar todos
+            document.getElementById('filtrosPdfOrdenes').style.display = 'none';
+            document.getElementById('filtrosPdfBitacora').style.display = 'none';
+            document.getElementById('filtrosPdfVerificados').style.display = 'none';
+            
+            // Mostrar el correspondiente
+            if (tipo === 'ordenes') {
+                document.getElementById('filtrosPdfOrdenes').style.display = 'flex';
+            } else if (tipo === 'bitacora') {
+                document.getElementById('filtrosPdfBitacora').style.display = 'flex';
+            } else if (tipo === 'verificados') {
+                document.getElementById('filtrosPdfVerificados').style.display = 'flex';
+            }
+        };
+
         window.ejecutarGeneracionPDF = async function() {
             const tipo = document.getElementById('selectTipoReportePDF').value;
+            const formato = document.getElementById('selectFormatoReporte').value;
+            const ordenDir = document.querySelector('input[name="rdoOrden"]:checked').value; // asc o desc
             const btn = document.getElementById('btnGenerarDocPDF');
             
             btn.innerHTML = '<span class="iconify animate-spin text-xl" data-icon="mdi:loading"></span> Generando...';
@@ -9044,101 +9102,181 @@ async function cargarYRenderizarRolesConfig() {
                 </div>
             `;
 
-            if (tipo === 'bitacora') {
-                htmlContenido += `<h2 style="color: #1f2937; font-family: sans-serif; margin-bottom: 20px;">Bitácora de Auditoría (Acciones Recientes)</h2>`;
-                const bitacoraEl = document.querySelector('#tablaBitacora');
-                const tablaBit = bitacoraEl?.closest('table');
-                if (tablaBit && bitacoraEl?.children.length > 0) {
-                    let clone = tablaBit.cloneNode(true);
-                    clone.style.width = '100%';
-                    clone.style.borderCollapse = 'collapse';
-                    clone.style.fontFamily = 'sans-serif';
-                    clone.querySelectorAll('th, td').forEach(td => {
-                        td.style.border = '1px solid #e5e7eb';
-                        td.style.padding = '8px';
-                        td.style.fontSize = '11px';
-                        td.style.color = '#1f2937';
-                    });
-                    clone.querySelectorAll('th').forEach(th => {
-                        th.style.backgroundColor = '#f3f4f6';
-                        th.style.fontWeight = 'bold';
-                        th.style.textAlign = 'left';
-                    });
-                    htmlContenido += clone.outerHTML;
-                } else {
-                    htmlContenido += `<p style="font-family: sans-serif;">No hay datos cargados en la bitácora actualmente. Carga los datos en la pestaña correspondiente primero.</p>`;
+            try {
+                const token = localStorage.getItem('token') || sessionStorage.getItem('token') || localStorage.getItem('semackro_token');
+                const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
+
+                if (tipo === 'ordenes') {
+                    const estado = document.getElementById('pdfFiltroOrdenEstado').value;
+                    const ocultarInfo = document.getElementById('pdfOcultarInfoContacto').checked;
+                    
+                    htmlContenido += `<h2 style="color: #1f2937; font-family: sans-serif; margin-bottom: 20px;">Reporte de Órdenes de Trabajo</h2>`;
+                    
+                    const res = await fetch(window.APP_CONFIG.BACKEND_URL + '/api/ordenes-trabajo', { headers });
+                    if(res.ok) {
+                        const payload = await res.json();
+                        let ordenes = payload.data || payload;
+                        if(estado !== 'todas') {
+                            ordenes = ordenes.filter(o => o.estado === estado);
+                        }
+                        
+                        if(ordenDir === 'asc') {
+                            ordenes.sort((a,b) => new Date(a.fecha_inicio) - new Date(b.fecha_inicio));
+                        } else {
+                            ordenes.sort((a,b) => new Date(b.fecha_inicio) - new Date(a.fecha_inicio));
+                        }
+
+                        htmlContenido += `<p style="font-family: sans-serif; font-size: 14px; margin-bottom: 20px;"><strong>Filtro:</strong> ${estado === 'todas' ? 'Todas' : estado.toUpperCase()} | <strong>Total:</strong> ${ordenes.length}</p>`;
+                        
+                        if (formato === 'detallado') {
+                            htmlContenido += `
+                                <table style="width: 100%; border-collapse: collapse; font-family: sans-serif;">
+                                    <thead>
+                                        <tr style="background-color: #f3f4f6;">
+                                            <th style="border: 1px solid #e5e7eb; padding: 8px; text-align: left; font-size: 11px;">ID</th>
+                                            <th style="border: 1px solid #e5e7eb; padding: 8px; text-align: left; font-size: 11px;">Título</th>
+                                            <th style="border: 1px solid #e5e7eb; padding: 8px; text-align: left; font-size: 11px;">Publicador</th>
+                                            <th style="border: 1px solid #e5e7eb; padding: 8px; text-align: left; font-size: 11px;">Estado</th>
+                                            <th style="border: 1px solid #e5e7eb; padding: 8px; text-align: left; font-size: 11px;">Fechas</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                            `;
+                            ordenes.forEach(o => {
+                                let contacto = ocultarInfo ? 'Oculto por privacidad' : (o.correo_usuario || 'N/A');
+                                htmlContenido += `
+                                    <tr>
+                                        <td style="border: 1px solid #e5e7eb; padding: 8px; font-size: 11px;">${o.id_orden}</td>
+                                        <td style="border: 1px solid #e5e7eb; padding: 8px; font-size: 11px; max-width: 200px;">${o.titulo}</td>
+                                        <td style="border: 1px solid #e5e7eb; padding: 8px; font-size: 11px;">${o.nombre_usuario || 'ID: '+o.usuario_id}<br><span style="font-size:9px; color:gray;">${contacto}</span></td>
+                                        <td style="border: 1px solid #e5e7eb; padding: 8px; font-size: 11px;">${o.estado}</td>
+                                        <td style="border: 1px solid #e5e7eb; padding: 8px; font-size: 11px;">Inicio: ${new Date(o.fecha_inicio).toLocaleDateString()}<br>Fin: ${new Date(o.fecha_fin).toLocaleDateString()}</td>
+                                    </tr>
+                                `;
+                            });
+                            htmlContenido += `</tbody></table>`;
+                        } else {
+                            htmlContenido += `<div style="border: 1px solid #e5e7eb; padding: 20px; font-family: sans-serif; text-align: center;">
+                                <h3 style="font-size: 36px; margin: 0; color: #1e3a8a;">${ordenes.length}</h3>
+                                <p style="margin: 0; color: #6b7280; font-size: 14px;">Órdenes de Trabajo Totales encontradas</p>
+                            </div>`;
+                        }
+                    } else {
+                        throw new Error('Error al obtener órdenes');
+                    }
+                } 
+                else if (tipo === 'bitacora') {
+                    const modulo = document.getElementById('pdfFiltroBitacoraModulo').value;
+                    htmlContenido += `<h2 style="color: #1f2937; font-family: sans-serif; margin-bottom: 20px;">Bitácora de Auditoría</h2>`;
+                    
+                    const url = `${window.APP_CONFIG.BACKEND_URL}/api/admin/bitacora?modulo=${encodeURIComponent(modulo)}`;
+                    const res = await fetch(url, { headers });
+                    if(res.ok) {
+                        const payload = await res.json();
+                        let logs = payload.data || [];
+                        
+                        if(ordenDir === 'asc') {
+                            logs.sort((a,b) => new Date(a.Fecha) - new Date(b.Fecha));
+                        } else {
+                            logs.sort((a,b) => new Date(b.Fecha) - new Date(a.Fecha));
+                        }
+                        
+                        htmlContenido += `<p style="font-family: sans-serif; font-size: 14px; margin-bottom: 20px;"><strong>Filtro:</strong> ${modulo || 'Todos los módulos'} | <strong>Total:</strong> ${logs.length}</p>`;
+                        
+                        if (formato === 'detallado') {
+                            htmlContenido += `
+                                <table style="width: 100%; border-collapse: collapse; font-family: sans-serif;">
+                                    <thead>
+                                        <tr style="background-color: #f3f4f6;">
+                                            <th style="border: 1px solid #e5e7eb; padding: 8px; text-align: left; font-size: 11px;">ID</th>
+                                            <th style="border: 1px solid #e5e7eb; padding: 8px; text-align: left; font-size: 11px;">Usuario</th>
+                                            <th style="border: 1px solid #e5e7eb; padding: 8px; text-align: left; font-size: 11px;">Acción</th>
+                                            <th style="border: 1px solid #e5e7eb; padding: 8px; text-align: left; font-size: 11px;">Detalles</th>
+                                            <th style="border: 1px solid #e5e7eb; padding: 8px; text-align: left; font-size: 11px;">Fecha</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                            `;
+                            logs.forEach(log => {
+                                htmlContenido += `
+                                    <tr>
+                                        <td style="border: 1px solid #e5e7eb; padding: 8px; font-size: 11px;">${log.ID_Bitacora}</td>
+                                        <td style="border: 1px solid #e5e7eb; padding: 8px; font-size: 11px;">${log.NombreUsuario} (ID: ${log.ID_Usuario})</td>
+                                        <td style="border: 1px solid #e5e7eb; padding: 8px; font-size: 11px;">${log.Accion} [${log.Modulo}]</td>
+                                        <td style="border: 1px solid #e5e7eb; padding: 8px; font-size: 11px; max-width: 250px;">${log.Detalles}</td>
+                                        <td style="border: 1px solid #e5e7eb; padding: 8px; font-size: 11px;">${new Date(log.Fecha).toLocaleString()}</td>
+                                    </tr>
+                                `;
+                            });
+                            htmlContenido += `</tbody></table>`;
+                        } else {
+                            htmlContenido += `<div style="border: 1px solid #e5e7eb; padding: 20px; font-family: sans-serif; text-align: center;">
+                                <h3 style="font-size: 36px; margin: 0; color: #1e3a8a;">${logs.length}</h3>
+                                <p style="margin: 0; color: #6b7280; font-size: 14px;">Registros de Auditoría Totales</p>
+                            </div>`;
+                        }
+                    } else {
+                        throw new Error('Error al obtener bitácora');
+                    }
                 }
-            } else if (tipo === 'ordenes') {
-                htmlContenido += `<h2 style="color: #1f2937; font-family: sans-serif; margin-bottom: 20px;">Órdenes de Trabajo (Intercambios)</h2>`;
-                const ordenesEl = document.querySelector('#intercambiosListado');
-                const tablaOrd = ordenesEl?.closest('table');
-                if (tablaOrd && ordenesEl?.children.length > 0) {
-                    let clone = tablaOrd.cloneNode(true);
-                    clone.style.width = '100%';
-                    clone.style.borderCollapse = 'collapse';
-                    clone.style.fontFamily = 'sans-serif';
-                    clone.querySelectorAll('th, td').forEach(td => {
-                        td.style.border = '1px solid #e5e7eb';
-                        td.style.padding = '8px';
-                        td.style.fontSize = '11px';
-                        td.style.color = '#1f2937';
-                    });
-                    clone.querySelectorAll('th').forEach(th => {
-                        th.style.backgroundColor = '#f3f4f6';
-                        th.style.fontWeight = 'bold';
-                        th.style.textAlign = 'left';
-                    });
-                    // Quitar columna de Acción que tiene botones
-                    clone.querySelectorAll('tr').forEach(tr => {
-                        if(tr.lastElementChild) tr.lastElementChild.remove();
-                    });
-                    htmlContenido += clone.outerHTML;
-                } else {
-                    htmlContenido += `<p style="font-family: sans-serif;">No hay órdenes de trabajo mostradas actualmente. Ve a la pestaña Órdenes de Trabajo primero.</p>`;
-                }
-            } else if (tipo === 'verificados') {
-                htmlContenido += `<h2 style="color: #1f2937; font-family: sans-serif; margin-bottom: 20px;">Listado de Usuarios Verificados</h2>`;
-                try {
-                    // Obtener la información del backend
-                    const headers = {};
-                    const token = localStorage.getItem('semackro_token');
-                    if (token) headers['Authorization'] = 'Bearer ' + token;
+                else if (tipo === 'verificados') {
+                    const estado = document.getElementById('pdfFiltroVerifEstado').value;
+                    htmlContenido += `<h2 style="color: #1f2937; font-family: sans-serif; margin-bottom: 20px;">Listado de Usuarios Verificados</h2>`;
+                    
                     const res = await fetch(window.APP_CONFIG.BACKEND_URL + '/api/verificacion-usuarios', { headers });
                     if(res.ok) {
-                        const data = await res.json();
-                        const verificados = data.filter(u => u.estado === 'aprobado');
-                        htmlContenido += `<p style="font-family: sans-serif; font-size: 16px; margin-bottom: 20px;"><strong>Total de Usuarios Verificados en la plataforma:</strong> ${verificados.length}</p>`;
-                        htmlContenido += `
-                            <table style="width: 100%; border-collapse: collapse; font-family: sans-serif;">
-                                <thead>
-                                    <tr style="background-color: #f3f4f6;">
-                                        <th style="border: 1px solid #e5e7eb; padding: 10px; text-align: left; font-size: 12px;">ID Usuario</th>
-                                        <th style="border: 1px solid #e5e7eb; padding: 10px; text-align: left; font-size: 12px;">Nombre Completo</th>
-                                        <th style="border: 1px solid #e5e7eb; padding: 10px; text-align: left; font-size: 12px;">Tipo DNI</th>
-                                        <th style="border: 1px solid #e5e7eb; padding: 10px; text-align: left; font-size: 12px;">Número DNI</th>
-                                        <th style="border: 1px solid #e5e7eb; padding: 10px; text-align: left; font-size: 12px;">Fecha Aprobación</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                        `;
-                        verificados.forEach(u => {
+                        let verificados = await res.json();
+                        if(estado !== 'todos') {
+                            verificados = verificados.filter(u => u.estado === estado);
+                        }
+                        
+                        if(ordenDir === 'asc') {
+                            verificados.sort((a,b) => new Date(a.fecha_solicitud) - new Date(b.fecha_solicitud));
+                        } else {
+                            verificados.sort((a,b) => new Date(b.fecha_solicitud) - new Date(a.fecha_solicitud));
+                        }
+                        
+                        htmlContenido += `<p style="font-family: sans-serif; font-size: 14px; margin-bottom: 20px;"><strong>Filtro:</strong> ${estado === 'todos' ? 'Todos' : estado.toUpperCase()} | <strong>Total:</strong> ${verificados.length}</p>`;
+                        
+                        if (formato === 'detallado') {
                             htmlContenido += `
-                                <tr>
-                                    <td style="border: 1px solid #e5e7eb; padding: 10px; font-size: 12px;">${u.id_usuario}</td>
-                                    <td style="border: 1px solid #e5e7eb; padding: 10px; font-size: 12px;">${u.nombre || ''} ${u.apellido || ''}</td>
-                                    <td style="border: 1px solid #e5e7eb; padding: 10px; font-size: 12px;">${u.tipo_documento || 'DNI'}</td>
-                                    <td style="border: 1px solid #e5e7eb; padding: 10px; font-size: 12px;">${u.numero_documento}</td>
-                                    <td style="border: 1px solid #e5e7eb; padding: 10px; font-size: 12px;">${new Date(u.fecha_revision).toLocaleDateString()}</td>
-                                </tr>
+                                <table style="width: 100%; border-collapse: collapse; font-family: sans-serif;">
+                                    <thead>
+                                        <tr style="background-color: #f3f4f6;">
+                                            <th style="border: 1px solid #e5e7eb; padding: 8px; text-align: left; font-size: 11px;">ID Solicitud</th>
+                                            <th style="border: 1px solid #e5e7eb; padding: 8px; text-align: left; font-size: 11px;">ID Perfil</th>
+                                            <th style="border: 1px solid #e5e7eb; padding: 8px; text-align: left; font-size: 11px;">Estado</th>
+                                            <th style="border: 1px solid #e5e7eb; padding: 8px; text-align: left; font-size: 11px;">Revisado Por</th>
+                                            <th style="border: 1px solid #e5e7eb; padding: 8px; text-align: left; font-size: 11px;">Fechas</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
                             `;
-                        });
-                        htmlContenido += `</tbody></table>`;
+                            verificados.forEach(u => {
+                                htmlContenido += `
+                                    <tr>
+                                        <td style="border: 1px solid #e5e7eb; padding: 8px; font-size: 11px;">${u.id}</td>
+                                        <td style="border: 1px solid #e5e7eb; padding: 8px; font-size: 11px;">${u.id_Perfil}</td>
+                                        <td style="border: 1px solid #e5e7eb; padding: 8px; font-size: 11px;">${u.estado}</td>
+                                        <td style="border: 1px solid #e5e7eb; padding: 8px; font-size: 11px;">${u.revisado_por || 'N/A'}</td>
+                                        <td style="border: 1px solid #e5e7eb; padding: 8px; font-size: 11px;">Solicitud: ${new Date(u.fecha_solicitud).toLocaleDateString()}<br>Revisión: ${u.fecha_revision ? new Date(u.fecha_revision).toLocaleDateString() : 'N/A'}</td>
+                                    </tr>
+                                `;
+                            });
+                            htmlContenido += `</tbody></table>`;
+                        } else {
+                            htmlContenido += `<div style="border: 1px solid #e5e7eb; padding: 20px; font-family: sans-serif; text-align: center;">
+                                <h3 style="font-size: 36px; margin: 0; color: #1e3a8a;">${verificados.length}</h3>
+                                <p style="margin: 0; color: #6b7280; font-size: 14px;">Solicitudes de Verificación Totales</p>
+                            </div>`;
+                        }
                     } else {
-                        htmlContenido += `<p style="font-family: sans-serif; color: red;">No se pudo acceder a los datos de verificados (Falta de permisos o sesión expirada).</p>`;
+                        throw new Error('Error al obtener verificados');
                     }
-                } catch(e) {
-                    htmlContenido += `<p style="font-family: sans-serif; color: red;">Error al obtener datos del servidor.</p>`;
                 }
+            } catch(e) {
+                console.error("Error al obtener datos del servidor para PDF:", e);
+                htmlContenido += `<p style="font-family: sans-serif; color: red;">Error al obtener datos del servidor. Verifica tu conexión o permisos.</p>`;
             }
 
             const finalHtml = `
