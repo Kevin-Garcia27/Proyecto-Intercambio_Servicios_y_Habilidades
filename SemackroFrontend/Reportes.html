@@ -8802,7 +8802,7 @@ async function cargarYRenderizarRolesConfig() {
     <!-- ════ MODAL GENERADOR DE REPORTES PDF ════ -->
     <div id="pdfModalRoot" style="display: none;" class="fixed inset-0 z-[9999] flex items-center justify-center">
         <!-- Overlay -->
-        <div class="absolute inset-0 bg-slate-900/50 dark:bg-black/70 backdrop-blur-sm transition-opacity" onclick="cerrarModalReportePDF()"></div>
+        <div class="absolute inset-0 bg-transparent transition-opacity" onclick="cerrarModalReportePDF()"></div>
         
         <!-- Contenido Modal -->
         <div id="pdfModalCard" class="relative bg-white dark:bg-gray-800 w-11/12 max-w-2xl rounded-lg shadow-2xl overflow-hidden transition-all transform scale-100 opacity-100 border-2 border-slate-300 dark:border-gray-600 flex flex-col max-h-[90vh]">
@@ -8902,10 +8902,6 @@ async function cargarYRenderizarRolesConfig() {
                     <button id="btnGenerarDocPDF" onclick="ejecutarGeneracionPDF()" type="button" class="flex flex-col items-center justify-center gap-1 p-2 rounded border border-slate-400 bg-slate-100 hover:bg-slate-200 active:bg-slate-300 dark:bg-gray-700 dark:border-gray-500 dark:hover:bg-gray-600 text-slate-800 dark:text-white text-[10px] font-bold shadow-sm transition-colors cursor-pointer">
                         <span class="iconify text-2xl text-blue-600 dark:text-blue-400" data-icon="mdi:printer-search"></span>
                         <span>Imprimir</span>
-                    </button>
-                    <button onclick="cerrarModalReportePDF()" type="button" class="flex flex-col items-center justify-center gap-1 p-2 rounded border border-slate-400 bg-slate-100 hover:bg-slate-200 active:bg-slate-300 dark:bg-gray-700 dark:border-gray-500 dark:hover:bg-gray-600 text-slate-800 dark:text-white text-[10px] font-bold shadow-sm transition-colors cursor-pointer">
-                        <span class="iconify text-xl text-red-600 dark:text-red-400" data-icon="mdi:exit-to-app"></span>
-                        <span>Cerrar</span>
                     </button>
                 </div>
             </div>
