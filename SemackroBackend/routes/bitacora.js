@@ -14,13 +14,41 @@ router.get('/', verificarPermiso('VER_BITACORA'), async (req, res) => {
         const f_inicio = fechaInicio ? new Date(fechaInicio) : null;
         const f_fin = fechaFin ? new Date(fechaFin) : null;
 
-        const [rows] = await pool.query(
-            'CALL sp_ObtenerBitacora(?, ?, ?, ?)',
-            [f_usuario, f_modulo, f_inicio, f_fin]
-        );
+        const querySQL = `
+            SELECT 
+                b.ID_Bitacora,
+                b.ID_Usuario,
+                COALESCE(CONCAT(p.nombre, ' ', p.apellido), 'Sistema') AS NombreUsuario,
+                p.imagenUrl AS imagenUrl_Persona,
+                b.Accion,
+                b.Modulo,
+                b.Detalles,
+                b.IP,
+                b.Fecha
+            FROM 
+                BitacoraAcciones b
+            LEFT JOIN 
+                Usuarios u ON b.ID_Usuario = u.id_usuario
+            LEFT JOIN 
+                Personas p ON u.id_usuario = p.id_Usuario
+            WHERE 
+                (? IS NULL OR CONCAT(p.nombre, ' ', p.apellido) LIKE CONCAT('%', ?, '%'))
+                AND (? IS NULL OR b.Modulo = ?)
+                AND (? IS NULL OR b.Fecha >= ?)
+                AND (? IS NULL OR b.Fecha <= ?)
+            ORDER BY 
+                b.Fecha DESC
+            LIMIT 1000
+        `;
 
-        // Los SP en MySQL devuelven un array de arrays (el primero es el resultset)
-        const registros = rows[0] || [];
+        const [rows] = await pool.query(querySQL, [
+            f_usuario, f_usuario,
+            f_modulo, f_modulo,
+            f_inicio, f_inicio,
+            f_fin, f_fin
+        ]);
+        
+        const registros = rows || [];
 
         res.json({ success: true, data: registros });
     } catch (error) {

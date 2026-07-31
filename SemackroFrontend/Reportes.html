@@ -1759,7 +1759,7 @@
                     tbody.innerHTML = '';
                     pageData.forEach((log, index) => {
                         const globalIndex = startIndex + index + 1;
-                        const avatarSrc = `https://api.dicebear.com/9.x/lorelei/svg?seed=${encodeURIComponent(log.NombreUsuario || 'Sistema')}&backgroundColor=b6e3f4,c0aade,d1d4f9,ffd5dc,ffdfa9`;
+                        const avatarSrc = log.imagenUrl_Persona ? log.imagenUrl_Persona : `https://api.dicebear.com/9.x/lorelei/svg?seed=${encodeURIComponent(log.NombreUsuario || 'Sistema')}&backgroundColor=b6e3f4,c0aade,d1d4f9,ffd5dc,ffdfa9`;
                         tbody.innerHTML += `
                             <tr class="border-b border-black/5 dark:border-white/5 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
                                 <td class="py-3 px-4 text-center text-xs text-gray-500">#${globalIndex}</td>
