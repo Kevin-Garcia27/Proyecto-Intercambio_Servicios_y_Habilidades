@@ -3,6 +3,7 @@ const express = require('express');
 const router = express.Router();
 const passport = require('../config/passport');
 const jwt = require('jsonwebtoken');
+const registrarAuditoria = require('../middlewares/auditLogger');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'tu_clave_secreta_super_segura_2025_SEMACKRO';
 const JWT_EXPIRES_IN = '7d';
@@ -60,6 +61,15 @@ router.get('/google/callback',
       const redirectUrl = `${getFrontendLoginUrl(frontendUrl)}?token=${token}&userId=${user.id_usuario}&email=${encodeURIComponent(user.correo)}&source=google&isNew=${user.isNew}`;
       
       console.log(' Redirigiendo a:', redirectUrl);
+      
+      // Registrar inicio de sesión con Google en bitácora (no bloquea si falla)
+      registrarAuditoria(
+          user.id_usuario, 
+          'INICIO_SESION', 
+          'Seguridad', 
+          'Usuario inició sesión exitosamente usando Google Auth', 
+          req.ip || '127.0.0.1'
+      );
       
       res.redirect(redirectUrl);
       
