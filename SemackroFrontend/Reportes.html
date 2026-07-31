@@ -8802,7 +8802,7 @@ async function cargarYRenderizarRolesConfig() {
     <!-- ════ MODAL GENERADOR DE REPORTES PDF ════ -->
     <div id="pdfModalRoot" style="display: none;" class="fixed inset-0 z-[9999] flex items-center justify-center">
         <!-- Overlay -->
-        <div class="absolute inset-0 bg-slate-900 opacity-100" onclick="cerrarModalReportePDF()"></div>
+        <div class="absolute inset-0 bg-slate-900/50 dark:bg-black/70 backdrop-blur-sm transition-opacity" onclick="cerrarModalReportePDF()"></div>
         
         <!-- Contenido Modal -->
         <div id="pdfModalCard" class="relative bg-white dark:bg-gray-800 w-11/12 max-w-2xl rounded-lg shadow-2xl overflow-hidden transition-all transform scale-100 opacity-100 border-2 border-slate-300 dark:border-gray-600 flex flex-col max-h-[90vh]">
