@@ -18,7 +18,7 @@ router.get('/', verificarPermiso('VER_BITACORA'), async (req, res) => {
             SELECT 
                 b.ID_Bitacora,
                 b.ID_Usuario,
-                COALESCE(CONCAT(p.nombre, ' ', p.apellido), 'Sistema') AS NombreUsuario,
+                COALESCE(CONCAT(p.nombre_Persona, ' ', p.apellido_Persona), 'Sistema') AS NombreUsuario,
                 p.imagenUrl AS imagenUrl_Persona,
                 b.Accion,
                 b.Modulo,
@@ -32,7 +32,7 @@ router.get('/', verificarPermiso('VER_BITACORA'), async (req, res) => {
             LEFT JOIN 
                 Personas p ON u.id_usuario = p.id_Usuario
             WHERE 
-                (? IS NULL OR CONCAT(p.nombre, ' ', p.apellido) LIKE CONCAT('%', ?, '%'))
+                (? IS NULL OR CONCAT(p.nombre_Persona, ' ', p.apellido_Persona) LIKE CONCAT('%', ?, '%'))
                 AND (? IS NULL OR b.Modulo = ?)
                 AND (? IS NULL OR b.Fecha >= ?)
                 AND (? IS NULL OR b.Fecha <= ?)
