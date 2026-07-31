@@ -8967,16 +8967,6 @@ async function cargarYRenderizarRolesConfig() {
             btn.innerHTML = '<span class="iconify animate-spin text-xl" data-icon="mdi:loading"></span> Generando...';
             btn.disabled = true;
 
-            // Crear un contenedor temporal fuera de pantalla
-            const printDiv = document.createElement('div');
-            printDiv.style.padding = '40px';
-            printDiv.style.background = '#ffffff';
-            printDiv.style.color = '#000000';
-            printDiv.style.width = '800px';
-            printDiv.style.position = 'absolute';
-            printDiv.style.left = '-9999px';
-            printDiv.style.top = '0';
-
             const d = new Date();
             const fechaHoy = d.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) + ' - ' + d.toLocaleTimeString('es-ES', {hour: '2-digit', minute:'2-digit'});
             
@@ -9085,8 +9075,11 @@ async function cargarYRenderizarRolesConfig() {
                 }
             }
 
-            printDiv.innerHTML = htmlContenido;
-            document.body.appendChild(printDiv);
+            const finalHtml = `
+                <div style="padding: 30px; background: #ffffff; color: #000000; font-family: sans-serif;">
+                    ${htmlContenido}
+                </div>
+            `;
 
             var opt = {
                 margin:       15,
@@ -9097,25 +9090,26 @@ async function cargarYRenderizarRolesConfig() {
             };
 
             try {
-                // Generar y guardar el PDF usando la librería
-                await html2pdf().set(opt).from(printDiv).save();
+                // Generar y guardar el PDF usando la librería directamente desde el string HTML
+                await html2pdf().set(opt).from(finalHtml).save();
                 
-                // Limpieza y feedback visual
-                document.body.removeChild(printDiv);
-                btn.innerHTML = '<span class="iconify text-xl" data-icon="mdi:check-circle"></span> ¡PDF Generado!';
-                btn.classList.replace('bg-blue-600', 'bg-green-600');
-                btn.classList.replace('hover:bg-blue-700', 'hover:bg-green-700');
+                // Feedback visual
+                btn.innerHTML = '<span class="iconify text-xl" data-icon="mdi:check-circle"></span> ¡Impreso!';
+                btn.classList.replace('bg-slate-100', 'bg-green-100');
+                btn.classList.replace('dark:bg-gray-700', 'dark:bg-green-900');
                 
                 setTimeout(() => {
-                    btn.innerHTML = '<span class="iconify text-lg" data-icon="mdi:file-pdf-box"></span> Descargar PDF';
-                    btn.classList.replace('bg-green-600', 'bg-blue-600');
-                    btn.classList.replace('hover:bg-green-700', 'hover:bg-blue-700');
+                    btn.innerHTML = `
+                        <span class="iconify text-2xl text-blue-600 dark:text-blue-400" data-icon="mdi:printer-search"></span>
+                        <span>Imprimir</span>
+                    `;
+                    btn.classList.replace('bg-green-100', 'bg-slate-100');
+                    btn.classList.replace('dark:bg-green-900', 'dark:bg-gray-700');
                     btn.disabled = false;
                     cerrarModalReportePDF();
                 }, 2000);
             } catch (err) {
                 console.error("Error al generar PDF:", err);
-                document.body.removeChild(printDiv);
                 btn.innerHTML = '<span class="iconify text-lg" data-icon="mdi:alert-circle"></span> Error';
                 btn.disabled = false;
             }
