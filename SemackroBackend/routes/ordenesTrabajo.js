@@ -5,6 +5,7 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../db');
+const registrarAuditoria = require('../middlewares/auditLogger');
 const { enviarNotificacionContextual } = require('../config/email');
 const verificarPermiso = require('../middlewares/verificarPermiso');
 
@@ -473,6 +474,7 @@ router.post('/', verificarPermiso(['crearOrdenesTrabajo', 'CREAR_POSTULACIONES_G
             [usuario_id, titulo, descripcion || null, ubicacion_obra || null, fecha_inicio, fecha_fin, especialidad || null, presupuesto_estimado || null, maxPost, restringir_por_ubicacion ? 1 : 0]
         );
         res.status(201).json({ success: true, mensaje: 'Orden creada exitosamente.', id_orden: result.insertId });
+        registrarAuditoria(usuario_id, 'CREAR_ORDEN', 'Órdenes de Trabajo', 'El usuario publicó una nueva orden de trabajo con ID: ' + result.insertId, req.ip || '127.0.0.1');
     } catch (err) {
         console.error('[OT POST /]', err);
         res.status(500).json({ success: false, mensaje: 'Error al crear la orden.', error: err.message });
