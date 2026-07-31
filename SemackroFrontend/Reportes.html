@@ -8990,8 +8990,9 @@ async function cargarYRenderizarRolesConfig() {
 
             if (tipo === 'bitacora') {
                 htmlContenido += `<h2 style="color: #1f2937; font-family: sans-serif; margin-bottom: 20px;">Bitácora de Auditoría (Acciones Recientes)</h2>`;
-                const tablaBit = document.querySelector('#tablaBitacora').closest('table');
-                if (tablaBit && document.querySelector('#tablaBitacora').children.length > 0) {
+                const bitacoraEl = document.querySelector('#tablaBitacora');
+                const tablaBit = bitacoraEl?.closest('table');
+                if (tablaBit && bitacoraEl?.children.length > 0) {
                     let clone = tablaBit.cloneNode(true);
                     clone.style.width = '100%';
                     clone.style.borderCollapse = 'collapse';
@@ -9013,8 +9014,9 @@ async function cargarYRenderizarRolesConfig() {
                 }
             } else if (tipo === 'ordenes') {
                 htmlContenido += `<h2 style="color: #1f2937; font-family: sans-serif; margin-bottom: 20px;">Órdenes de Trabajo (Intercambios)</h2>`;
-                const tablaOrd = document.querySelector('#intercambiosListado').closest('table');
-                if (tablaOrd && document.querySelector('#intercambiosListado').children.length > 0) {
+                const ordenesEl = document.querySelector('#intercambiosListado');
+                const tablaOrd = ordenesEl?.closest('table');
+                if (tablaOrd && ordenesEl?.children.length > 0) {
                     let clone = tablaOrd.cloneNode(true);
                     clone.style.width = '100%';
                     clone.style.borderCollapse = 'collapse';
