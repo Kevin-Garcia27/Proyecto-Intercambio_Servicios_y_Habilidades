@@ -44,7 +44,8 @@ router.get('/google/callback',
       // Generar token JWT
       const token = jwt.sign(
         { 
-          id_usuario: user.id_usuario,
+          usuarioId: user.id_usuario,
+          id_usuario: user.id_usuario, // Mantenido por retrocompatibilidad por si se usa en otro lado
           correo: user.correo 
         },
         JWT_SECRET,
