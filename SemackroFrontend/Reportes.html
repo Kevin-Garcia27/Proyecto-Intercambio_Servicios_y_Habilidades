@@ -2848,6 +2848,13 @@
                 
                 // 2.5 Mostrar/Ocultar sección Bitácora
                 const secBitacora = document.getElementById('bitacoraSection');
+                const optBitacoraPdf = document.querySelector('#selectTipoReportePDF option[value="bitacora"]');
+                if (optBitacoraPdf && window.Permisos && window.Permisos.puedeVerBitacora) {
+                    if (!window.Permisos.puedeVerBitacora()) {
+                        optBitacoraPdf.style.display = 'none';
+                        optBitacoraPdf.disabled = true;
+                    }
+                }
                 if (secBitacora && window.Permisos && window.Permisos.puedeVerBitacora) {
                     if (!window.Permisos.puedeVerBitacora()) {
                         secBitacora.classList.add('hidden');
