@@ -19,7 +19,7 @@ router.get('/', verificarPermiso('VER_BITACORA'), async (req, res) => {
                 b.ID_Bitacora,
                 b.ID_Usuario,
                 COALESCE(CONCAT(p.nombre_Persona, ' ', p.apellido_Persona), 'Sistema') AS NombreUsuario,
-                p.imagenUrl AS imagenUrl_Persona,
+                p.imagenUrl_Persona AS imagenUrl_Persona,
                 b.Accion,
                 b.Modulo,
                 b.Detalles,
